@@ -1,0 +1,25 @@
+# hardhat
+artifacts
+cache
+deployments
+node_modules
+
+
+/data/
+node_modules
+dist
+.idea/
+.env
+.vscode/
+.DS_Store
+.build/
+coverage
+files/
+!src/modules/files/
+!src/e2e-tests/e2e/files/
+tmp/
+e2e-tests-files/
+.secrets/
+!.secrets/*.example
+*.log
+.jobs-settings
