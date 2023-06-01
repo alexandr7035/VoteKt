@@ -1,12 +1,12 @@
 package com.example.votekt.ui.box_contract
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.BuildConfig
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
@@ -49,11 +49,11 @@ class BoxViewModel : ViewModel() {
     fun loadNetInfo() {
         viewModelScope.launch(Dispatchers.IO) {
 
-            while (true) {
+            while (isActive) {
                 val res = web3j.ethBlockNumber().send()
                 netInfoState.value = res.blockNumber.toString()
 
-                delay(5 * 1000)
+                delay(5_000)
             }
         }
     }
