@@ -3,6 +3,7 @@ package com.example.votekt.ui.box_contract
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.BuildConfig
+import com.example.votekt.ui.SimpleState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,8 @@ class BoxViewModel : ViewModel() {
 
     val balanceState = MutableStateFlow("0")
     val netInfoState = MutableStateFlow("-")
+
+    val boxState = MutableStateFlow(SimpleState(lastValue = 0L, isLoading = true))
 
     fun loadBalance() {
         viewModelScope.launch(Dispatchers.IO) {
@@ -55,6 +58,28 @@ class BoxViewModel : ViewModel() {
 
                 delay(5_000)
             }
+        }
+    }
+
+    fun readBox() {
+        viewModelScope.launch(Dispatchers.IO) {
+            val oldState = boxState.value.copy(isLoading = true)
+            delay(3000)
+
+            // TODO
+            boxState.value = SimpleState(lastValue = 333, isLoading = false)
+        }
+    }
+
+    fun updateBox(newValue: Long) {
+        viewModelScope.launch(Dispatchers.IO) {
+            val oldState = boxState.value.copy(isLoading = true)
+            boxState.value = oldState
+
+            delay(3000)
+
+            // TODO
+            boxState.value = SimpleState(lastValue = newValue, isLoading = false)
         }
     }
 }
