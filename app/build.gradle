@@ -19,8 +19,15 @@ android {
             useSupportLibrary true
         }
 
-        buildConfigField("String", "INFURA_API_KEY", INFURA_API_KEY)
         buildConfigField("String", "TEST_ADDRESS", TEST_ADDRESS)
+    }
+
+    flavorDimensions "environment"
+    productFlavors {
+        goerli {
+            dimension "environment"
+            buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
+        }
     }
 
     buildTypes {

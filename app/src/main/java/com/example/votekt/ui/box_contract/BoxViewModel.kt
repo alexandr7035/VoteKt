@@ -21,8 +21,7 @@ class BoxViewModel : ViewModel() {
     private var web3j: Web3j
 
     init {
-        val url = "https://goerli.infura.io/v3/${BuildConfig.INFURA_API_KEY}"
-        web3j = Web3j.build(HttpService(url))
+        web3j = Web3j.build(HttpService(BuildConfig.ETH_NODE_URL))
     }
 
     val balanceState = MutableStateFlow("0")
