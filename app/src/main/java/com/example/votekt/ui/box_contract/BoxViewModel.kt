@@ -1,30 +1,43 @@
 package com.example.votekt.ui.box_contract
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.BuildConfig
+import com.example.votekt.contracts.Box
 import com.example.votekt.ui.SimpleState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.http.HttpService
+import org.web3j.tx.RawTransactionManager
+import org.web3j.tx.TransactionManager
+import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
 import java.math.BigDecimal
 import java.math.RoundingMode
 
 class BoxViewModel : ViewModel() {
 
-    private var web3j: Web3j
+    private var web3j: Web3j = Web3j.build(HttpService(BuildConfig.ETH_NODE_URL))
+    private var contract: Box
+    private var txManager: TransactionManager
 
     init {
-        web3j = Web3j.build(HttpService(BuildConfig.ETH_NODE_URL))
+        Log.d("DEBUG_TAG", "Mnemonic: ${BuildConfig.TEST_MNEMONIC.split(" ").size} words")
+        val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
+        Log.d("DEBUG_TAG", "KEY PAIR for ${credentials.address} created")
+
+        txManager = RawTransactionManager(web3j, credentials)
+        contract = Box.load(BuildConfig.CONTRACT_ADDRESS, web3j, txManager, DefaultGasProvider())
     }
 
-    val balanceState = MutableStateFlow("0")
+    val balanceState = MutableStateFlow("...")
     val netInfoState = MutableStateFlow("-")
 
     val boxState = MutableStateFlow(SimpleState(lastValue = 0L, isLoading = true))
@@ -63,10 +76,13 @@ class BoxViewModel : ViewModel() {
     fun readBox() {
         viewModelScope.launch(Dispatchers.IO) {
             val oldState = boxState.value.copy(isLoading = true)
-            delay(3000)
+            boxState.value = oldState
+
+            val boxValue = contract.retrieve().send()
+            Log.d("DEBUG_TAG", "READ box value: ${boxValue}")
 
             // TODO
-            boxState.value = SimpleState(lastValue = 333, isLoading = false)
+            boxState.value = SimpleState(lastValue = boxValue.toLong(), isLoading = false)
         }
     }
 
@@ -75,10 +91,10 @@ class BoxViewModel : ViewModel() {
             val oldState = boxState.value.copy(isLoading = true)
             boxState.value = oldState
 
+            // TODO updating box
             delay(3000)
 
-            // TODO
-            boxState.value = SimpleState(lastValue = newValue, isLoading = false)
+            readBox()
         }
     }
 }

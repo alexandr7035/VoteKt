@@ -68,14 +68,22 @@ fun BoxCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(text = boxState.lastValue.toString(), style = MaterialTheme.typography.headlineLarge)
+            Text(text="Box contract value", style = MaterialTheme.typography.headlineSmall)
+
+            Text(
+                text = "${boxState.lastValue}",
+                style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.primary
+            )
 
             var inFieldText by remember { mutableStateOf("0") }
 
             OutlinedTextField(
-                value = inFieldText, onValueChange = { it: String -> inFieldText = it }, keyboardOptions = KeyboardOptions.Default.copy(
+                value = inFieldText,
+                onValueChange = { it: String -> inFieldText = it },
+                keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
-                )
+                ),
             )
 
             Button(modifier = Modifier.fillMaxWidth(), enabled = !boxState.isLoading, onClick = {

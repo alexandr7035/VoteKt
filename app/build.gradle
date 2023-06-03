@@ -20,6 +20,7 @@ android {
         }
 
         buildConfigField("String", "TEST_ADDRESS", TEST_ADDRESS)
+        buildConfigField("String", "TEST_MNEMONIC", TEST_MNEMONIC)
     }
 
     flavorDimensions "environment"
@@ -27,6 +28,7 @@ android {
         goerli {
             dimension "environment"
             buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
+            buildConfigField("String", "CONTRACT_ADDRESS", CONTRACT_ADDRESS)
         }
     }
 
