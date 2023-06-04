@@ -17,7 +17,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.TransactionManager
-import org.web3j.tx.gas.ContractGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import org.web3j.utils.Convert
 import java.math.BigDecimal
 import java.math.BigInteger
@@ -37,23 +37,14 @@ class BoxViewModel : ViewModel() {
         txManager = RawTransactionManager(web3j, credentials)
 
         // TODO gas estimation
-        contract = Box.load(BuildConfig.CONTRACT_ADDRESS, web3j, txManager, object : ContractGasProvider {
-            override fun getGasPrice(contractFunc: String?): BigInteger {
-                return BigInteger.valueOf(1_500_000_000)
-            }
-
-            override fun getGasPrice(): BigInteger {
-                return BigInteger.valueOf(1_500_000_000)
-            }
-
-            override fun getGasLimit(contractFunc: String?): BigInteger {
-                return BigInteger.valueOf(9_000_000)
-            }
-
-            override fun getGasLimit(): BigInteger {
-                return BigInteger.valueOf(9_000_000)
-            }
-        })
+        contract = Box.load(
+            BuildConfig.CONTRACT_ADDRESS, web3j, txManager, StaticGasProvider(
+                // Gas price
+                BigInteger.valueOf(1_500_000_000),
+                // Gas limit
+                BigInteger.valueOf(9_000_000),
+            )
+        )
     }
 
     val balanceState = MutableStateFlow("...")
@@ -109,19 +100,6 @@ class BoxViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val oldState = boxState.value.copy(isLoading = true)
             boxState.value = oldState
-
-//            val transaction = Transaction(
-//                BuildConfig.TEST_ADDRESS,
-//                BigInteger.valueOf(0),
-//                DefaultGasProvider.GAS_PRICE,
-//                DefaultGasProvider.GAS_LIMIT,
-//                BuildConfig.CONTRACT_ADDRESS,
-//                BigInteger.valueOf(100),
-//                Box.FUNC_STORE,
-//            )
-//
-//            val gas = web3j.ethEstimateGas(transaction).send()
-//            Log.d("DEBUG_TAG", "estimated gas ${gas.error.message}")
 
             val receipt = contract.store(BigInteger.valueOf(newValue)).send()
             Log.d("DEBUG_TAG", "tx sent, receipt is ${receipt.transactionHash}")
