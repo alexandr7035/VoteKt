@@ -1,23 +1,35 @@
 package com.example.votekt.ui.components
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.votekt.R
 import com.example.votekt.ui.theme.VoteKtTheme
 
 data class VotingBarParams(
@@ -29,11 +41,26 @@ data class VotingBarParams(
 
 @Composable
 fun VotingBar(params: VotingBarParams) {
+    Row(
+        Modifier
+            .background(MaterialTheme.colorScheme.background),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        VotingMetric(isFor = false, votersCount = params.votesAgainst)
+        VotingBarCircle(params = params, modifier = Modifier.weight(1f))
+        VotingMetric(isFor = true, votersCount = params.votesFor)
+    }
+}
+
+@Composable
+fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
             .aspectRatio(1f)
             .background(MaterialTheme.colorScheme.background)
+            .then(modifier)
     ) { // Adjust the size of the diagram as needed
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerX = size.width / 2
@@ -82,6 +109,53 @@ fun VotingBar(params: VotingBarParams) {
     }
 }
 
+@Composable
+private fun VotingMetric(isFor: Boolean, votersCount: Int) {
+
+    Column(
+        modifier = Modifier.wrapContentSize(),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+
+
+        var icon: Painter
+        var color: Color
+        var label: String
+
+
+
+        if (isFor) {
+            icon = painterResource(id = R.drawable.thumb_up)
+            color = Color.Green
+            label = "Yes"
+        } else {
+            icon = painterResource(id = R.drawable.thumb_up)
+            color = Color.Red
+            label = "No"
+        }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
+        ) {
+            Image(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.size(24.dp),
+                colorFilter = ColorFilter.tint(color)
+            )
+            Text(text = label, fontSize = 18.sp)
+        }
+
+
+        Text(
+            text = votersCount.toString(),
+            fontSize = 36.sp,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
 private fun shouldHideSpacings(params: VotingBarParams): Boolean {
     return params.votesFor == 0 || params.votesAgainst == 0
 }
@@ -91,8 +165,13 @@ private fun shouldHideSpacings(params: VotingBarParams): Boolean {
 fun VotingBar_Preview() {
     VoteKtTheme(darkTheme = false, dynamicColor = false) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-            VotingBar(params = VotingBarParams(100, 50))
-            VotingBar(params = VotingBarParams(50, 0))
+            VotingBarCircle(params = VotingBarParams(100, 50))
+            VotingBar(params = VotingBarParams(
+                votesAgainst = 50,
+                votesFor = 45,
+                segmentWidth = 16.dp,
+                circleSpacingPerc = 0.025f
+            ))
         }
     }
 }
