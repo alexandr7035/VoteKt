@@ -89,7 +89,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             val rectTopLeft = Offset(centerX - radius, centerY - radius)
 
             drawArc(
-                color = Color.Green,
+                color = VotingColors.forColor,
                 startAngle = startAngle,
                 sweepAngle = sweepAngleFor,
                 useCenter = false,
@@ -99,7 +99,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             )
 
             drawArc(
-                color = Color.Red,
+                color = VotingColors.againstColor,
                 startAngle = startAngle + spaceAngle / 2 + sweepAngleFor,
                 sweepAngle = sweepAngleAgainst,
                 useCenter = false,
@@ -121,11 +121,11 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
 
             if (isFor) {
                 icon = painterResource(id = R.drawable.thumb_up)
-                color = Color.Green
+                color = VotingColors.forColor
                 perc = params.votesFor / totalVotes.toFloat()
             } else {
                 icon = painterResource(id = R.drawable.thumb_down)
-                color = Color.Red
+                color = VotingColors.againstColor
                 perc = params.votesAgainst / totalVotes.toFloat()
             }
 
@@ -157,11 +157,11 @@ private fun VotingMetric(isFor: Boolean, votersCount: Int) {
 
         if (isFor) {
             icon = painterResource(id = R.drawable.thumb_up)
-            color = Color.Green
+            color = VotingColors.forColor
             label = "Yes"
         } else {
             icon = painterResource(id = R.drawable.thumb_down)
-            color = Color.Red
+            color = VotingColors.againstColor
             label = "No"
         }
 
@@ -189,6 +189,11 @@ private fun VotingMetric(isFor: Boolean, votersCount: Int) {
 
 private fun shouldHideSpacings(params: VotingBarParams): Boolean {
     return params.votesFor == 0 || params.votesAgainst == 0
+}
+
+private object VotingColors {
+    val forColor = Color(0xFF00B16E)
+    val againstColor = Color(0xFFEB3A61)
 }
 
 @Preview(widthDp = 360)
