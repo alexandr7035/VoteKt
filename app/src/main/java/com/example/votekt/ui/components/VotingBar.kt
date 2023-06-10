@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.R
 import com.example.votekt.ui.theme.VoteKtTheme
+import kotlin.math.roundToInt
 
 data class VotingBarParams(
     val votesFor: Int,
@@ -60,7 +61,8 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             .fillMaxWidth()
             .aspectRatio(1f)
             .background(MaterialTheme.colorScheme.background)
-            .then(modifier)
+            .then(modifier),
+        contentAlignment = Alignment.Center
     ) { // Adjust the size of the diagram as needed
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerX = size.width / 2
@@ -106,6 +108,38 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
                 style = Stroke(params.segmentWidth.toPx())
             )
         }
+
+        Column() {
+            var icon: Painter
+            var color: Color
+            var perc: Float
+
+            val totalVotes = params.votesFor + params.votesAgainst
+
+            // Include 50/50 here
+            val isFor = params.votesFor >= params.votesAgainst
+
+            if (isFor) {
+                icon = painterResource(id = R.drawable.thumb_up)
+                color = Color.Green
+                perc = params.votesFor / totalVotes.toFloat()
+            } else {
+                icon = painterResource(id = R.drawable.thumb_down)
+                color = Color.Red
+                perc = params.votesAgainst / totalVotes.toFloat()
+            }
+
+            val prettyPerc = "${(perc * 100).roundToInt()}%"
+
+            Image(
+                painter = icon,
+                contentDescription = null,
+                modifier = Modifier.size(56.dp),
+                colorFilter = ColorFilter.tint(color)
+            )
+
+            Text(text = prettyPerc, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
@@ -117,19 +151,16 @@ private fun VotingMetric(isFor: Boolean, votersCount: Int) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
 
-
         var icon: Painter
         var color: Color
         var label: String
-
-
 
         if (isFor) {
             icon = painterResource(id = R.drawable.thumb_up)
             color = Color.Green
             label = "Yes"
         } else {
-            icon = painterResource(id = R.drawable.thumb_up)
+            icon = painterResource(id = R.drawable.thumb_down)
             color = Color.Red
             label = "No"
         }
