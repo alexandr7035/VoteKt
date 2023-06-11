@@ -1,5 +1,7 @@
 package com.example.votekt.ui.components
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -15,6 +17,9 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -64,23 +69,41 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             .then(modifier),
         contentAlignment = Alignment.Center
     ) { // Adjust the size of the diagram as needed
+
+        val totalVotes = params.votesFor + params.votesAgainst
+
+        val spaceAngle = if (!shouldHideSpacings(params)) {
+            360 * params.circleSpacingPerc
+        } else {
+            0f
+        }
+
+        var startAngle = 270 + spaceAngle / 4
+
+        val totalAngle = 360 - spaceAngle
+        val sweepAngleFor = (params.votesFor.toFloat() / totalVotes) * totalAngle
+        val sweepAngleAgainst = (params.votesAgainst.toFloat() / totalVotes) * totalAngle
+
+        val forArcAnimated = remember { Animatable(0f) }
+        val againstArcAnimated = remember { Animatable(0f) }
+
+        LaunchedEffect(Unit) {
+            againstArcAnimated.animateTo(
+                targetValue = sweepAngleAgainst,
+                animationSpec = tween(durationMillis = 500)
+            )
+        }
+
+        LaunchedEffect(Unit) {
+            forArcAnimated.animateTo(
+                targetValue = sweepAngleFor,
+                animationSpec = tween(durationMillis = 500)
+            )
+        }
+
         Canvas(modifier = Modifier.fillMaxSize()) {
             val centerX = size.width / 2
             val centerY = size.height / 2
-
-            val totalVotes = params.votesFor + params.votesAgainst
-
-            val spaceAngle = if (!shouldHideSpacings(params)) {
-                360 * params.circleSpacingPerc
-            } else {
-                0f
-            }
-
-            var startAngle = 270 + spaceAngle / 4
-
-            val totalAngle = 360 - spaceAngle
-            val sweepAngleFor = (params.votesFor.toFloat() / totalVotes) * totalAngle
-            val sweepAngleAgainst = (params.votesAgainst.toFloat() / totalVotes) * totalAngle
 
             val diameter = size.width - params.segmentWidth.toPx()
             val radius = diameter / 2
@@ -91,7 +114,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             drawArc(
                 color = VotingColors.forColor,
                 startAngle = startAngle,
-                sweepAngle = sweepAngleFor,
+                sweepAngle = forArcAnimated.value,
                 useCenter = false,
                 topLeft = rectTopLeft,
                 size = rectSize,
@@ -101,7 +124,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             drawArc(
                 color = VotingColors.againstColor,
                 startAngle = startAngle + spaceAngle / 2 + sweepAngleFor,
-                sweepAngle = sweepAngleAgainst,
+                sweepAngle = againstArcAnimated.value,
                 useCenter = false,
                 topLeft = rectTopLeft,
                 size = rectSize,
@@ -181,7 +204,7 @@ private fun VotingMetric(isFor: Boolean, votersCount: Int) {
 
         Text(
             text = votersCount.toString(),
-            fontSize = 36.sp,
+            fontSize = 24.sp,
             fontWeight = FontWeight.Bold
         )
     }
