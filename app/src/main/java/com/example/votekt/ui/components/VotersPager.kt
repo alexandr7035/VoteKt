@@ -42,15 +42,12 @@ fun VotersPager(modifier: Modifier = Modifier) {
                 .fillMaxWidth()
                 .wrapContentSize()
         ) { page ->
-            // Our page content
-
-            LazyColumn(content = {
-                items(pagerState.pageCount) {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                // FIXME
+                (0..4).forEach {
                     VotedAddress(address = "0x242524524524545", votedFor = false)
                 }
-            },
-            verticalArrangement = Arrangement.spacedBy(8.dp))
-
+            }
         }
 
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
