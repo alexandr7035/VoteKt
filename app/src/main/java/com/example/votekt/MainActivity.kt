@@ -10,8 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.votekt.ui.box_contract.BoxScreen
-import com.example.votekt.ui.box_contract.BoxViewModel
+import com.example.votekt.ui.VotingViewModel
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
 
@@ -19,14 +18,13 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-
-            val viewModel = remember { BoxViewModel() }
+            val viewModel = remember { VotingViewModel() }
 
             VoteKtTheme {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 //                    BoxScreen(viewModel)
-                    VotingDetailsScreen()
+                    VotingDetailsScreen(viewModel)
                 }
             }
         }
