@@ -2,7 +2,6 @@ package com.example.votekt.ui.voting_details
 
 import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +25,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.votekt.ui.VotingViewModel
 import com.example.votekt.ui.components.SkeletonShape
 import com.example.votekt.ui.components.VotersPager
@@ -69,11 +69,11 @@ fun VotingDetailsScreen(viewModel: VotingViewModel) {
 
                 // TODO helper methods
                 when {
-                    addressesState.value != null -> {
-                        VotersPager(votedAddresses = addressesState.value)
+                    addressesState.shouldShowData() -> {
+                        VotersPager(votedAddresses = addressesState.data!!)
                     }
 
-                    addressesState.value == null && addressesState.isLoading -> {
+                    addressesState.shouldShowFullLoading() || addressesState.shouldShowPartialLoading() -> {
                         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                             (1..5).forEach {
                                 SkeletonShape(
@@ -83,6 +83,11 @@ fun VotingDetailsScreen(viewModel: VotingViewModel) {
                                 )
                             }
                         }
+                    }
+
+                    // TODO error
+                    addressesState.shouldShowFullError() || addressesState.shouldShowPartialError() -> {
+                        Text(fontSize = 36.sp, text = addressesState.error?.message!!)
                     }
                 }
             }

@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.Web3Repository
 import com.example.votekt.data.impl.Web3RepositoryImpl
+import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,13 +17,13 @@ class VotingViewModel : ViewModel() {
 
     // TODO reducer
     private val _votedAddressesUi = MutableStateFlow(
-        value = ScreenState<List<VoterAddress>>(value = null, isLoading = true, error = null)
+        value = ScreenState<List<VoterAddress>>(data = null, isLoading = true, error = null)
     )
 
     fun loadVotedAddresses() {
         viewModelScope.launch {
             val res = web3Repository.getVotedAddresses()
-            _votedAddressesUi.value = _votedAddressesUi.value.copy(value = res, isLoading = false)
+            _votedAddressesUi.value = _votedAddressesUi.value.copy(data = res, isLoading = false)
         }
     }
 
