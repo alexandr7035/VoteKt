@@ -13,6 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.votekt.ui.VotingViewModel
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
+import com.example.votekt.ui.votings_list.ProposalsScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +25,8 @@ class MainActivity : ComponentActivity() {
                 // A surface container using the 'background' color from the theme
                 Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
 //                    BoxScreen(viewModel)
-                    VotingDetailsScreen(viewModel)
+                    ProposalsScreen()
+//                    VotingDetailsScreen(viewModel)
                 }
             }
         }
