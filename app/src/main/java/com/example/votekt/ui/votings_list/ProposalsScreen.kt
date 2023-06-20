@@ -19,7 +19,9 @@ import com.example.votekt.ui.theme.VoteKtTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProposalsScreen() {
+fun ProposalsScreen(
+    onProposalClick: (proposalId: String) -> Unit = {},
+) {
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = "Proposals") })
     }) { pv ->
@@ -29,7 +31,7 @@ fun ProposalsScreen() {
             verticalArrangement = Arrangement.spacedBy(16.dp),
             content = {
                 items(7) {
-                    ProposalCard(proposal = Proposal.mock())
+                    ProposalCard(proposal = Proposal.mock(), onClick = { onProposalClick.invoke(it) })
                 }
             })
     }

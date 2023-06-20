@@ -35,7 +35,10 @@ import com.example.votekt.ui.components.VotingBarParams
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun VotingDetailsScreen(viewModel: VotingViewModel) {
+fun VotingDetailsScreen(
+    viewModel: VotingViewModel,
+    onBack: () -> Unit = {}
+) {
     val addressesState = viewModel.getVotedAddressesObservable().collectAsState().value
 
     Row(Modifier.fillMaxSize()) {
@@ -44,7 +47,9 @@ fun VotingDetailsScreen(viewModel: VotingViewModel) {
             TopAppBar(title = {
                 Text(text = "Voting res", style = MaterialTheme.typography.headlineLarge)
             }, colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                IconButton(onClick = { }) {
+                IconButton(onClick = {
+                    onBack.invoke()
+                }) {
                     Icon(
                         imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
                     )
