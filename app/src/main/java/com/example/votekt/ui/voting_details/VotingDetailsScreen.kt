@@ -31,14 +31,15 @@ import com.example.votekt.ui.components.SkeletonShape
 import com.example.votekt.ui.components.VotersPager
 import com.example.votekt.ui.components.VotingBar
 import com.example.votekt.ui.components.VotingBarParams
+import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VotingDetailsScreen(
     proposalId: String,
-    viewModel: VotingViewModel,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    viewModel: VotingViewModel = koinViewModel(),
 ) {
     val addressesState = viewModel.getVotedAddressesObservable().collectAsState().value
 
