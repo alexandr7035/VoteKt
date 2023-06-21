@@ -28,49 +28,13 @@ import com.example.votekt.ui.votings_list.ProposalsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AppNavHost(navController: NavHostController) {
-
-    val bottomNavItems = listOf(
-        NavEntries.Proposals,
-        NavEntries.Admin,
-    )
-
+fun AppNavHost(
+    navController: NavHostController,
+    showBottomNav: Boolean = false
+) {
     Scaffold(bottomBar = {
-        BottomAppBar() {
-            val navBackStackEntry by navController.currentBackStackEntryAsState()
-            val currentDestination = navBackStackEntry?.destination
-
-            bottomNavItems.forEach { screen ->
-                val isDestinationSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
-
-                // Bottom nav icons
-                NavigationBarItem(
-                    onClick = {
-                        navController.navigate(screen.route) {
-                            // Pop up to the start destination of the graph to
-                            // avoid building up a large stack of destinations
-                            // on the back stack as users select items
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            // Avoid multiple copies of the same destination when
-                            // reselecting the same item
-                            launchSingleTop = true
-                            // Restore state when reselecting a previously selected item
-                            restoreState = true
-                        }
-                    },
-                    selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
-                    icon = {
-                        Icon(
-                            imageVector = screen.navIcon!!,
-                            contentDescription = null,
-                            tint = if (isDestinationSelected) Color.Red else Color.Gray
-                        )
-                    },
-                    label = { Text(text = screen.label) },
-                )
-            }
+        if (showBottomNav) {
+            AppBottomNav(navController = navController)
         }
     }) { pv ->
 
