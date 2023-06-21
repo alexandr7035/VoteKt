@@ -36,6 +36,7 @@ import com.example.votekt.ui.components.VotingBarParams
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VotingDetailsScreen(
+    proposalId: String,
     viewModel: VotingViewModel,
     onBack: () -> Unit = {}
 ) {
@@ -45,7 +46,7 @@ fun VotingDetailsScreen(
 
         Scaffold(topBar = {
             TopAppBar(title = {
-                Text(text = "Voting res", style = MaterialTheme.typography.headlineLarge)
+                Text(text = "Voting res ${proposalId}", style = MaterialTheme.typography.headlineLarge)
             }, colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent), navigationIcon = {
                 IconButton(onClick = {
                     onBack.invoke()

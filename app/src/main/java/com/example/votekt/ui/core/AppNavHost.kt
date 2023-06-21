@@ -19,9 +19,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.navArgument
 import com.example.votekt.ui.VotingViewModel
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
 import com.example.votekt.ui.votings_list.ProposalsScreen
@@ -29,8 +31,7 @@ import com.example.votekt.ui.votings_list.ProposalsScreen
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost(
-    navController: NavHostController,
-    showBottomNav: Boolean = false
+    navController: NavHostController, showBottomNav: Boolean = false
 ) {
     Scaffold(bottomBar = {
         if (showBottomNav) {
@@ -47,8 +48,8 @@ fun AppNavHost(
             modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
         ) {
             composable(NavEntries.Proposals.route) {
-                ProposalsScreen(onProposalClick = {
-                    navController.navigate(NavEntries.VotingDetails.route)
+                ProposalsScreen(onProposalClick = { proposalId ->
+                    navController.navigate("${NavEntries.VotingDetails.route}/${proposalId}")
                 })
             }
 
@@ -58,11 +59,13 @@ fun AppNavHost(
                 }
             }
 
-            composable(NavEntries.VotingDetails.route) {
-                VotingDetailsScreen(
+            composable(
+                route = "${NavEntries.VotingDetails.route}/{proposalId}",
+                arguments = listOf(navArgument("proposalId") { type = NavType.StringType })
+            ) {
+                VotingDetailsScreen(proposalId = it.arguments?.getString("proposalId")!!,
                     viewModel = viewModel,
-                    onBack = { navController.popBackStack() }
-                )
+                    onBack = { navController.popBackStack() })
             }
         }
     }
