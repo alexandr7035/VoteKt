@@ -2,6 +2,8 @@ package com.example.votekt.ui.votings_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -27,11 +29,15 @@ fun ProposalsScreen(
     }) { pv ->
         LazyColumn(modifier = Modifier
             .background(MaterialTheme.colorScheme.background)
-            .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp),
+            .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp, bottom = pv.calculateBottomPadding()),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             content = {
                 items(7) {
                     ProposalCard(proposal = Proposal.mock(), onClick = { onProposalClick.invoke(it) })
+                }
+
+                item {
+                    Spacer(Modifier.height(12.dp))
                 }
             })
     }
