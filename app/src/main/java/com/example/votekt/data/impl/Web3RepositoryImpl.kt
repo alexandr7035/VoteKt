@@ -3,9 +3,9 @@ package com.example.votekt.data.impl
 import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.Web3Repository
 import kotlinx.coroutines.delay
+import org.web3j.protocol.Web3j
 
-// TODO DI
-class Web3RepositoryImpl() : Web3Repository {
+class Web3RepositoryImpl(web3j: Web3j) : Web3Repository {
     override suspend fun getVotedAddresses(): List<VoterAddress> {
         delay(3000)
 
