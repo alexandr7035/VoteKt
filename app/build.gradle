@@ -24,11 +24,18 @@ android {
     }
 
     flavorDimensions "environment"
+
     productFlavors {
         goerli {
             dimension "environment"
             buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
-            buildConfigField("String", "CONTRACT_ADDRESS", CONTRACT_ADDRESS)
+            buildConfigField("String", "CONTRACT_ADDRESS", GOERLI_CONTRACT_ADDRESS)
+        }
+
+        local {
+            dimension "environment"
+            buildConfigField("String", "ETH_NODE_URL", LOCAL_NODE_URL)
+            buildConfigField("String", "CONTRACT_ADDRESS", LOCAL_CONTRACT_ADDRESS)
         }
     }
 
