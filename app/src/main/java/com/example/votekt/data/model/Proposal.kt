@@ -5,7 +5,8 @@ data class Proposal(
     val title: String,
     val description: String,
     val votesFor: Int,
-    val votesAgainst: Int
+    val votesAgainst: Int,
+    val expirationTime: Long
 ) {
 
     companion object {
@@ -16,6 +17,7 @@ data class Proposal(
                 description = "My awesome description. Lorem ipsum lorem ipsum. My awesome description. Lorem ipsum lorem ipsum.",
                 votesFor = 10,
                 votesAgainst = 25,
+                expirationTime = 0
             )
         }
     }
