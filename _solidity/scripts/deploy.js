@@ -1,10 +1,10 @@
 async function main () {
     // We get the contract to deploy
-    const Box = await ethers.getContractFactory('Box');
-    console.log('Deploying Box...');
-    const box = await Box.deploy();
-    await box.deployed();
-    console.log('Box deployed to:', box.address);
+    const VotingContract = await ethers.getContractFactory('VotingContract');
+    console.log('Deploying contract...');
+    const contract = await VotingContract.deploy();
+    await contract.deployed();
+    console.log('Contract deployed to:', contract.address);
   }
   
   main()

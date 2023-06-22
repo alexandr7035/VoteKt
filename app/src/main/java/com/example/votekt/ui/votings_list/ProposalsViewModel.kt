@@ -1,0 +1,27 @@
+package com.example.votekt.ui.votings_list
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.votekt.data.Web3Repository
+import com.example.votekt.data.model.Proposal
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
+
+class ProposalsViewModel(private val web3Repository: Web3Repository): ViewModel() {
+    val _proposalsUi = MutableStateFlow<List<Proposal>>(emptyList())
+    val proposalsUi = _proposalsUi.asStateFlow()
+
+    fun loadProposals() {
+        viewModelScope.launch {
+            val res = web3Repository.getProposals()
+
+            if (res.isSuccess) {
+                _proposalsUi.value = res.getOrThrow()
+            }
+            else {
+                throw res.exceptionOrNull()!!
+            }
+        }
+    }
+}
