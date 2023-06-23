@@ -2,10 +2,12 @@ package com.example.votekt.ui.votings_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -25,33 +27,49 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProposalsScreen(
-    onProposalClick: (proposalId: String) -> Unit = {},
-    viewModel: ProposalsViewModel = koinViewModel()
+    onProposalClick: (proposalId: String) -> Unit = {}, viewModel: ProposalsViewModel = koinViewModel()
 ) {
     Scaffold(topBar = {
         TopAppBar(title = { Text(text = "Proposals") })
     }) { pv ->
 
-        val proposals = viewModel.proposalsUi.collectAsState().value
+        val state = viewModel.proposalsUi.collectAsState().value
 
         LaunchedEffect(Unit) {
             viewModel.loadProposals()
         }
 
-        LazyColumn(modifier = Modifier
-            .background(MaterialTheme.colorScheme.background)
-            .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp, bottom = pv.calculateBottomPadding()),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            content = {
-                items(proposals.size) {
-                    ProposalCard(proposal = proposals[it], onClick = { onProposalClick.invoke(it) })
-                }
+        when {
+            state.shouldShowData() -> {
+                ProposalsList(proposals = state.data!!, pv = pv, onProposalClick = onProposalClick)
+            }
 
-                item {
-                    Spacer(Modifier.height(12.dp))
-                }
-            })
+            state.shouldShowFullError() -> {
+                Text(text = "Error ${state.error!!}")
+            }
+        }
     }
+}
+
+@Composable
+private fun ProposalsList(
+    proposals: List<Proposal>,
+    pv: PaddingValues,
+    onProposalClick: (proposalId: String) -> Unit
+) {
+    LazyColumn(modifier = Modifier
+        .background(MaterialTheme.colorScheme.background)
+        .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp, bottom = pv.calculateBottomPadding()),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
+        content = {
+            items(proposals.size) {
+                ProposalCard(proposal = proposals[it], onClick = { onProposalClick.invoke(it) })
+            }
+
+            item {
+                Spacer(Modifier.height(12.dp))
+            }
+        })
 }
 
 @Composable

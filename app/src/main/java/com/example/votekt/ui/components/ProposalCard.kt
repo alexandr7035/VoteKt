@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -46,8 +45,8 @@ fun ProposalCard(
 
             HorizontalVotingBar(
                 params = VotingBarParams(
-                    votesFor = 10,
-                    votesAgainst = 5,
+                    votesFor = proposal.votesFor,
+                    votesAgainst = proposal.votesAgainst,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()

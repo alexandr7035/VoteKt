@@ -1,7 +1,11 @@
 package com.example.votekt.ui.core
 
+import com.example.votekt.data.AppError
+
 data class ScreenState<T>(
-    val data: T?, val error: Exception?, val isLoading: Boolean
+    val data: T?,
+    val error: AppError?,
+    val isLoading: Boolean
 ) {
     fun shouldShowData(): Boolean {
         return data != null && !isLoading && error == null

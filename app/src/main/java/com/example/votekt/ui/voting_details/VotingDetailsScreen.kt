@@ -94,7 +94,7 @@ fun VotingDetailsScreen(
 
                     // TODO error
                     addressesState.shouldShowFullError() || addressesState.shouldShowPartialError() -> {
-                        Text(fontSize = 36.sp, text = addressesState.error?.message!!)
+//                        Text(fontSize = 36.sp, text = addressesState.error?.message!!)
                     }
                 }
             }

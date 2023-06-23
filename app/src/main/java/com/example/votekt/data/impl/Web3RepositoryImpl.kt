@@ -3,6 +3,7 @@ package com.example.votekt.data.impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
+import com.example.votekt.data.OperationResult
 import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.Web3Repository
 import com.example.votekt.data.helpers.executeWeb3Call
@@ -29,7 +30,7 @@ class Web3RepositoryImpl(web3j: Web3j) : Web3Repository {
         )
     }
 
-    override suspend fun getProposalById(id: Long): Result<Proposal> {
+    override suspend fun getProposalById(id: Long): OperationResult<Proposal> {
         return executeWeb3Call {
             val res = votingContract.getProposalDetails(BigInteger.valueOf(id)).send()
             Proposal(
@@ -44,9 +45,10 @@ class Web3RepositoryImpl(web3j: Web3j) : Web3Repository {
         }
     }
 
-    override suspend fun getProposals(): Result<List<Proposal>> {
+    override suspend fun getProposals(): OperationResult<List<Proposal>> {
         return executeWeb3Call {
             val raw = votingContract.proposalsList.send()
+            Log.d("DEBUG_TAG", "${raw}")
             raw.map { it as VotingContract.ProposalRaw }.map { rawProposal ->
                 Proposal(
                     // TODO
