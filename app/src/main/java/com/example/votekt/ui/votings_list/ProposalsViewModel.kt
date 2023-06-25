@@ -48,4 +48,14 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
             }
         }
     }
+
+    // TODO screen
+    fun createProposal() {
+        viewModelScope.launch {
+            web3Repository.createProposal(
+                title = "Mocked proposal",
+                description = "Mock description lorem ipsum"
+            )
+        }
+    }
 }

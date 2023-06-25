@@ -9,7 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,11 +34,25 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProposalsScreen(
-    onProposalClick: (proposalId: String) -> Unit = {}, viewModel: ProposalsViewModel = koinViewModel()
+    onProposalClick: (proposalId: String) -> Unit = {},
+    viewModel: ProposalsViewModel = koinViewModel()
 ) {
-    Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Proposals") })
-    }) { pv ->
+    Scaffold(
+        topBar = {
+            TopAppBar(title = { Text(text = "Proposals") })
+        },
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                onClick = { viewModel.createProposal() },
+                icon = {
+                    Icon(
+                        Icons.Outlined.Add,
+                        contentDescription = "Favorite"
+                    )
+                },
+                text = { Text("Create") }
+            )
+        }) { pv ->
 
         val state = viewModel.proposalsUi.collectAsState().value
 
@@ -46,9 +64,7 @@ fun ProposalsScreen(
             state.shouldShowData() -> {
                 if (state.data!!.isNotEmpty()) {
                     ProposalsList(
-                        proposals = state.data,
-                        pv = pv,
-                        onProposalClick = onProposalClick
+                        proposals = state.data, pv = pv, onProposalClick = onProposalClick
                     )
                 } else {
                     NoProposalsStub(pv = pv)
@@ -66,9 +82,7 @@ fun ProposalsScreen(
 
 @Composable
 private fun ProposalsList(
-    proposals: List<Proposal>,
-    pv: PaddingValues,
-    onProposalClick: (proposalId: String) -> Unit
+    proposals: List<Proposal>, pv: PaddingValues, onProposalClick: (proposalId: String) -> Unit
 ) {
     LazyColumn(modifier = Modifier
         .background(MaterialTheme.colorScheme.background)
@@ -92,11 +106,8 @@ private fun NoProposalsStub(pv: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = pv.calculateTopPadding(),
-                bottom = pv.calculateBottomPadding()
-            ),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+                top = pv.calculateTopPadding(), bottom = pv.calculateBottomPadding()
+            ), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(text = "No Proposals yet", style = MaterialTheme.typography.titleLarge)
     }
@@ -106,10 +117,6 @@ private fun NoProposalsStub(pv: PaddingValues) {
 @Preview()
 fun ProposalsScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
-        ProposalsList(
-            proposals = List(5) { Proposal.mock() },
-            pv = PaddingValues(12.dp),
-            onProposalClick = {}
-        )
+        ProposalsList(proposals = List(5) { Proposal.mock() }, pv = PaddingValues(12.dp), onProposalClick = {})
     }
 }

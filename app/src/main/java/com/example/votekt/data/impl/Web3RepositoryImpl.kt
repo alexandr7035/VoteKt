@@ -8,14 +8,19 @@ import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.Web3Repository
 import com.example.votekt.data.helpers.executeWeb3Call
 import com.example.votekt.data.model.Proposal
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigInteger
 
-class Web3RepositoryImpl(web3j: Web3j) : Web3Repository {
+class Web3RepositoryImpl(
+    web3j: Web3j,
+    private val dispatcher: CoroutineDispatcher
+) : Web3Repository {
     private val votingContract: VotingContract
 
     init {
@@ -61,6 +66,15 @@ class Web3RepositoryImpl(web3j: Web3j) : Web3Repository {
                 )
             }
         }
+    }
+
+    override suspend fun createProposal(title: String, description: String): Unit = withContext(dispatcher) {
+        val tx = votingContract.createProposal(
+            title,
+            description
+        )
+
+        tx.send()
     }
 
     override suspend fun getVotedAddresses(): List<VoterAddress> {
