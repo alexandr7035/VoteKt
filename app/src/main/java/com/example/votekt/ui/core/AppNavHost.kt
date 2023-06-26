@@ -15,13 +15,14 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
 import com.example.votekt.ui.votings_list.ProposalsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppNavHost(
-    navController: NavHostController, showBottomNav: Boolean = false
+    navController: NavHostController, showBottomNav: Boolean = true
 ) {
     Scaffold(bottomBar = {
         if (showBottomNav) {
@@ -38,6 +39,10 @@ fun AppNavHost(
                 ProposalsScreen(onProposalClick = { proposalId ->
                     navController.navigate("${NavEntries.VotingDetails.route}/${proposalId}")
                 })
+            }
+
+            composable(NavEntries.TxHistory.route) {
+                TransactionHistoryScreen()
             }
 
             composable(NavEntries.Admin.route) {

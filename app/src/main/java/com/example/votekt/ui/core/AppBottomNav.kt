@@ -17,7 +17,7 @@ fun AppBottomNav(navController: NavHostController) {
 
     val bottomNavItems = listOf(
         NavEntries.Proposals,
-        NavEntries.Admin,
+        NavEntries.TxHistory
     )
 
     BottomAppBar() {
