@@ -12,6 +12,10 @@ module.exports = {
 
     hardhat: {
       blockTime: 3000,
+      mining: {
+        auto: false,
+        interval: 3000
+      }
     },
    },
 };
