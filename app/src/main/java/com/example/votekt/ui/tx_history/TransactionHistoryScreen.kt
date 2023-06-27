@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.components.TransactionCard
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,8 +80,7 @@ private fun TransactionsList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = {
             items(transactions.size) {
-                // TODO card
-                Text(text = transactions[it].hash)
+                TransactionCard(transaction = transactions[it])
             }
 
             item {
