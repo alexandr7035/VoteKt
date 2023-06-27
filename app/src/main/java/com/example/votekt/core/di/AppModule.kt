@@ -34,11 +34,11 @@ val appModule = module {
     }
 
     single<Web3Repository> {
-        Web3RepositoryImpl(get(), Dispatchers.IO)
+        Web3RepositoryImpl(get(), get(), Dispatchers.IO)
     }
 
     single<TransactionRepository> {
-        TransactionRepositoryImpl(get())
+        TransactionRepositoryImpl(get(), Dispatchers.IO)
     }
 
     single<Web3j> {
