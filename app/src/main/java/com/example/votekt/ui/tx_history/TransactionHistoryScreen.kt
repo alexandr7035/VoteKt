@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
+import com.example.votekt.ui.core.AppBar
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,7 +37,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
     }
 
     Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Proposals") })
+        AppBar(title = "Transactions")
     }) { pv ->
         Box(
             Modifier

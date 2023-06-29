@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.ProposalCard
+import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -39,7 +40,7 @@ fun ProposalsScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Proposals") })
+            AppBar(title = "Proposals")
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(

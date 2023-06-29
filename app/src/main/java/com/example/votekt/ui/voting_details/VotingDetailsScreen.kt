@@ -31,6 +31,7 @@ import com.example.votekt.ui.components.SkeletonShape
 import com.example.votekt.ui.components.VotersPager
 import com.example.votekt.ui.components.VotingBar
 import com.example.votekt.ui.components.VotingBarParams
+import com.example.votekt.ui.core.AppBar
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -45,19 +46,12 @@ fun VotingDetailsScreen(
 
     Row(Modifier.fillMaxSize()) {
 
-        Scaffold(topBar = {
-            TopAppBar(title = {
-                Text(text = "Voting res ${proposalId}", style = MaterialTheme.typography.headlineLarge)
-            }, colors = TopAppBarDefaults.smallTopAppBarColors(containerColor = Color.Transparent), navigationIcon = {
-                IconButton(onClick = {
+        Scaffold(
+            topBar = {
+                AppBar(title = "Proposal #${proposalId}") {
                     onBack.invoke()
-                }) {
-                    Icon(
-                        imageVector = Icons.Filled.ArrowBack, contentDescription = "Back"
-                    )
                 }
-            })
-        }) { pv ->
+            }) { pv ->
 
             LaunchedEffect(Unit) {
                 viewModel.loadVotedAddresses()
@@ -74,7 +68,6 @@ fun VotingDetailsScreen(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // TODO helper methods
                 when {
                     addressesState.shouldShowData() -> {
                         VotersPager(votedAddresses = addressesState.data!!)
