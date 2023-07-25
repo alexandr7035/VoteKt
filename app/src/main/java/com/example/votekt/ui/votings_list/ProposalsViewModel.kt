@@ -1,5 +1,6 @@
 package com.example.votekt.ui.votings_list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.OperationResult
@@ -30,6 +31,7 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
             _proposalsUi.value = loadingState
 
             val res = web3Repository.getProposals()
+            Log.d("TEST", res.toString())
 
             when (res) {
                 is OperationResult.Success -> {

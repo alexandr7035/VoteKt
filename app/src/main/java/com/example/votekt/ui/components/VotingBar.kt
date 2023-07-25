@@ -1,5 +1,6 @@
 package com.example.votekt.ui.components
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
@@ -69,6 +70,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             .then(modifier),
         contentAlignment = Alignment.Center
     ) { // Adjust the size of the diagram as needed
+        Log.d("TEST", params.toString())
 
         val totalVotes = params.votesFor + params.votesAgainst
 
@@ -137,8 +139,6 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
             var color: Color
             var perc: Float
 
-            val totalVotes = params.votesFor + params.votesAgainst
-
             // Include 50/50 here
             val isFor = params.votesFor >= params.votesAgainst
 
@@ -152,6 +152,7 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
                 perc = params.votesAgainst / totalVotes.toFloat()
             }
 
+            Log.d("TEST", perc.toString())
             val prettyPerc = "${(perc * 100).roundToInt()}%"
 
             Image(
