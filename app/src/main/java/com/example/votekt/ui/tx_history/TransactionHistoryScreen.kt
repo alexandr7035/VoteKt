@@ -14,7 +14,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,7 +32,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
     val state = viewModel.state.collectAsState().value
 
     LaunchedEffect(Unit) {
-        viewModel.load()
+        viewModel.loadTransactionList()
     }
 
     Scaffold(topBar = {
@@ -48,7 +47,8 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
                 state.shouldShowData() -> {
                     if (state.data!!.isNotEmpty()) {
                         TransactionsList(
-                            transactions = state.data
+                            transactions = state.data,
+                            viewModel = viewModel
                         )
                     } else {
                         NoTransactionsStub()
@@ -57,7 +57,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
 
                 state.shouldShowFullError() -> {
                     ErrorFullScreen(appError = state.error!!, onRetry = {
-                        viewModel.load()
+                        viewModel.loadTransactionList()
                     })
                 }
 
@@ -74,6 +74,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
 @Composable
 private fun TransactionsList(
     transactions: List<Transaction>,
+    viewModel: TransactionsViewModel
 ) {
     LazyColumn(modifier = Modifier
         .background(MaterialTheme.colorScheme.background)
@@ -81,7 +82,10 @@ private fun TransactionsList(
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = {
             items(transactions.size) {
-                TransactionCard(transaction = transactions[it])
+                TransactionCard(
+                    transaction = transactions[it],
+                    viewModel = viewModel
+                )
             }
 
             item {
