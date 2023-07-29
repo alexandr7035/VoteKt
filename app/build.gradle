@@ -116,5 +116,5 @@ dependencies {
     kapt "androidx.room:room-compiler:$room_version"
 
     // Lifecycle lib for compose
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-alpha01")
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.6.0-alpha01")
 }
