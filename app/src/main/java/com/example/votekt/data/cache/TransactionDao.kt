@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 
 @Dao
 interface TransactionDao {
@@ -15,4 +16,7 @@ interface TransactionDao {
 
     @Query("SELECT * FROM transactions WHERE hash = :hash")
     suspend fun getTransactionByHash(hash: String): TransactionEntity?
+
+    @Update
+    suspend fun updateTransaction(transaction: TransactionEntity)
 }

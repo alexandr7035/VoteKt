@@ -1,6 +1,5 @@
 package com.example.votekt.ui.components
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,12 +10,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberUpdatedState
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -34,15 +29,16 @@ fun TransactionCard(
 
     val colors = listOf(Color(0xFFffe53b), Color(0xFFff2525))
 
-    // Create a mutable state to hold the transaction status
-    val txStatus = remember { mutableStateOf(TxStatus.PENDING) }
+    // Set cached status as first value
+    val txStatus = remember { mutableStateOf(transaction.status) }
 
-    // Use LaunchedEffect to collect the transaction status only once
     LaunchedEffect(transaction.hash) {
-        val flow = viewModel.observeTransactionStatus(transaction.hash)
-        // Collect the latest transaction status and update the state
-        flow.collect { latestStatus ->
-            txStatus.value = latestStatus
+        if (transaction.status == TxStatus.PENDING) {
+            val flow = viewModel.observeTransactionStatus(transaction.hash)
+            // Collect the latest transaction status and update the state
+            flow.collect { latestStatus ->
+                txStatus.value = latestStatus
+            }
         }
     }
 
