@@ -20,13 +20,14 @@ import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TxStatus
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.utils.prettifyAddress
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @Composable
 fun TransactionCard(
     transaction: Transaction,
     viewModel: TransactionsViewModel
 ) {
-
     val colors = listOf(Color(0xFFffe53b), Color(0xFFff2525))
 
     // Set cached status as first value
@@ -55,7 +56,14 @@ fun TransactionCard(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(text = "Hash ${transaction.hash.prettifyAddress()}")
-        Text(text = transaction.dateSent.toString())
         Text(text = txStatus.value.toString())
+        Text(text = "${getFormattedDate(transaction.dateSent)} utc")
     }
+}
+
+
+
+private fun getFormattedDate(timestamp: Long): String {
+    val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US)
+    return formatter.format(timestamp)
 }

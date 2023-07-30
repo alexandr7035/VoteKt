@@ -6,6 +6,6 @@ data class Transaction(
     val dateSent: Long
 ) {
     companion object {
-        fun mock() = Transaction(hash = "abcdef1234", status = TxStatus.CONFIRMED, dateSent = 0)
+        fun mock() = Transaction(hash = "abcdef1234", status = TxStatus.MINED, dateSent = 0)
     }
 }

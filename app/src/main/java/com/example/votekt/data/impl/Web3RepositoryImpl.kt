@@ -14,22 +14,17 @@ import com.example.votekt.data.model.TxStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import org.web3j.commons.ChainId
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
-import org.web3j.tx.response.Callback
-import org.web3j.tx.response.EmptyTransactionReceipt
 import org.web3j.tx.response.NoOpProcessor
-import org.web3j.tx.response.PollingTransactionReceiptProcessor
-import org.web3j.tx.response.QueuingTransactionReceiptProcessor
-import java.lang.Exception
 import java.math.BigInteger
 
 class Web3RepositoryImpl(
-    web3j: Web3j, private val transactionRepository: TransactionRepository, private val dispatcher: CoroutineDispatcher
+    web3j: Web3j,
+    private val transactionRepository: TransactionRepository,
+    private val dispatcher: CoroutineDispatcher
 ) : Web3Repository {
     private val votingContract: VotingContract
 
@@ -98,7 +93,9 @@ class Web3RepositoryImpl(
 
         transactionRepository.cacheTransaction(
             Transaction(
-                hash = tx.transactionHash, dateSent = System.currentTimeMillis(), status = TxStatus.PENDING
+                hash = tx.transactionHash,
+                dateSent = System.currentTimeMillis(),
+                status = TxStatus.PENDING
             )
         )
     }

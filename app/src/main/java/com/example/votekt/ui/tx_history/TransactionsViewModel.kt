@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.isActive
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
@@ -24,6 +23,8 @@ import kotlinx.coroutines.launch
 class TransactionsViewModel(
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
+
+    private val CHECK_FOR_TX_DELAY = 10_000L
 
     private val _state = MutableStateFlow(
         ScreenState<List<Transaction>>(
@@ -49,7 +50,7 @@ class TransactionsViewModel(
     }
 
     fun observeTransactionStatus(hash: String): StateFlow<TxStatus> {
-        Log.d("DEBUG_TAG", "subscribe for ${hash}")
+        Log.d("DEBUG_TAG", "subscribe for tx receipt ${hash}")
 
         return flow {
             while (currentCoroutineContext().isActive) {
@@ -58,12 +59,18 @@ class TransactionsViewModel(
                 when (res) {
                     is OperationResult.Success -> {
                         emit(res.data)
+
+                        if (res.data != TxStatus.PENDING) {
+                            break
+                        }
                     }
 
                     is OperationResult.Failure -> {
                         // TODO
                     }
                 }
+
+                delay(CHECK_FOR_TX_DELAY)
             }
 
         }.conflate().stateIn(viewModelScope, SharingStarted.WhileSubscribed(0), TxStatus.PENDING)
