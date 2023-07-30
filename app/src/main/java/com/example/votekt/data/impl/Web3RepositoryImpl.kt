@@ -10,6 +10,7 @@ import com.example.votekt.data.Web3Repository
 import com.example.votekt.data.helpers.executeWeb3Call
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.data.model.Transaction
+import com.example.votekt.data.model.TransactionType
 import com.example.votekt.data.model.TxStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
@@ -93,6 +94,7 @@ class Web3RepositoryImpl(
 
         transactionRepository.cacheTransaction(
             Transaction(
+                type = TransactionType.CREATE_PROPOSAL,
                 hash = tx.transactionHash,
                 dateSent = System.currentTimeMillis(),
                 status = TxStatus.PENDING

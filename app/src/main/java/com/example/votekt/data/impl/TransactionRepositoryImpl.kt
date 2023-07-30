@@ -19,6 +19,7 @@ class TransactionRepositoryImpl(
     override suspend fun getTransactions(): List<Transaction> = withContext(dispatcher) {
         return@withContext txDao.getTransactions().map {
             Transaction(
+                it.type,
                 it.hash,
                 it.status,
                 it.dateSent,
@@ -29,6 +30,7 @@ class TransactionRepositoryImpl(
     override suspend fun cacheTransaction(transaction: Transaction) {
         txDao.cacheTransaction(
             TransactionEntity(
+                type = transaction.type,
                 hash = transaction.hash,
                 status = transaction.status,
                 dateSent = transaction.dateSent,

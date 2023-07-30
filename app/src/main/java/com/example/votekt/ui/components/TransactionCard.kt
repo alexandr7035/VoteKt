@@ -62,8 +62,7 @@ private fun TransactionCardUi(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(
-                    // TODO
-                    text = "Transaction type", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
+                    text = transaction.type.uiMessage, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
                 )
 
                 val statusUi = getStatusUi(transactionStatus)
