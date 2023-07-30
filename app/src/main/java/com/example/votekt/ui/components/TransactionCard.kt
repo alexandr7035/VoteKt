@@ -1,23 +1,27 @@
 package com.example.votekt.ui.components
 
-import androidx.compose.foundation.border
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TxStatus
+import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.utils.prettifyAddress
 import java.text.SimpleDateFormat
@@ -25,11 +29,8 @@ import java.util.Locale
 
 @Composable
 fun TransactionCard(
-    transaction: Transaction,
-    viewModel: TransactionsViewModel
+    transaction: Transaction, viewModel: TransactionsViewModel
 ) {
-    val colors = listOf(Color(0xFFffe53b), Color(0xFFff2525))
-
     // Set cached status as first value
     val txStatus = remember { mutableStateOf(transaction.status) }
 
@@ -43,27 +44,88 @@ fun TransactionCard(
         }
     }
 
-    Column(
-        Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .border(
-                width = 4.dp,
-                brush = Brush.horizontalGradient(colors = colors),
-                shape = RoundedCornerShape(16.dp)
-            )
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+    TransactionCardUi(
+        transaction = transaction,
+        transactionStatus = txStatus.value
+    )
+}
+
+@Composable
+private fun TransactionCardUi(
+    transaction: Transaction, transactionStatus: TxStatus
+) {
+    Card(
+        modifier = Modifier.fillMaxWidth()
     ) {
-        Text(text = "Hash ${transaction.hash.prettifyAddress()}")
-        Text(text = txStatus.value.toString())
-        Text(text = "${getFormattedDate(transaction.dateSent)} utc")
+        Column(
+            Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
+        ) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    // TODO
+                    text = "Transaction type", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
+                )
+
+                val statusUi = getStatusUi(transactionStatus)
+
+                Text(
+                    text = statusUi.first, fontSize = 18.sp, color = statusUi.second, fontWeight = FontWeight.ExtraBold
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            Row(verticalAlignment = Alignment.Top) {
+                Text(
+                    text = transaction.hash.prettifyAddress(),
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Gray,
+                    modifier = Modifier.weight(1f),
+                )
+
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = getFormattedDate(transaction.dateSent, "dd MMM yyyy"),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.Gray
+                    )
+
+                    Text(
+                        text = "${getFormattedDate(transaction.dateSent, "HH:mm:ss")} UTC",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = Color.Gray
+                    )
+                }
+
+            }
+        }
+
     }
 }
 
+@Preview
+@Composable
+fun TransactionCard_Preview() {
+    VoteKtTheme {
+        TransactionCardUi(
+            transaction = Transaction.mock(), transactionStatus = TxStatus.REVERTED
+        )
+    }
+}
 
-
-private fun getFormattedDate(timestamp: Long): String {
-    val formatter = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.US)
+private fun getFormattedDate(timestamp: Long, format: String): String {
+    val formatter = SimpleDateFormat(format, Locale.US)
     return formatter.format(timestamp)
+}
+
+private fun getStatusUi(txStatus: TxStatus): Pair<String, Color> {
+    return when (txStatus) {
+        TxStatus.PENDING -> Pair("Pending", Color.DarkGray)
+        TxStatus.MINED -> Pair("Completed", Color.Green)
+        TxStatus.REVERTED -> Pair("Failed", Color.Red)
+    }
 }
