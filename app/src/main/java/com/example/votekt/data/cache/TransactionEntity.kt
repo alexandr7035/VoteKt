@@ -8,8 +8,8 @@ import com.example.votekt.data.model.TxStatus
 @Entity(tableName = "transactions")
 data class TransactionEntity(
     @PrimaryKey
-    val type: TransactionType,
     val hash: String,
+    val type: TransactionType,
     val status: TxStatus,
     val dateSent: Long
 )

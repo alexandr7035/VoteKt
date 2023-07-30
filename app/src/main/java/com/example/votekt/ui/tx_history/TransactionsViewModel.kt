@@ -38,14 +38,19 @@ class TransactionsViewModel(
 
     fun loadTransactionList() {
         viewModelScope.launch {
-            delay(500)
-
             val txs = transactionRepository.getTransactions()
             _state.value = _state.value.copy(
                 isLoading = false,
                 data = txs,
                 error = null
             )
+        }
+    }
+
+    fun clearTransactions() {
+        viewModelScope.launch {
+            transactionRepository.clearTransactions()
+            loadTransactionList()
         }
     }
 

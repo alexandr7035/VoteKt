@@ -38,6 +38,15 @@ class TransactionRepositoryImpl(
         )
     }
 
+    override suspend fun clearTransactions(): OperationResult<Unit> {
+        return try {
+            txDao.clearTransactionHistory()
+            OperationResult.Success(Unit)
+        } catch (e: Exception) {
+            OperationResult.Failure(AppError.UnknownError(e.toString()))
+        }
+    }
+
     override suspend fun refreshTxStatus(txHash: String): OperationResult<TxStatus> = withContext(dispatcher) {
         try {
             val receipt = web3j.ethGetTransactionReceipt(txHash).send().result

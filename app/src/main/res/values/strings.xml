@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Vote Kt</string>
+    <string name="clear_transactions">Clear transactions</string>
 </resources>

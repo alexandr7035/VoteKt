@@ -9,4 +9,6 @@ interface TransactionRepository {
     suspend fun cacheTransaction(transaction: Transaction)
 
     suspend fun refreshTxStatus(txHash: String): OperationResult<TxStatus>
+
+    suspend fun clearTransactions(): OperationResult<Unit>
 }

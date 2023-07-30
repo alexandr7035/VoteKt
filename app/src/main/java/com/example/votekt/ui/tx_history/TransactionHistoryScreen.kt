@@ -9,8 +9,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -18,8 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.votekt.R
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
@@ -36,7 +42,18 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
     }
 
     Scaffold(topBar = {
-        AppBar(title = "Transactions")
+        AppBar(
+            title = "Transactions",
+            actions = {
+                IconButton(onClick = { viewModel.clearTransactions() }) {
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = stringResource(R.string.clear_transactions),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
+                }
+            }
+        )
     }) { pv ->
         Box(
             Modifier
