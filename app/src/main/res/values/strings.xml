@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Vote Kt</string>
     <string name="clear_transactions">Clear transactions</string>
+    <string name="proposal_title">Proposal title</string>
+    <string name="proposal_desc">Proposal description</string>
+    <string name="create_proposal">Create proposal</string>
 </resources>

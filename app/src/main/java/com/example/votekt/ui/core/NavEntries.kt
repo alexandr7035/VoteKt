@@ -17,6 +17,12 @@ sealed class NavEntries(
         label = "Proposals"
     )
 
+    object NewProposal: NavEntries(
+        route = "new_proposal",
+        navIcon = null,
+        label = "New proposal"
+    )
+
     object VotingDetails : NavEntries(
         route = "voting",
         navIcon = null,

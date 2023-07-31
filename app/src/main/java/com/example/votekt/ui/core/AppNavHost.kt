@@ -19,6 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
+import com.example.votekt.ui.votings_list.CreateProposalScreen
 import com.example.votekt.ui.votings_list.ProposalsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -28,8 +29,7 @@ fun AppNavHost(
 ) {
 
     val primaryDestinations = listOf(
-        NavEntries.Proposals.route,
-        NavEntries.TxHistory.route
+        NavEntries.Proposals.route, NavEntries.TxHistory.route
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -49,6 +49,14 @@ fun AppNavHost(
             composable(NavEntries.Proposals.route) {
                 ProposalsScreen(onProposalClick = { proposalId ->
                     navController.navigate("${NavEntries.VotingDetails.route}/${proposalId}")
+                }, onNewProposalClick = {
+                    navController.navigate(NavEntries.NewProposal.route)
+                })
+            }
+
+            composable(NavEntries.NewProposal.route) {
+                CreateProposalScreen(onBack = {
+                    navController.popBackStack()
                 })
             }
 
@@ -66,10 +74,7 @@ fun AppNavHost(
                 route = "${NavEntries.VotingDetails.route}/{proposalId}",
                 arguments = listOf(navArgument("proposalId") { type = NavType.StringType })
             ) {
-                VotingDetailsScreen(
-                    proposalId = it.arguments?.getString("proposalId")!!,
-                    onBack = { navController.popBackStack() }
-                )
+                VotingDetailsScreen(proposalId = it.arguments?.getString("proposalId")!!, onBack = { navController.popBackStack() })
             }
         }
     }

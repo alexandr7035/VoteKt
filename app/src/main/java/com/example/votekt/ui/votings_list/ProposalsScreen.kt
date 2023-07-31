@@ -35,6 +35,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ProposalsScreen(
     onProposalClick: (proposalId: String) -> Unit = {},
+    onNewProposalClick: ()-> Unit = {},
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
     Scaffold(
@@ -43,7 +44,7 @@ fun ProposalsScreen(
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
-                onClick = { viewModel.createProposal() },
+                onClick = { onNewProposalClick.invoke() },
                 icon = {
                     Icon(
                         Icons.Outlined.Add,

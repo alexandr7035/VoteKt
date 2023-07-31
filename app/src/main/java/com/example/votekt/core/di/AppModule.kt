@@ -9,6 +9,7 @@ import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.Web3RepositoryImpl
 import com.example.votekt.ui.VotingViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
+import com.example.votekt.ui.votings_list.CreateProposalViewModel
 import com.example.votekt.ui.votings_list.ProposalsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
@@ -21,6 +22,7 @@ val appModule = module {
     viewModel { VotingViewModel(get()) }
     viewModel { ProposalsViewModel(get()) }
     viewModel { TransactionsViewModel(get()) }
+    viewModel { CreateProposalViewModel(get()) }
 
     single {
         Room.databaseBuilder(
