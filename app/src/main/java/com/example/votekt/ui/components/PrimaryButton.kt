@@ -12,7 +12,12 @@ import androidx.compose.ui.unit.dp
 import com.example.votekt.ui.theme.VoteKtTheme
 
 @Composable
-fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun PrimaryButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier
+) {
     Button(
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.buttonColors(
@@ -20,8 +25,11 @@ fun PrimaryButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifi
             containerColor = MaterialTheme.colorScheme.primary
         ),
         contentPadding = PaddingValues(horizontal = 36.dp),
-        modifier = modifier.then(Modifier
-            .defaultMinSize(minHeight = 48.dp))
+        modifier = modifier.then(
+            Modifier
+                .defaultMinSize(minHeight = 48.dp)
+        ),
+        enabled = enabled
     ) {
         Text(text = text)
     }
