@@ -1,5 +1,6 @@
 package com.example.votekt.ui.votings_list
 
+import android.widget.Toast
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -17,13 +18,16 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -31,6 +35,16 @@ fun CreateProposalScreen(
     viewModel: CreateProposalViewModel = koinViewModel(),
     onBack: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val state = viewModel.uiState.collectAsStateWithLifecycle().value
+
+    EventEffect(
+        event = state.isCreateCompleted,
+        onConsumed = viewModel::onProposalCreatedEvent
+    ) { isProposalCreated ->
+        Toast.makeText(context, "Proposal created: $isProposalCreated", Toast.LENGTH_SHORT).show()
+    }
+
     CreateProposalScreen_Ui(
         onBack = onBack,
         onSubmit = { title, desc ->

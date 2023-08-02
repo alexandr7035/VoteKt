@@ -3,6 +3,7 @@ package com.example.votekt.data.impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
+import com.example.votekt.data.AppError
 import com.example.votekt.data.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VoterAddress
@@ -85,21 +86,26 @@ class Web3RepositoryImpl(
         }
     }
 
-    override suspend fun createProposal(title: String, description: String): Unit = withContext(dispatcher) {
-        val tx = votingContract.createProposal(
-            title, description
-        ).send()
+    override suspend fun createProposal(title: String, description: String): OperationResult<Unit> = withContext(dispatcher) {
+        try {
+            val tx = votingContract.createProposal(
+                title, description
+            ).send()
 
-        Log.d("TEST", tx.toString())
-
-        transactionRepository.cacheTransaction(
-            Transaction(
-                type = TransactionType.CREATE_PROPOSAL,
-                hash = tx.transactionHash,
-                dateSent = System.currentTimeMillis(),
-                status = TxStatus.PENDING
+            transactionRepository.cacheTransaction(
+                Transaction(
+                    type = TransactionType.CREATE_PROPOSAL,
+                    hash = tx.transactionHash,
+                    dateSent = System.currentTimeMillis(),
+                    status = TxStatus.PENDING
+                )
             )
-        )
+
+            return@withContext OperationResult.Success(Unit)
+        }
+        catch (e: Exception) {
+            return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
+        }
     }
 
     override suspend fun getVotedAddresses(): List<VoterAddress> {

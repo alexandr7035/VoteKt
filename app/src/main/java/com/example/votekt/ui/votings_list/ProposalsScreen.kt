@@ -1,5 +1,6 @@
 package com.example.votekt.ui.votings_list
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -56,6 +57,7 @@ fun ProposalsScreen(
         }) { pv ->
 
         val state = viewModel.proposalsUi.collectAsStateWithLifecycle().value
+        Log.d("TEST", state.toString())
 
         LaunchedEffect(Unit) {
             viewModel.loadProposals()
@@ -90,6 +92,10 @@ private fun ProposalsList(
         .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp, bottom = pv.calculateBottomPadding()),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         content = {
+            item {
+                Spacer(Modifier.height(8.dp))
+            }
+
             items(proposals.size) {
                 ProposalCard(proposal = proposals[it], onClick = { onProposalClick.invoke(it) })
             }

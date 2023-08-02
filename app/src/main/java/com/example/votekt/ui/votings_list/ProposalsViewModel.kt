@@ -37,7 +37,8 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
                 is OperationResult.Success -> {
                     _proposalsUi.value = _proposalsUi.value.copy(
                         data = res.data,
-                        isLoading = false
+                        isLoading = false,
+                        error = null
                     )
                 }
 
