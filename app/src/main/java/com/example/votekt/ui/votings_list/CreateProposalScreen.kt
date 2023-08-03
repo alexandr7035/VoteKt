@@ -14,6 +14,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -23,7 +24,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.votekt.BuildConfig
 import com.example.votekt.R
+import com.example.votekt.core.config.ProposalConfig
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -77,6 +80,16 @@ private fun CreateProposalScreen_Ui(
         ) {
             val titleText = remember { mutableStateOf("") }
             val descText = remember { mutableStateOf("") }
+
+            if (BuildConfig.DEBUG) {
+                val ctx = LocalContext.current
+
+                LaunchedEffect(Unit) {
+                    val mock = ProposalConfig.getRandomMockProposalText(ctx)
+                    titleText.value = mock.first
+                    descText.value = mock.second
+                }
+            }
 
             Text(
                 text = "Choose proposal title", style = MaterialTheme.typography.headlineSmall

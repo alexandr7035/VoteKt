@@ -4,4 +4,14 @@
     <string name="proposal_title">Proposal title</string>
     <string name="proposal_desc">Proposal description</string>
     <string name="create_proposal">Create proposal</string>
+
+    <string name="mock_proposal_title_1">Education for All - Empowering Minds, Transforming Lives!</string>
+    <string name="mock_proposal_desc_1">Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities. Together, we can create a brighter future and empower young minds to shape their destinies. Vote now and be a part of this transformative journey!</string>
+
+    <string name="mock_proposal_title_2">Healthcare Heroes - Vote for Better Healthcare!</string>
+    <string name="mock_proposal_desc_2">Celebrate our healthcare heroes and promote better healthcare for everyone. Your vote will drive funding for medical facilities, research, and essential resources. Join us in acknowledging the dedication of our healthcare professionals and ensuring a healthier future for all. Make your voice count - vote for better healthcare today!</string>
+
+    <string name="mock_proposal_title_3">Community Arts - Unleash Creativity, Enrich Lives!</string>
+    <string name="mock_proposal_desc_3">Embrace the arts and support our community\'s creative spirit. This voting campaign seeks to invest in art programs, public installations, and cultural events that inspire and enrich lives. Your vote can spark a colorful revolution in our community. Together, let\'s make art an integral part of our collective experience. Vote now and unlock creativity!</string>
+
 </resources>
