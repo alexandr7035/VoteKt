@@ -32,24 +32,21 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateProposalScreen(
-    viewModel: CreateProposalViewModel = koinViewModel(),
-    onBack: () -> Unit = {}
+    viewModel: CreateProposalViewModel = koinViewModel(), onBack: () -> Unit = {}
 ) {
     val context = LocalContext.current
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     EventEffect(
-        event = state.isCreateCompleted,
-        onConsumed = viewModel::onProposalCreatedEvent
+        event = state.isCreateCompleted, onConsumed = viewModel::onProposalCreatedEvent
     ) { isProposalCreated ->
         Toast.makeText(context, "Proposal created: $isProposalCreated", Toast.LENGTH_SHORT).show()
     }
 
     CreateProposalScreen_Ui(
-        onBack = onBack,
-        onSubmit = { title, desc ->
+        onBack = onBack, onSubmit = { title, desc ->
             viewModel.createProposal(title, desc)
-        }
+        }, titleMaxLength = state.titleMaxLength, descMaxLength = state.descMaxLength
     )
 }
 
@@ -57,8 +54,7 @@ fun CreateProposalScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateProposalScreen_Ui(
-    onBack: () -> Unit = {},
-    onSubmit: (title: String, description: String) -> Unit = { _, _ -> }
+    titleMaxLength: Int, descMaxLength: Int, onBack: () -> Unit = {}, onSubmit: (title: String, description: String) -> Unit = { _, _ -> }
 ) {
 
     Scaffold(
@@ -90,13 +86,19 @@ private fun CreateProposalScreen_Ui(
                 value = titleText.value,
                 maxLines = 1,
                 singleLine = true,
-                onValueChange = { titleText.value = it },
+                onValueChange = {
+                    if (it.length <= titleMaxLength) {
+                        titleText.value = it
+                    } else {
+                        titleText.value = it.take(titleMaxLength)
+                    }
+                },
                 label = { Text(stringResource(R.string.proposal_title)) })
 
             Text(
                 modifier = Modifier
                     .wrapContentSize()
-                    .align(Alignment.End), text = "${titleText.value.length} / 100"
+                    .align(Alignment.End), text = "${titleText.value.length} / $titleMaxLength"
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -111,14 +113,20 @@ private fun CreateProposalScreen_Ui(
                     .height(180.dp),
                 value = descText.value,
                 maxLines = 5,
-                onValueChange = { descText.value = it },
+                onValueChange = {
+                    if (it.length <= descMaxLength) {
+                        descText.value = it
+                    } else {
+                        descText.value = it.take(descMaxLength)
+                    }
+                },
                 label = { Text(stringResource(R.string.proposal_desc)) },
             )
 
             Text(
                 modifier = Modifier
                     .wrapContentSize()
-                    .align(Alignment.End), text = "${descText.value.length} / 100"
+                    .align(Alignment.End), text = "${descText.value.length} / $descMaxLength"
             )
 
             Spacer(Modifier.height(16.dp))
@@ -141,6 +149,6 @@ private fun CreateProposalScreen_Ui(
 @Composable
 fun CreateProposalScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
-        CreateProposalScreen_Ui()
+        CreateProposalScreen_Ui(50, 250)
     }
 }
