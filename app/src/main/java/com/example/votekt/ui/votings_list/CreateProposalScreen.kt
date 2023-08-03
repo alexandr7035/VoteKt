@@ -1,6 +1,8 @@
 package com.example.votekt.ui.votings_list
 
 import android.widget.Toast
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -17,9 +21,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,9 +67,17 @@ private fun CreateProposalScreen_Ui(
     titleMaxLength: Int, descMaxLength: Int, onBack: () -> Unit = {}, onSubmit: (title: String, description: String) -> Unit = { _, _ -> }
 ) {
 
+    // To hide keyboard
+    val focusManager = LocalFocusManager.current
+
     Scaffold(
         topBar = {
             AppBar(title = "New proposal", onBack = { onBack.invoke() })
+        },
+        modifier = Modifier.pointerInput(Unit) {
+            detectTapGestures(onTap = {
+                focusManager.clearFocus()
+            })
         },
     ) { pv ->
         Column(
@@ -70,13 +85,7 @@ private fun CreateProposalScreen_Ui(
                 .fillMaxSize()
                 .padding(
                     top = pv.calculateTopPadding() + 8.dp, bottom = pv.calculateBottomPadding(), start = 8.dp, end = 8.dp
-                ),
-//                .pointerInput(Unit) {
-//                    detectTapGestures(onTap = {
-//                        LocalFocusManager.current.clearFocus()
-//                    })
-//                },
-//            verticalArrangement = Arrangement.spacedBy(12.dp),
+                )
         ) {
             val titleText = remember { mutableStateOf("") }
             val descText = remember { mutableStateOf("") }
@@ -91,67 +100,78 @@ private fun CreateProposalScreen_Ui(
                 }
             }
 
-            Text(
-                text = "Choose proposal title", style = MaterialTheme.typography.headlineSmall
-            )
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .weight(1f)
+            ) {
 
-            OutlinedTextField(modifier = Modifier.fillMaxWidth(),
-                value = titleText.value,
-                maxLines = 1,
-                singleLine = true,
-                onValueChange = {
-                    if (it.length <= titleMaxLength) {
-                        titleText.value = it
-                    } else {
-                        titleText.value = it.take(titleMaxLength)
-                    }
-                },
-                label = { Text(stringResource(R.string.proposal_title)) })
+                Text(
+                    text = "Choose proposal title", style = MaterialTheme.typography.headlineSmall
+                )
 
-            Text(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .align(Alignment.End), text = "${titleText.value.length} / $titleMaxLength"
-            )
+                OutlinedTextField(modifier = Modifier.fillMaxWidth(),
+                    value = titleText.value,
+                    maxLines = 1,
+                    singleLine = true,
+                    onValueChange = {
+                        if (it.length <= titleMaxLength) {
+                            titleText.value = it
+                        } else {
+                            titleText.value = it.take(titleMaxLength)
+                        }
+                    },
+                    label = { Text(stringResource(R.string.proposal_title)) })
 
-            Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.End), text = "${titleText.value.length} / $titleMaxLength"
+                )
 
-            Text(
-                text = "Choose proposal description", style = MaterialTheme.typography.headlineSmall
-            )
+                Spacer(modifier = Modifier.height(16.dp))
 
-            OutlinedTextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp),
-                value = descText.value,
-                maxLines = 5,
-                onValueChange = {
-                    if (it.length <= descMaxLength) {
-                        descText.value = it
-                    } else {
-                        descText.value = it.take(descMaxLength)
-                    }
-                },
-                label = { Text(stringResource(R.string.proposal_desc)) },
-            )
+                Text(
+                    text = "Choose proposal description", style = MaterialTheme.typography.headlineSmall
+                )
 
-            Text(
-                modifier = Modifier
-                    .wrapContentSize()
-                    .align(Alignment.End), text = "${descText.value.length} / $descMaxLength"
-            )
+                OutlinedTextField(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(180.dp),
+                    value = descText.value,
+                    maxLines = 5,
+                    onValueChange = {
+                        if (it.length <= descMaxLength) {
+                            descText.value = it
+                        } else {
+                            descText.value = it.take(descMaxLength)
+                        }
+                    },
+                    label = { Text(stringResource(R.string.proposal_desc)) },
+                )
 
-            Spacer(Modifier.height(16.dp))
+                Text(
+                    modifier = Modifier
+                        .wrapContentSize()
+                        .align(Alignment.End), text = "${descText.value.length} / $descMaxLength"
+                )
 
-            PrimaryButton(
-                modifier = Modifier.fillMaxWidth(),
-                text = stringResource(R.string.create_proposal),
-                onClick = {
-                    onSubmit.invoke(titleText.value, descText.value)
-                },
-                enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
-            )
+                Spacer(Modifier.height(16.dp))
+            }
+
+
+            Box(Modifier.padding(vertical = 16.dp, horizontal = 8.dp)) {
+                PrimaryButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.create_proposal),
+                    onClick = {
+                        onSubmit.invoke(titleText.value, descText.value)
+                    },
+                    enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
+                )
+            }
         }
     }
 
