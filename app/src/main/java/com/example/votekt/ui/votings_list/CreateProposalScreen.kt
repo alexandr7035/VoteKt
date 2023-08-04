@@ -21,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -35,6 +34,8 @@ import com.example.votekt.BuildConfig
 import com.example.votekt.R
 import com.example.votekt.core.config.ProposalConfig
 import com.example.votekt.ui.components.PrimaryButton
+import com.example.votekt.ui.components.SelectorGroup
+import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import de.palm.composestateevents.EventEffect
@@ -159,17 +160,35 @@ private fun CreateProposalScreen_Ui(
                 )
 
                 Spacer(Modifier.height(16.dp))
+
+                Text(
+                    text = "Choose proposal duration", style = MaterialTheme.typography.headlineSmall
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                val ctx = LocalContext.current
+
+                SelectorGroup(
+                    onSelectedChanged = {
+                        // TODO
+                        Toast.makeText(ctx, it.valueText, Toast.LENGTH_SHORT).show()
+                    }, options = listOf(
+                        // TODO
+                        SelectorOption(0, "24 hours"),
+                        SelectorOption(1, "7 days"),
+                        SelectorOption(2, "30 days"),
+                    )
+                )
             }
 
 
             Box(Modifier.padding(vertical = 16.dp, horizontal = 8.dp)) {
                 PrimaryButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    text = stringResource(R.string.create_proposal),
-                    onClick = {
+                    modifier = Modifier.fillMaxWidth(), text = stringResource(R.string.create_proposal), onClick = {
                         onSubmit.invoke(titleText.value, descText.value)
-                    },
-                    enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
+                    }, enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
                 )
             }
         }
