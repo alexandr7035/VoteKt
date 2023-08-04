@@ -9,6 +9,7 @@ import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.Web3Repository
 import com.example.votekt.data.helpers.executeWeb3Call
+import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TransactionType
@@ -86,10 +87,11 @@ class Web3RepositoryImpl(
         }
     }
 
-    override suspend fun createProposal(title: String, description: String): OperationResult<Unit> = withContext(dispatcher) {
+    override suspend fun createProposal(req: CreateProposalReq): OperationResult<Unit> = withContext(dispatcher) {
         try {
             val tx = votingContract.createProposal(
-                title, description
+                // TODO duration
+                req.title, req.desc
             ).send()
 
             transactionRepository.cacheTransaction(

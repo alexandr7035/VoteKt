@@ -1,5 +1,6 @@
 package com.example.votekt.data
 
+import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.Proposal
 
 interface Web3Repository {
@@ -7,6 +8,6 @@ interface Web3Repository {
     suspend fun getVotedAddresses(): List<VoterAddress>
     suspend fun getProposalById(id: Long): OperationResult<Proposal>
     suspend fun getProposals(): OperationResult<List<Proposal>>
-    suspend fun createProposal(title: String, description: String): OperationResult<Unit>
+    suspend fun createProposal(req: CreateProposalReq): OperationResult<Unit>
 }
 
