@@ -19,7 +19,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
-import com.example.votekt.ui.votings_list.CreateProposalScreen
+import com.example.votekt.ui.create_proposal.CreateProposalScreen
 import com.example.votekt.ui.votings_list.ProposalsScreen
 
 @OptIn(ExperimentalMaterial3Api::class)

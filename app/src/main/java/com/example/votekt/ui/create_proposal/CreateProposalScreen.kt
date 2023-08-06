@@ -1,4 +1,4 @@
-package com.example.votekt.ui.votings_list
+package com.example.votekt.ui.create_proposal
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -40,12 +40,14 @@ import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.ProposalDuration
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
+import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.prettifyAddress
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
 
@@ -58,12 +60,19 @@ fun CreateProposalScreen(
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     EventEffect(
-        event = state.isCreateCompleted, onConsumed = viewModel::onProposalCreatedEvent
-    ) { isProposalCreated ->
-        if (isProposalCreated) {
-            snackBarHostState.showResultSnackBar("Transaction submitted!", SnackBarMode.Positive)
+        event = state.submitProposalEvent, onConsumed = viewModel::onProposalCreatedEvent
+    ) { eventData ->
+        if (eventData.isTransactionSubmitted) {
+            snackBarHostState.showResultSnackBar(
+                "Transaction submitted! Wait for the transaction result\n\nHash: ${eventData.transactionHash!!.prettifyAddress()}",
+                SnackBarMode.Positive
+            )
+            onBack.invoke()
         } else {
-            snackBarHostState.showResultSnackBar("Failed to submit Proposal", SnackBarMode.Negative)
+            snackBarHostState.showResultSnackBar(
+                "Failed to submit Proposal\n\n${eventData.error?.defaultMessage?.title}. ${eventData.error?.defaultMessage?.message}",
+                SnackBarMode.Negative
+            )
         }
     }
 
@@ -76,7 +85,8 @@ fun CreateProposalScreen(
         },
         titleMaxLength = state.titleMaxLength,
         descMaxLength = state.descMaxLength,
-        snackarHostState = snackBarHostState
+        snackarHostState = snackBarHostState,
+        isLoading = state.isLoading
     )
 }
 
@@ -89,7 +99,8 @@ private fun CreateProposalScreen_Ui(
     descMaxLength: Int,
     onBack: () -> Unit = {},
     onSubmit: (title: String, description: String, duration: ProposalDuration) -> Unit = { _, _, _ -> },
-    snackarHostState: SnackbarHostState = SnackbarHostState()
+    snackarHostState: SnackbarHostState = SnackbarHostState(),
+    isLoading: Boolean = false
 ) {
 
     // To hide keyboard
@@ -227,6 +238,10 @@ private fun CreateProposalScreen_Ui(
                     enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
                 )
             }
+        }
+
+        if (isLoading) {
+            FullscreenProgressBar()
         }
     }
 

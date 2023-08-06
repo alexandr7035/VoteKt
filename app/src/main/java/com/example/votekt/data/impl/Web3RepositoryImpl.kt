@@ -87,7 +87,7 @@ class Web3RepositoryImpl(
         }
     }
 
-    override suspend fun createProposal(req: CreateProposalReq): OperationResult<Unit> = withContext(dispatcher) {
+    override suspend fun createProposal(req: CreateProposalReq): OperationResult<String> = withContext(dispatcher) {
         try {
             val tx = votingContract.createProposal(
                 // TODO duration
@@ -103,7 +103,7 @@ class Web3RepositoryImpl(
                 )
             )
 
-            return@withContext OperationResult.Success(Unit)
+            return@withContext OperationResult.Success(tx.transactionHash)
         }
         catch (e: Exception) {
             return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
