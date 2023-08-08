@@ -44,7 +44,6 @@ import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
-import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.prettifyAddress
@@ -53,7 +52,9 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun CreateProposalScreen(
-    viewModel: CreateProposalViewModel = koinViewModel(), onBack: () -> Unit = {}
+    viewModel: CreateProposalViewModel = koinViewModel(),
+    onBack: () -> Unit = {},
+    onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
 
@@ -63,13 +64,14 @@ fun CreateProposalScreen(
         event = state.submitProposalEvent, onConsumed = viewModel::onProposalCreatedEvent
     ) { eventData ->
         if (eventData.isTransactionSubmitted) {
-            snackBarHostState.showResultSnackBar(
+            onShowSnackBar.invoke(
                 "Transaction submitted! Wait for the transaction result\n\nHash: ${eventData.transactionHash!!.prettifyAddress()}",
                 SnackBarMode.Positive
             )
+            
             onBack.invoke()
         } else {
-            snackBarHostState.showResultSnackBar(
+            onShowSnackBar.invoke(
                 "Failed to submit Proposal\n\n${eventData.error?.defaultMessage?.title}. ${eventData.error?.defaultMessage?.message}",
                 SnackBarMode.Negative
             )
