@@ -7,6 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -16,13 +17,15 @@ fun PrimaryButton(
     text: String,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    buttonColor: Color? = null,
+    textColor: Color? = null
 ) {
     Button(
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.buttonColors(
-            contentColor = MaterialTheme.colorScheme.onPrimary,
-            containerColor = MaterialTheme.colorScheme.primary
+            contentColor = textColor ?: MaterialTheme.colorScheme.onPrimary,
+            containerColor = buttonColor ?: MaterialTheme.colorScheme.primary
         ),
         contentPadding = PaddingValues(horizontal = 36.dp),
         modifier = modifier.then(

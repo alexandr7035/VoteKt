@@ -9,10 +9,11 @@ import com.example.votekt.data.model.Proposal
 import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel() {
-    private val _proposalsUi = MutableStateFlow<ScreenState<List<Proposal>>>(
+    private val _proposalsListUi = MutableStateFlow<ScreenState<List<Proposal>>>(
         ScreenState(
             data = null,
             isLoading = true,
@@ -20,22 +21,31 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
         )
     )
 
-    val proposalsUi = _proposalsUi.asStateFlow()
+    private val _proposalUi = MutableStateFlow<ScreenState<Proposal>>(
+        ScreenState(
+            data = null,
+            isLoading = true,
+            error = null
+        )
+    )
+
+    val proposalsListUi = _proposalsListUi.asStateFlow()
+    val proposalUi = _proposalUi.asStateFlow()
 
     fun loadProposals() {
         viewModelScope.launch {
             // Emit loading state
-            val loadingState = _proposalsUi.value.copy(
+            val loadingState = _proposalsListUi.value.copy(
                 isLoading = true
             )
-            _proposalsUi.value = loadingState
+            _proposalsListUi.value = loadingState
 
             val res = web3Repository.getProposals()
             Log.d("TEST", res.toString())
 
             when (res) {
                 is OperationResult.Success -> {
-                    _proposalsUi.value = _proposalsUi.value.copy(
+                    _proposalsListUi.value = _proposalsListUi.value.copy(
                         data = res.data,
                         isLoading = false,
                         error = null
@@ -43,7 +53,7 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
                 }
 
                 is OperationResult.Failure -> {
-                    _proposalsUi.value = _proposalsUi.value.copy(
+                    _proposalsListUi.value = _proposalsListUi.value.copy(
                         isLoading = false,
                         error = res.error
                     )
@@ -52,4 +62,38 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
         }
     }
 
+
+    fun loadProposalById(id: String) {
+        viewModelScope.launch {
+            _proposalUi.update { curr ->
+                curr.copy(
+                    isLoading = true
+                )
+            }
+
+            // FIXME not random
+            val res = web3Repository.getProposals()
+
+            when (res) {
+                is OperationResult.Success -> {
+                    _proposalUi.update { curr ->
+                        curr.copy(
+                            data = res.data[0],
+                            isLoading = false,
+                            error = null
+                        )
+                    }
+                }
+
+                is OperationResult.Failure -> {
+                    _proposalUi.update { curr ->
+                        curr.copy(
+                            isLoading = false,
+                            error = res.error
+                        )
+                    }
+                }
+            }
+        }
+    }
 }

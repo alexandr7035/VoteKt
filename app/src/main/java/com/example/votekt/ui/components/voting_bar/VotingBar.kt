@@ -1,4 +1,4 @@
-package com.example.votekt.ui.components
+package com.example.votekt.ui.components.voting_bar
 
 import android.util.Log
 import androidx.compose.animation.core.Animatable
@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -44,7 +43,28 @@ data class VotingBarParams(
     val votesAgainst: Int,
     val segmentWidth: Dp = 32.dp,
     val circleSpacingPerc: Float = 0.05f,
-)
+) {
+    fun votingNotEmpty(): Boolean {
+        return votesAgainst + votesFor != 0
+    }
+
+    // Include 50/50 here
+    fun isFor(): Boolean {
+        return votesFor > votesAgainst
+    }
+
+    fun getVoteColor(): Color {
+        return if (votingNotEmpty()) {
+            if (isFor()) {
+                VotingColors.forColor
+            } else {
+                VotingColors.againstColor
+            }
+        } else {
+            Color.LightGray
+        }
+    }
+}
 
 @Composable
 fun VotingBar(params: VotingBarParams) {
@@ -72,73 +92,88 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
     ) { // Adjust the size of the diagram as needed
         Log.d("TEST", params.toString())
 
-        val totalVotes = params.votesFor + params.votesAgainst
-
-        val spaceAngle = if (!shouldHideSpacings(params)) {
-            360 * params.circleSpacingPerc
-        } else {
-            0f
+        if (params.votingNotEmpty()) {
+            VotingCircle_Voted(params = params)
         }
-
-        var startAngle = 270 + spaceAngle / 4
-
-        val totalAngle = 360 - spaceAngle
-        val sweepAngleFor = (params.votesFor.toFloat() / totalVotes) * totalAngle
-        val sweepAngleAgainst = (params.votesAgainst.toFloat() / totalVotes) * totalAngle
-
-        val forArcAnimated = remember { Animatable(0f) }
-        val againstArcAnimated = remember { Animatable(0f) }
-
-        LaunchedEffect(Unit) {
-            againstArcAnimated.animateTo(
-                targetValue = sweepAngleAgainst,
-                animationSpec = tween(durationMillis = 500)
-            )
+        else {
+            VotingCircle_Empty(params = params)
         }
+    }
+}
 
-        LaunchedEffect(Unit) {
-            forArcAnimated.animateTo(
-                targetValue = sweepAngleFor,
-                animationSpec = tween(durationMillis = 500)
-            )
-        }
+@Composable
+private fun VotingCircle_Voted(
+    params: VotingBarParams
+) {
 
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            val centerX = size.width / 2
-            val centerY = size.height / 2
+    val totalVotes = params.votesFor + params.votesAgainst
 
-            val diameter = size.width - params.segmentWidth.toPx()
-            val radius = diameter / 2
+    val spaceAngle = if (!shouldHideSpacings(params)) {
+        360 * params.circleSpacingPerc
+    } else {
+        0f
+    }
 
-            val rectSize = Size(diameter, diameter)
-            val rectTopLeft = Offset(centerX - radius, centerY - radius)
+    var startAngle = 270 + spaceAngle / 4
 
-            drawArc(
-                color = VotingColors.forColor,
-                startAngle = startAngle,
-                sweepAngle = forArcAnimated.value,
-                useCenter = false,
-                topLeft = rectTopLeft,
-                size = rectSize,
-                style = Stroke(params.segmentWidth.toPx())
-            )
+    val totalAngle = 360 - spaceAngle
+    val sweepAngleFor = (params.votesFor.toFloat() / totalVotes) * totalAngle
+    val sweepAngleAgainst = (params.votesAgainst.toFloat() / totalVotes) * totalAngle
 
-            drawArc(
-                color = VotingColors.againstColor,
-                startAngle = startAngle + spaceAngle / 2 + sweepAngleFor,
-                sweepAngle = againstArcAnimated.value,
-                useCenter = false,
-                topLeft = rectTopLeft,
-                size = rectSize,
-                style = Stroke(params.segmentWidth.toPx())
-            )
-        }
+    val forArcAnimated = remember { Animatable(0f) }
+    val againstArcAnimated = remember { Animatable(0f) }
 
-        Column() {
-            var icon: Painter
-            var color: Color
-            var perc: Float
+    LaunchedEffect(Unit) {
+        againstArcAnimated.animateTo(
+            targetValue = sweepAngleAgainst,
+            animationSpec = tween(durationMillis = 500)
+        )
+    }
 
+    LaunchedEffect(Unit) {
+        forArcAnimated.animateTo(
+            targetValue = sweepAngleFor,
+            animationSpec = tween(durationMillis = 500)
+        )
+    }
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+        val centerX = size.width / 2
+        val centerY = size.height / 2
+
+        val diameter = size.width - params.segmentWidth.toPx()
+        val radius = diameter / 2
+
+        val rectSize = Size(diameter, diameter)
+        val rectTopLeft = Offset(centerX - radius, centerY - radius)
+
+        drawArc(
+            color = VotingColors.forColor,
+            startAngle = startAngle,
+            sweepAngle = forArcAnimated.value,
+            useCenter = false,
+            topLeft = rectTopLeft,
+            size = rectSize,
+            style = Stroke(params.segmentWidth.toPx())
+        )
+
+        drawArc(
+            color = VotingColors.againstColor,
+            startAngle = startAngle + spaceAngle / 2 + sweepAngleFor,
+            sweepAngle = againstArcAnimated.value,
+            useCenter = false,
+            topLeft = rectTopLeft,
+            size = rectSize,
+            style = Stroke(params.segmentWidth.toPx())
+        )
+    }
+
+    Column() {
+        var icon: Painter
+        var color: Color
+        var perc: Float
+
+        if (totalVotes > 0) {
             // Include 50/50 here
             val isFor = params.votesFor >= params.votesAgainst
 
@@ -151,20 +186,51 @@ fun VotingBarCircle(params: VotingBarParams, modifier: Modifier = Modifier) {
                 color = VotingColors.againstColor
                 perc = params.votesAgainst / totalVotes.toFloat()
             }
-
-            Log.d("TEST", perc.toString())
-            val prettyPerc = "${(perc * 100).roundToInt()}%"
-
-            Image(
-                painter = icon,
-                contentDescription = null,
-                modifier = Modifier.size(56.dp),
-                colorFilter = ColorFilter.tint(color)
-            )
-
-            Text(text = prettyPerc, fontSize = 32.sp, fontWeight = FontWeight.Bold)
+        } else {
+            icon = painterResource(id = R.drawable.thumb_down)
+            color = Color.LightGray
+            perc = 0F
         }
+
+        Log.d("TEST", perc.toString())
+        val prettyPerc = "${(perc * 100).roundToInt()}%"
+
+        Image(
+            painter = icon,
+            contentDescription = null,
+            modifier = Modifier.size(56.dp),
+            colorFilter = ColorFilter.tint(color)
+        )
+
+        Text(text = prettyPerc, fontSize = 32.sp, fontWeight = FontWeight.Bold)
     }
+}
+
+@Composable
+private fun VotingCircle_Empty(params: VotingBarParams) {
+
+    Canvas(modifier = Modifier.fillMaxSize()) {
+
+        val centerX = size.width / 2
+        val centerY = size.height / 2
+
+        val diameter = size.width - params.segmentWidth.toPx()
+        val radius = diameter / 2
+
+        val rectSize = Size(diameter, diameter)
+        val rectTopLeft = Offset(centerX - radius, centerY - radius)
+
+        drawArc(
+            color = params.getVoteColor(),
+            startAngle = 0F,
+            sweepAngle = 360F,
+            useCenter = false,
+            topLeft = rectTopLeft,
+            size = rectSize,
+            style = Stroke(params.segmentWidth.toPx())
+        )
+    }
+
 }
 
 @Composable
@@ -226,12 +292,23 @@ fun VotingBar_Preview() {
     VoteKtTheme(darkTheme = false, dynamicColor = false) {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             VotingBarCircle(params = VotingBarParams(100, 50))
-            VotingBar(params = VotingBarParams(
-                votesAgainst = 50,
-                votesFor = 45,
-                segmentWidth = 16.dp,
-                circleSpacingPerc = 0.025f
-            ))
+            VotingBar(
+                params = VotingBarParams(
+                    votesAgainst = 50,
+                    votesFor = 45,
+                    segmentWidth = 16.dp,
+                    circleSpacingPerc = 0.025f
+                )
+            )
+
+            VotingBar(
+                params = VotingBarParams(
+                    votesAgainst = 0,
+                    votesFor = 0,
+                    segmentWidth = 16.dp,
+                    circleSpacingPerc = 0.025f
+                )
+            )
         }
     }
 }

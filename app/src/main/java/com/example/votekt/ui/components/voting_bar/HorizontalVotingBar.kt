@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -30,55 +31,51 @@ import kotlin.math.roundToInt
 
 @Composable
 fun HorizontalVotingBar(
-    params: VotingBarParams,
-    modifier: Modifier
+    votesFor: Int, votesAgainst: Int, modifier: Modifier, corners: Dp = 16.dp
 ) {
-    val totalVotes = params.votesFor + params.votesAgainst
-    val proportionFor = params.votesFor.toFloat() / totalVotes
-    val proportionAgainst = params.votesAgainst.toFloat() / totalVotes
+    val totalVotes = votesFor + votesAgainst
+    val proportionFor = votesFor.toFloat() / totalVotes
+    val proportionAgainst = votesAgainst.toFloat() / totalVotes
 
-    Row(modifier) {
-        if (totalVotes == 0) {
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = Color.LightGray,
-                    )
-                    .weight(1f)
-                    .fillMaxHeight()
+    Box(
+        modifier = modifier.then(
+            Modifier.clip(
+                shape = RoundedCornerShape(corners),
             )
-        }
+        )
+    ) {
 
-        if (proportionFor > 0F) {
-            Box(
-                modifier = Modifier
-                    .clipToBounds()
+        Row(modifier) {
+            if (totalVotes == 0) {
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = Color.LightGray,
+                        )
+                        .weight(1f)
+                        .fillMaxHeight()
+                )
+            }
 
-                    .background(
-                        color = getVoteColor(isVotedFor = true),
-//                        shape = RoundedCornerShape(
-//                            topStart = 16.dp, bottomStart = 16.dp
-//                        )
-                    )
-                    .weight(proportionFor)
-                    .fillMaxHeight()
-            )
-        }
+            if (proportionFor > 0F) {
+                Box(
+                    modifier = Modifier
+                        .clipToBounds()
+                        .background(color = getVoteColor(isVotedFor = true))
+                        .weight(proportionFor)
+                        .fillMaxHeight()
+                )
+            }
 
-        if (proportionAgainst > 0F) {
-            Box(
-                modifier = Modifier
-                    .clipToBounds()
-
-                    .background(
-                        color = getVoteColor(isVotedFor = false),
-//                        shape = RoundedCornerShape(
-//                            topEnd = 16.dp, bottomEnd = 16.dp
-//                        )
-                    )
-                    .weight(proportionAgainst)
-                    .fillMaxHeight()
-            )
+            if (proportionAgainst > 0F) {
+                Box(
+                    modifier = Modifier
+                        .clipToBounds()
+                        .background(color = getVoteColor(isVotedFor = false))
+                        .weight(proportionAgainst)
+                        .fillMaxHeight()
+                )
+            }
         }
     }
 }
@@ -95,25 +92,25 @@ fun HorizontalVotingBar_Preview() {
 
             Column(Modifier.wrapContentHeight(), Arrangement.spacedBy(12.dp)) {
                 HorizontalVotingBar(
-                    params = VotingBarParams(10, 5), modifier = Modifier
+                    votesFor = 10, votesAgainst = 5, modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    params = VotingBarParams(1, 50), modifier = Modifier
+                    votesFor = 1, votesAgainst = 50, modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    params = VotingBarParams(1, 0), modifier = Modifier
+                    votesFor = 1, votesAgainst = 0, modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    params = VotingBarParams(0, 0), modifier = Modifier
+                    votesFor = 0, votesAgainst = 0, modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
