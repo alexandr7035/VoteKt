@@ -1,7 +1,7 @@
 package com.example.votekt.data.model
 
 data class Proposal(
-    val id: String,
+    val id: Long,
     val title: String,
     val description: String,
     val votesFor: Int,
@@ -12,7 +12,7 @@ data class Proposal(
     companion object {
         fun mock(): Proposal {
             return Proposal(
-                id = "0",
+                id = 0,
                 title = "My awesome Proposal",
                 description = "My awesome description. Lorem ipsum lorem ipsum. My awesome description. Lorem ipsum lorem ipsum.",
                 votesFor = 10,

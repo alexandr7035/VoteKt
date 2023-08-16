@@ -26,7 +26,7 @@ import com.example.votekt.ui.theme.VoteKtTheme
 @Composable
 fun ProposalCard(
     proposal: Proposal,
-    onClick: (proposalId: String) -> Unit = {}
+    onClick: (proposalId: Long) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -74,24 +74,7 @@ fun ProposalCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
             }
-
-//            Box(
-//                modifier = Modifier
-//                    .width(100.dp)
-//                    .wrapContentHeight(),
-//            ) {
-//                VotingBarCircle(
-//                    params = VotingBarParams(
-//                        votesFor = proposal.votesFor,
-//                        votesAgainst = proposal.votesAgainst,
-//                        segmentWidth = 12.dp
-//                    )
-//                )
-//            }
-
         }
-
-
     }
 }
 

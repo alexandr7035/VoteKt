@@ -34,7 +34,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProposalsScreen(
-    onProposalClick: (proposalId: String) -> Unit = {},
+    onProposalClick: (proposalId: Long) -> Unit = {},
     onNewProposalClick: ()-> Unit = {},
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
@@ -84,7 +84,7 @@ fun ProposalsScreen(
 
 @Composable
 private fun ProposalsList(
-    proposals: List<Proposal>, pv: PaddingValues, onProposalClick: (proposalId: String) -> Unit
+    proposals: List<Proposal>, pv: PaddingValues, onProposalClick: (proposalId: Long) -> Unit
 ) {
     LazyColumn(modifier = Modifier
         .background(MaterialTheme.colorScheme.background)
@@ -96,7 +96,8 @@ private fun ProposalsList(
             }
 
             items(proposals.size) {
-                ProposalCard(proposal = proposals[it], onClick = { onProposalClick.invoke(it) })
+                val proposal = proposals[it]
+                ProposalCard(proposal = proposal, onClick = { onProposalClick.invoke(proposal.id) })
             }
 
             item {

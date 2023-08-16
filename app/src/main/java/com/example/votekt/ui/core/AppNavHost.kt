@@ -90,9 +90,9 @@ fun AppNavHost(
 
             composable(
                 route = "${NavEntries.VotingDetails.route}/{proposalId}",
-                arguments = listOf(navArgument("proposalId") { type = NavType.StringType })
+                arguments = listOf(navArgument("proposalId") { type = NavType.LongType })
             ) {
-                VotingDetailsScreen(proposalId = it.arguments?.getString("proposalId")!!, onBack = { navController.popBackStack() })
+                VotingDetailsScreen(proposalId = it.arguments?.getLong("proposalId")!!, onBack = { navController.popBackStack() })
             }
         }
     }

@@ -19,10 +19,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.voting_bar.VotingBar
@@ -37,7 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun VotingDetailsScreen(
-    proposalId: String,
+    proposalId: Long,
     onBack: () -> Unit = {},
 //    viewModel: VotingViewModel = koinViewModel(),
     viewModel: ProposalsViewModel = koinViewModel()
@@ -107,9 +107,17 @@ private fun VotingDetailsScreen_Ui(
                 text = proposal.description,
                 style = MaterialTheme.typography.bodyLarge
             )
+
+            // TODO timer
+            Text(text = "Expires at: ${proposal.expirationTime.getFormattedDate("dd MMM yyyy / HH:mm:ss")} UTC")
+
+            Spacer(Modifier.height(16.dp))
         }
 
-        Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            modifier = Modifier.padding(vertical = 16.dp)
+        ) {
             PrimaryButton(
                 text = "Vote against",
                 onClick = { /*TODO*/ },
@@ -122,8 +130,6 @@ private fun VotingDetailsScreen_Ui(
                 modifier = Modifier.weight(1f)
             )
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 

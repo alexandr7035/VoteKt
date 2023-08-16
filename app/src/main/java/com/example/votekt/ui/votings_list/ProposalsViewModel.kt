@@ -63,7 +63,7 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
     }
 
 
-    fun loadProposalById(id: String) {
+    fun loadProposalById(id: Long) {
         viewModelScope.launch {
             _proposalUi.update { curr ->
                 curr.copy(
@@ -71,14 +71,11 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
                 )
             }
 
-            // FIXME not random
-            val res = web3Repository.getProposals()
-
-            when (res) {
+            when (val res = web3Repository.getProposalById(id)) {
                 is OperationResult.Success -> {
                     _proposalUi.update { curr ->
                         curr.copy(
-                            data = res.data[0],
+                            data = res.data,
                             isLoading = false,
                             error = null
                         )

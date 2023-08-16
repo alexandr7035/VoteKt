@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TxStatus
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -86,14 +87,14 @@ private fun TransactionCardUi(
 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = getFormattedDate(transaction.dateSent, "dd MMM yyyy"),
+                        text = transaction.dateSent.getFormattedDate("dd MMM yyyy"),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.Gray
                     )
 
                     Text(
-                        text = "${getFormattedDate(transaction.dateSent, "HH:mm:ss")} UTC",
+                        text = "${transaction.dateSent.getFormattedDate("HH:mm:ss")} UTC",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.ExtraBold,
                         color = Color.Gray

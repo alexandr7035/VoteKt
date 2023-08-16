@@ -58,13 +58,12 @@ class Web3RepositoryImpl(
         return executeWeb3Call {
             val res = votingContract.getProposalDetails(BigInteger.valueOf(id)).send()
             Proposal(
-                // TODO
-                id = "0",
+                id = res.id.toLong(),
                 title = res.title,
                 description = res.description,
                 votesAgainst = res.votesAgainst.toInt(),
                 votesFor = res.votesFor.toInt(),
-                expirationTime = res.expirationTime.toLong()
+                expirationTime = res.expirationTime.toLong() * 1000,
             )
         }
     }
@@ -75,13 +74,12 @@ class Web3RepositoryImpl(
             Log.d("DEBUG_TAG", "${raw}")
             raw.map { it as VotingContract.ProposalRaw }.map { rawProposal ->
                 Proposal(
-                    // TODO
-                    id = "0",
+                    id = rawProposal.id.toLong(),
                     title = rawProposal.title,
                     description = rawProposal.description,
                     votesAgainst = rawProposal.votesAgainst.toInt(),
                     votesFor = rawProposal.votesFor.toInt(),
-                    expirationTime = rawProposal.expirationTime.toLong()
+                    expirationTime = rawProposal.expirationTime.toLong() * 1000
                 )
             }
         }
@@ -90,8 +88,9 @@ class Web3RepositoryImpl(
     override suspend fun createProposal(req: CreateProposalReq): OperationResult<String> = withContext(dispatcher) {
         try {
             val tx = votingContract.createProposal(
-                // TODO duration
-                req.title, req.desc
+                req.title,
+                req.desc,
+                req.duration.getDurationInDays().toBigInteger()
             ).send()
 
             transactionRepository.cacheTransaction(

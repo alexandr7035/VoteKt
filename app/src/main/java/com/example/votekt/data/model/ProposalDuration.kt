@@ -5,11 +5,11 @@ enum class ProposalDuration {
     DURATION_7_DAYS,
     DURATION_30_DAYS;
 
-    fun getDurationInMills(): Long {
+    fun getDurationInDays(): Long {
         return when (this) {
-            DURATION_24_HOURS -> 24 * 3600_000L
-            DURATION_7_DAYS -> 24 * 7 * 3600_000L
-            DURATION_30_DAYS -> 24 * 30 * 3600_000L
+            DURATION_24_HOURS -> 1
+            DURATION_7_DAYS -> 7
+            DURATION_30_DAYS -> 30
         }
     }
 
