@@ -4,6 +4,9 @@ cache
 deployments
 node_modules
 
+*.abi
+*.bin
+
 
 /data/
 node_modules

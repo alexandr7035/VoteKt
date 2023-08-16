@@ -4,6 +4,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VotingContract is Ownable {
     struct ProposalRaw {
+        uint id;
         string title;
         string description;
         uint votesFor;
@@ -37,7 +38,11 @@ contract VotingContract is Ownable {
         _;
     }
 
-    function createProposal(string memory title, string memory description)
+    function createProposal(
+        string memory title,
+        string memory description,
+        uint durationInDays
+    )
         public
         onlyOwner
         checkActiveProposalsLimit
@@ -45,9 +50,12 @@ contract VotingContract is Ownable {
         uint256 proposalId = proposals.length;
 
         ProposalRaw memory newProposal;
+        newProposal.id = proposalId;
         newProposal.title = title;
         newProposal.description = description;
-        newProposal.expirationTime = block.timestamp + 1 days;
+
+        uint256 expiration = block.timestamp + durationInDays * 86400;
+        newProposal.expirationTime = expiration;
 
         proposals.push(newProposal);
         emit ProposalCreated(proposalId, title);
