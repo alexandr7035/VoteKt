@@ -10,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -22,20 +24,24 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProposalsScreen(
     onProposalClick: (proposalId: Long) -> Unit = {},
-    onNewProposalClick: ()-> Unit = {},
+    onNewProposalClick: () -> Unit = {},
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
     Scaffold(
@@ -59,14 +65,23 @@ fun ProposalsScreen(
         Log.d("TEST", state.toString())
 
         LaunchedEffect(Unit) {
-            viewModel.loadProposals()
+            while (this.isActive) {
+                viewModel.loadProposals()
+                delay(5000)
+            }
         }
 
         when {
+            state.shouldShowFullLoading() -> {
+                FullscreenProgressBar(backgroundColor = Color.Transparent)
+            }
+
             state.shouldShowData() -> {
                 if (state.data!!.isNotEmpty()) {
                     ProposalsList(
-                        proposals = state.data, pv = pv, onProposalClick = onProposalClick
+                        proposals = state.data,
+                        pv = pv,
+                        onProposalClick = onProposalClick,
                     )
                 } else {
                     NoProposalsStub(pv = pv)
@@ -84,7 +99,9 @@ fun ProposalsScreen(
 
 @Composable
 private fun ProposalsList(
-    proposals: List<Proposal>, pv: PaddingValues, onProposalClick: (proposalId: Long) -> Unit
+    proposals: List<Proposal>,
+    pv: PaddingValues,
+    onProposalClick: (proposalId: Long) -> Unit,
 ) {
     LazyColumn(modifier = Modifier
         .background(MaterialTheme.colorScheme.background)
@@ -95,9 +112,16 @@ private fun ProposalsList(
                 Spacer(Modifier.height(8.dp))
             }
 
-            items(proposals.size) {
-                val proposal = proposals[it]
-                ProposalCard(proposal = proposal, onClick = { onProposalClick.invoke(proposal.id) })
+            itemsIndexed(
+                items = proposals,
+                key = { _, proposal ->
+                    proposal.id
+                }
+            )  { _, proposal ->
+                ProposalCard(
+                    proposal = proposal,
+                    onClick = { onProposalClick.invoke(proposal.id) }
+                )
             }
 
             item {

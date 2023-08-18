@@ -35,28 +35,35 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
     fun loadProposals() {
         viewModelScope.launch {
             // Emit loading state
-            val loadingState = _proposalsListUi.value.copy(
-                isLoading = true
-            )
-            _proposalsListUi.value = loadingState
+
+            _proposalsListUi.update { prev ->
+                prev.copy(
+                    isLoading = true
+                )
+            }
 
             val res = web3Repository.getProposals()
             Log.d("TEST", res.toString())
 
             when (res) {
                 is OperationResult.Success -> {
-                    _proposalsListUi.value = _proposalsListUi.value.copy(
-                        data = res.data,
-                        isLoading = false,
-                        error = null
-                    )
+
+                    _proposalsListUi.update { prev ->
+                        prev.copy(
+                            data = res.data,
+                            isLoading = false,
+                            error = null
+                        )
+                    }
                 }
 
                 is OperationResult.Failure -> {
-                    _proposalsListUi.value = _proposalsListUi.value.copy(
-                        isLoading = false,
-                        error = res.error
-                    )
+                    _proposalsListUi.update { prev ->
+                        prev.copy(
+                            isLoading = false,
+                            error = res.error
+                        )
+                    }
                 }
             }
         }

@@ -8,7 +8,7 @@ data class ScreenState<T>(
     val isLoading: Boolean
 ) {
     fun shouldShowData(): Boolean {
-        return data != null && !isLoading && error == null
+        return data != null
     }
 
     fun shouldShowFullLoading(): Boolean {
