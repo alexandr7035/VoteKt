@@ -85,6 +85,7 @@ class Web3RepositoryImpl(
         }
     }
 
+
     override suspend fun createProposal(req: CreateProposalReq): OperationResult<String> = withContext(dispatcher) {
         try {
             val tx = votingContract.createProposal(
@@ -103,8 +104,27 @@ class Web3RepositoryImpl(
             )
 
             return@withContext OperationResult.Success(tx.transactionHash)
+        } catch (e: Exception) {
+            return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
         }
-        catch (e: Exception) {
+    }
+
+    override suspend fun voteOnProposal(proposalId: Long, isFor: Boolean): OperationResult<String> = withContext(dispatcher) {
+        try {
+            val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
+
+            transactionRepository.cacheTransaction(
+                Transaction(
+                    type = TransactionType.VOTE,
+                    hash = tx.transactionHash,
+                    dateSent = System.currentTimeMillis(),
+                    status = TxStatus.PENDING
+                )
+            )
+
+            return@withContext OperationResult.Success(tx.transactionHash)
+
+        } catch (e: Exception) {
             return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
         }
     }

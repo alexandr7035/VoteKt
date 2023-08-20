@@ -92,7 +92,14 @@ fun AppNavHost(
                 route = "${NavEntries.VotingDetails.route}/{proposalId}",
                 arguments = listOf(navArgument("proposalId") { type = NavType.LongType })
             ) {
-                VotingDetailsScreen(proposalId = it.arguments?.getLong("proposalId")!!, onBack = { navController.popBackStack() })
+                VotingDetailsScreen(
+                    proposalId = it.arguments?.getLong("proposalId")!!,
+                    onBack = { navController.popBackStack() },
+                    onShowSnackBar = { msg, mode ->
+                        hostCoroutineScope.launch {
+                            snackBarHostState.showResultSnackBar(msg, mode)
+                        }
+                    })
             }
         }
     }

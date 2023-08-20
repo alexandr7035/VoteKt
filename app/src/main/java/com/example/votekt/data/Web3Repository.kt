@@ -9,5 +9,6 @@ interface Web3Repository {
     suspend fun getProposalById(id: Long): OperationResult<Proposal>
     suspend fun getProposals(): OperationResult<List<Proposal>>
     suspend fun createProposal(req: CreateProposalReq): OperationResult<String>
+    suspend fun voteOnProposal(proposalId: Long, isFor: Boolean): OperationResult<String>
 }
 

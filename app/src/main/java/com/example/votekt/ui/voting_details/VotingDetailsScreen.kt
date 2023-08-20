@@ -19,18 +19,25 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Proposal
+import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.PrimaryButton
+import com.example.votekt.ui.components.progress.FullscreenProgressBar
+import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.components.voting_bar.VotingBar
 import com.example.votekt.ui.components.voting_bar.VotingBarParams
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.ResultColors
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.votings_list.ProposalsViewModel
+import com.example.votekt.ui.utils.prettifyAddress
+import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -39,11 +46,9 @@ import org.koin.androidx.compose.koinViewModel
 fun VotingDetailsScreen(
     proposalId: Long,
     onBack: () -> Unit = {},
-//    viewModel: VotingViewModel = koinViewModel(),
-    viewModel: ProposalsViewModel = koinViewModel()
+    onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
+    viewModel: VotingDetailsViewModel = koinViewModel(),
 ) {
-//    val addressesState = viewModel.getVotedAddressesObservable().collectAsStateWithLifecycle().value
-
     val proposalState = viewModel.proposalUi.collectAsStateWithLifecycle().value
 
     Row(Modifier.fillMaxSize()) {
@@ -59,13 +64,57 @@ fun VotingDetailsScreen(
             }) { pv ->
 
             LaunchedEffect(Unit) {
-                viewModel.loadProposalById(proposalId)
+                while (isActive) {
+                    viewModel.loadProposalById(proposalId)
+                    delay(10_000)
+                }
             }
-
 
             when {
                 proposalState.shouldShowData() -> {
-                    VotingDetailsScreen_Ui(proposalState.data!!, pv)
+                    // State of vote btn action
+                    val voteState = viewModel.voteActionState.collectAsStateWithLifecycle().value
+
+                    VotingDetailsScreen_Ui(
+                        proposal = proposalState.data!!,
+                        pv = pv,
+                        onVote = { vote ->
+                            viewModel.makeVote(proposalId, vote)
+                        }
+                    )
+
+                    EventEffect(
+                        event = voteState.voteTxSubmittedEvent, onConsumed = viewModel::onVoteCreatedEvent
+                    ) { eventData ->
+                        if (eventData.isTransactionSubmitted) {
+                            onShowSnackBar.invoke(
+                                "Vote submitted! Wait for the transaction result\n\nHash: ${eventData.transactionHash!!.prettifyAddress()}",
+                                SnackBarMode.Neutral
+                            )
+                        } else {
+                            onShowSnackBar.invoke(
+                                "Failed to submit your vote\n\n${eventData.error?.defaultMessage?.title}. ${eventData.error?.defaultMessage?.message}",
+                                SnackBarMode.Negative
+                            )
+                        }
+                    }
+
+                    if (voteState.isLoading) {
+                        FullscreenProgressBar()
+                    }
+                }
+
+                proposalState.shouldShowFullError() -> {
+                    ErrorFullScreen(
+                        appError = proposalState.error!!,
+                        onRetry = {
+                            viewModel.loadProposalById(proposalId)
+                        }
+                    )
+                }
+
+                proposalState.shouldShowFullLoading() -> {
+                    FullscreenProgressBar(backgroundColor = Color.Transparent)
                 }
             }
         }
@@ -76,7 +125,8 @@ fun VotingDetailsScreen(
 @Composable
 private fun VotingDetailsScreen_Ui(
     proposal: Proposal,
-    pv: PaddingValues
+    pv: PaddingValues,
+    onVote: (isFor: Boolean) -> Unit
 ) {
     Column(
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = pv.calculateTopPadding() + 16.dp),
@@ -120,13 +170,13 @@ private fun VotingDetailsScreen_Ui(
         ) {
             PrimaryButton(
                 text = "Vote against",
-                onClick = { /*TODO*/ },
+                onClick = { onVote.invoke(false) },
                 modifier = Modifier.weight(1f),
                 buttonColor = ResultColors.negativeColor
             )
             PrimaryButton(
                 text = "Vote for",
-                onClick = { /*TODO*/ },
+                onClick = { onVote.invoke(true) },
                 modifier = Modifier.weight(1f)
             )
         }
@@ -141,7 +191,8 @@ fun VotingDetailsScreen_Preview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             VotingDetailsScreen_Ui(
                 proposal = Proposal.mock(),
-                pv = PaddingValues(16.dp)
+                pv = PaddingValues(16.dp),
+                onVote = {}
             )
         }
     }

@@ -21,16 +21,7 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
         )
     )
 
-    private val _proposalUi = MutableStateFlow<ScreenState<Proposal>>(
-        ScreenState(
-            data = null,
-            isLoading = true,
-            error = null
-        )
-    )
-
     val proposalsListUi = _proposalsListUi.asStateFlow()
-    val proposalUi = _proposalUi.asStateFlow()
 
     fun loadProposals() {
         viewModelScope.launch {
@@ -60,38 +51,6 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
                 is OperationResult.Failure -> {
                     _proposalsListUi.update { prev ->
                         prev.copy(
-                            isLoading = false,
-                            error = res.error
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-
-    fun loadProposalById(id: Long) {
-        viewModelScope.launch {
-            _proposalUi.update { curr ->
-                curr.copy(
-                    isLoading = true
-                )
-            }
-
-            when (val res = web3Repository.getProposalById(id)) {
-                is OperationResult.Success -> {
-                    _proposalUi.update { curr ->
-                        curr.copy(
-                            data = res.data,
-                            isLoading = false,
-                            error = null
-                        )
-                    }
-                }
-
-                is OperationResult.Failure -> {
-                    _proposalUi.update { curr ->
-                        curr.copy(
                             isLoading = false,
                             error = res.error
                         )

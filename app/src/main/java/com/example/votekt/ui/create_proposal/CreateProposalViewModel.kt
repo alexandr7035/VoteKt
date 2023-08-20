@@ -33,7 +33,7 @@ class CreateProposalViewModel(private val web3Repository: Web3Repository) : View
                     _uiState.update { prev ->
                         prev.copy(
                             submitProposalEvent = triggered(
-                                CreateProposalResult(
+                                SubmitTransactionResult(
                                     isTransactionSubmitted = true,
                                     transactionHash = res.data,
                                     error = null
@@ -48,7 +48,7 @@ class CreateProposalViewModel(private val web3Repository: Web3Repository) : View
                     _uiState.update { prev ->
                         prev.copy(
                             submitProposalEvent = triggered(
-                                CreateProposalResult(
+                                SubmitTransactionResult(
                                     isTransactionSubmitted = false,
                                     transactionHash = null,
                                     error = res.error
