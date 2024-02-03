@@ -8,6 +8,7 @@ import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
 import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
+import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.voting_details.VotingDetailsViewModel
 import com.example.votekt.ui.votings_list.ProposalsViewModel
@@ -23,6 +24,7 @@ val appModule = module {
     viewModel { ProposalsViewModel(get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
+    viewModel { WalletViewModel() }
 
     single {
         Room.databaseBuilder(

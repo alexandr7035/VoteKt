@@ -31,21 +31,70 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
+import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
+import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
+import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.showToast
+import de.palm.composestateevents.NavigationEventEffect
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun WalletScreen() {
+fun WalletScreen(
+    viewModel: WalletViewModel = koinViewModel(),
+) {
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    val context = LocalContext.current
+
+    WalletScreen_Ui(
+        state = state,
+        onWalletAction = {
+            viewModel.onWalletIntent(it)
+        }
+    )
+
+    NavigationEventEffect(
+        event = state.navigationEvent,
+        onConsumed = viewModel::consumeNavigationEvent,
+        action = {
+            when (it) {
+                WalletScreenNavigationEvent.ToNetworkDetails -> {
+                    context.showToast("Network details")
+                }
+                WalletScreenNavigationEvent.ToReceive -> {
+                    context.showToast("Receive")
+                }
+                WalletScreenNavigationEvent.ToSend -> {
+                    context.showToast("Send")
+                }
+                WalletScreenNavigationEvent.ToVote -> {
+                    context.showToast("Vote")
+                }
+            }
+        }
+    )
+}
+
+@Composable
+private fun WalletScreen_Ui(
+    state: WalletScreenState,
+    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
-        Header()
+        Header(
+            onWalletAction = onWalletAction
+        )
     }
 }
 
 @Composable
-private fun Header() {
+private fun Header(
+    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
+) {
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primary)
@@ -56,7 +105,9 @@ private fun Header() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Balance()
-        Actions()
+        Actions(
+            onWalletAction = onWalletAction
+        )
     }
 }
 
@@ -73,7 +124,9 @@ private fun Balance() {
 }
 
 @Composable
-private fun Actions() {
+private fun Actions(
+    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
+) {
     Row(
         modifier = Modifier.wrapContentSize(),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
@@ -81,15 +134,15 @@ private fun Actions() {
         val context = LocalContext.current
 
         ActionBtn(icon = R.drawable.ic_send) {
-            context.showToast("Send")
+            onWalletAction(WalletScreenIntent.WalletAction.Send)
         }
 
         ActionBtn(icon = R.drawable.ic_receive) {
-            context.showToast("Receive")
+            onWalletAction(WalletScreenIntent.WalletAction.Receive)
         }
 
         ActionBtn(icon = R.drawable.ic_vote_outlined) {
-            context.showToast("Vote")
+            onWalletAction(WalletScreenIntent.WalletAction.Vote)
         }
     }
 }
