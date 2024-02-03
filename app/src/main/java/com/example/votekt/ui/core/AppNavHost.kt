@@ -26,6 +26,7 @@ import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
 import com.example.votekt.ui.create_proposal.CreateProposalScreen
+import com.example.votekt.ui.feature_wallet.WalletScreen
 import com.example.votekt.ui.votings_list.ProposalsScreen
 import kotlinx.coroutines.launch
 
@@ -34,9 +35,9 @@ import kotlinx.coroutines.launch
 fun AppNavHost(
     navController: NavHostController
 ) {
-
+    // TODO refactoring
     val primaryDestinations = listOf(
-        NavEntries.Proposals.route, NavEntries.TxHistory.route
+        NavEntries.Proposals.route, NavEntries.TxHistory.route, NavEntries.Wallet.route
     )
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -55,9 +56,13 @@ fun AppNavHost(
 
         NavHost(
             navController = navController,
-            startDestination = NavEntries.Proposals.route,
+            startDestination = NavEntries.Wallet.route,
             modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
         ) {
+            composable(NavEntries.Wallet.route) {
+                WalletScreen()
+            }
+
             composable(NavEntries.Proposals.route) {
                 ProposalsScreen(onProposalClick = { proposalId ->
                     navController.navigate("${NavEntries.VotingDetails.route}/${proposalId}")

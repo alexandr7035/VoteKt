@@ -16,8 +16,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 fun AppBottomNav(navController: NavHostController) {
 
     val bottomNavItems = listOf(
+        NavEntries.Wallet,
         NavEntries.Proposals,
-        NavEntries.TxHistory
+        NavEntries.TxHistory,
     )
 
     BottomAppBar() {
