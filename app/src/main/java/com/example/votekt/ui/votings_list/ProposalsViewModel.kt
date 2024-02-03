@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.OperationResult
-import com.example.votekt.data.Web3Repository
+import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel() {
+class ProposalsViewModel(private val votingRepository: VotingRepository) : ViewModel() {
     private val _proposalsListUi = MutableStateFlow<ScreenState<List<Proposal>>>(
         ScreenState(
             data = null,
@@ -33,7 +33,7 @@ class ProposalsViewModel(private val web3Repository: Web3Repository) : ViewModel
                 )
             }
 
-            val res = web3Repository.getProposals()
+            val res = votingRepository.getProposals()
             Log.d("TEST", res.toString())
 
             when (res) {

@@ -7,7 +7,7 @@ import com.example.votekt.data.AppError
 import com.example.votekt.data.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VoterAddress
-import com.example.votekt.data.Web3Repository
+import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.helpers.executeWeb3Call
 import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.Proposal
@@ -24,11 +24,11 @@ import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.response.NoOpProcessor
 import java.math.BigInteger
 
-class Web3RepositoryImpl(
+class VotingRepositoryImpl(
     web3j: Web3j,
     private val transactionRepository: TransactionRepository,
     private val dispatcher: CoroutineDispatcher
-) : Web3Repository {
+) : VotingRepository {
     private val votingContract: VotingContract
 
     init {

@@ -3,7 +3,7 @@ package com.example.votekt.ui.create_proposal
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.OperationResult
-import com.example.votekt.data.Web3Repository
+import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.model.CreateProposalReq
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CreateProposalViewModel(private val web3Repository: Web3Repository) : ViewModel() {
+class CreateProposalViewModel(private val votingRepository: VotingRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(
         CreateProposalScreenState()
     )
@@ -26,7 +26,7 @@ class CreateProposalViewModel(private val web3Repository: Web3Repository) : View
                 prev.copy(isLoading = true)
             }
 
-            val res = web3Repository.createProposal(data)
+            val res = votingRepository.createProposal(data)
 
             when (res) {
                 is OperationResult.Success -> {
