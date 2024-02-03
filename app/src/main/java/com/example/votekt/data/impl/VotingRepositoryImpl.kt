@@ -13,7 +13,7 @@ import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.Proposal
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TransactionType
-import com.example.votekt.data.model.TxStatus
+import com.example.votekt.data.web3_core.transactions.TxStatus
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -27,14 +27,13 @@ import java.math.BigInteger
 class VotingRepositoryImpl(
     web3j: Web3j,
     private val transactionRepository: TransactionRepository,
-    private val dispatcher: CoroutineDispatcher
+    private val dispatcher: CoroutineDispatcher,
 ) : VotingRepository {
     private val votingContract: VotingContract
 
     init {
         val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
         Log.d("DEBUG_TAG", "KEY PAIR for ${credentials.address} created")
-
 
         // NoOpProcessor provides an EmptyTransactionReceipt to clients which only contains the transaction hash.
         // This is for clients who do not want web3j to perform any polling for a transaction receipt.

@@ -1,4 +1,4 @@
-package com.example.votekt.data.model
+package com.example.votekt.data.web3_core.transactions
 
 enum class TxStatus {
     REVERTED,

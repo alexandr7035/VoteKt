@@ -6,6 +6,7 @@ import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
+import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.voting_details.VotingDetailsViewModel
@@ -41,4 +42,6 @@ val appModule = module {
     single<TransactionRepository> {
         TransactionRepositoryImpl(get(), get(), Dispatchers.IO)
     }
+
+    single { TransactionDataSource(get()) }
 }

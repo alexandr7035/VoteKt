@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.model.Transaction
-import com.example.votekt.data.model.TxStatus
+import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.delay

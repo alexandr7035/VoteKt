@@ -9,7 +9,7 @@ import androidx.room.Update
 @Dao
 interface TransactionDao {
     @Query("SELECT * FROM transactions ORDER BY dateSent DESC")
-    fun getTransactions(): List<TransactionEntity>
+    suspend fun getTransactions(): List<TransactionEntity>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun cacheTransaction(transaction: TransactionEntity)

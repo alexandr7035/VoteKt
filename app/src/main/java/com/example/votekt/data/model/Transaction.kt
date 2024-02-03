@@ -1,5 +1,7 @@
 package com.example.votekt.data.model
 
+import com.example.votekt.data.web3_core.transactions.TxStatus
+
 data class Transaction(
     val type: TransactionType,
     val hash: String,

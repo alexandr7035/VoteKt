@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
-import com.example.votekt.data.model.TxStatus
+import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.utils.prettifyAddress
