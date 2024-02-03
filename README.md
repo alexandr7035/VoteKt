@@ -1,6 +1,17 @@
 # README.md
 
-## Local setup
+## Notes
+Infura limits (Free):
+100,000 Total Requests/Day
+25,000 Ethereum Mainnet Archive Requests/Day
+
+[Dashboard | Create a key](https://app.infura.io/)  
+[See all info about limits](https://support.infura.io/hc/en-us/articles/10650822554395-What-are-Infura-s-daily-limits-)  
+[Blockchain Series — How MetaMask Creates Accounts](https://levelup.gitconnected.com/blockchain-series-how-metamask-creates-accounts-a8971b21a74b)
+
+## Running the app
+
+### Local setup
 Use Android Emulator with default network settings
 
 ### Deploy and test contract
@@ -47,3 +58,6 @@ LOCAL_TEST_ADDRESS="0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"
 ```
 
 Choose localDebug build variant and build
+
+## Useful materials
+[Build your first Android Dapp using Web3j and Infura](https://medium.com/@madhurakunjir2611/build-your-first-android-dapp-using-web3j-and-infura-36d2596c1e2a#:~:text=The%20default%20derivation%20path%20used,account%20into%20the%20Credentials%20object.)
