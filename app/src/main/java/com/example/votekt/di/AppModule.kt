@@ -3,6 +3,8 @@ package com.example.votekt.di
 import androidx.room.Room
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VotingRepository
+import com.example.votekt.data.account.AccountRepository
+import com.example.votekt.data.account.AccountRepositoryImpl
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
@@ -16,6 +18,7 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import kotlin.time.Duration.Companion.seconds
 
 val appModule = module {
     includes(web3Module)
@@ -24,7 +27,7 @@ val appModule = module {
     viewModel { ProposalsViewModel(get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
-    viewModel { WalletViewModel() }
+    viewModel { WalletViewModel(get()) }
 
     single {
         Room.databaseBuilder(
@@ -35,6 +38,14 @@ val appModule = module {
 
     single {
         get<TransactionsDatabase>().transactionDao()
+    }
+
+    single<AccountRepository> {
+        AccountRepositoryImpl(
+            dispatcher = Dispatchers.IO,
+            web3Client = get(),
+            balancePollingDelay = 5.seconds
+        )
     }
 
     single<VotingRepository> {

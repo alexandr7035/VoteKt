@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
+import com.example.votekt.ui.common.BalanceUi
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -63,12 +64,15 @@ fun WalletScreen(
                 WalletScreenNavigationEvent.ToNetworkDetails -> {
                     context.showToast("Network details")
                 }
+
                 WalletScreenNavigationEvent.ToReceive -> {
                     context.showToast("Receive")
                 }
+
                 WalletScreenNavigationEvent.ToSend -> {
                     context.showToast("Send")
                 }
+
                 WalletScreenNavigationEvent.ToVote -> {
                     context.showToast("Vote")
                 }
@@ -80,19 +84,23 @@ fun WalletScreen(
 @Composable
 private fun WalletScreen_Ui(
     state: WalletScreenState,
-    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
+    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit = {}
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
     ) {
         Header(
-            onWalletAction = onWalletAction
+            onWalletAction = onWalletAction,
+            balance = state.balance,
+            isBalanceLoading = state.isBalanceLoading
         )
     }
 }
 
 @Composable
 private fun Header(
+    balance: BalanceUi?,
+    isBalanceLoading: Boolean,
     onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
 ) {
     Column(
@@ -104,7 +112,10 @@ private fun Header(
         verticalArrangement = Arrangement.spacedBy(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Balance()
+        Balance(
+            balance = balance,
+            isBalanceLoading = isBalanceLoading
+        )
         Actions(
             onWalletAction = onWalletAction
         )
@@ -112,15 +123,36 @@ private fun Header(
 }
 
 @Composable
-private fun Balance() {
-    Text(
-        style = TextStyle(
-            color = MaterialTheme.colorScheme.onPrimary,
-            fontSize = 32.sp,
-            fontWeight = FontWeight.Bold
-        ),
-        text = "200 ETH"
-    )
+private fun Balance(
+    balance: BalanceUi?,
+    isBalanceLoading: Boolean,
+) {
+    when {
+        isBalanceLoading -> {
+            // TODO
+            Text(
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                text = "..."
+            )
+        }
+
+        balance != null -> {
+            Text(
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold
+                ),
+                text = balance.value
+            )
+        }
+
+        else -> error("Balance is null")
+    }
 }
 
 @Composable
@@ -184,7 +216,9 @@ private fun ActionBtn(
 private fun WalletScreen_Preview() {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
-            WalletScreen()
+            WalletScreen_Ui(
+                state = WalletScreenState(),
+            )
         }
     }
 }
