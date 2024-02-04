@@ -1,4 +1,4 @@
-package com.example.votekt.data
+package com.example.votekt.domain.core
 
 sealed class OperationResult<out T : Any> {
     data class Success<out T : Any>(val data: T) : OperationResult<T>()
