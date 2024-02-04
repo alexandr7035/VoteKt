@@ -40,6 +40,10 @@ val appModule = module {
         get<TransactionsDatabase>().transactionDao()
     }
 
+    single {
+        get<TransactionsDatabase>().proposalsDao()
+    }
+
     single<AccountRepository> {
         AccountRepositoryImpl(
             dispatcher = Dispatchers.IO,
