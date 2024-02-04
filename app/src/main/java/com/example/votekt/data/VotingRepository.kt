@@ -2,6 +2,7 @@ package com.example.votekt.data
 
 import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.data.model.Proposal
+import com.example.votekt.domain.core.OperationResult
 
 interface VotingRepository {
     // TODO

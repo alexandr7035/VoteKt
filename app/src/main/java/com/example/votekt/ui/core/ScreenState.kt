@@ -1,6 +1,6 @@
 package com.example.votekt.ui.core
 
-import com.example.votekt.data.AppError
+import com.example.votekt.domain.core.AppError
 
 data class ScreenState<T>(
     val data: T?,

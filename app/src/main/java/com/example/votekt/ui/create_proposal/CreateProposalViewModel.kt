@@ -2,7 +2,7 @@ package com.example.votekt.ui.create_proposal
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.OperationResult
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.model.CreateProposalReq
 import de.palm.composestateevents.consumed

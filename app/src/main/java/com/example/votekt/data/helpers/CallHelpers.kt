@@ -1,7 +1,7 @@
 package com.example.votekt.data.helpers
 
-import com.example.votekt.data.AppError
-import com.example.votekt.data.OperationResult
+import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.OperationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.net.ConnectException

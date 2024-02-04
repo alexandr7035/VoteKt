@@ -1,7 +1,7 @@
 package com.example.votekt.data.impl
 
-import com.example.votekt.data.AppError
-import com.example.votekt.data.OperationResult
+import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.data.model.Transaction

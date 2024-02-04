@@ -3,8 +3,8 @@ package com.example.votekt.data.impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
-import com.example.votekt.data.AppError
-import com.example.votekt.data.OperationResult
+import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.VotingRepository

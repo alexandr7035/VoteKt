@@ -1,4 +1,4 @@
-package com.example.votekt.data
+package com.example.votekt.domain.core
 
 sealed class AppError() {
     object ConnectionError : AppError()

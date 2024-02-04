@@ -3,7 +3,7 @@ package com.example.votekt.ui.tx_history
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.OperationResult
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus

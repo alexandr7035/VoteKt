@@ -11,7 +11,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.votekt.data.AppError
+import com.example.votekt.domain.core.AppError
 import com.example.votekt.ui.theme.VoteKtTheme
 
 
