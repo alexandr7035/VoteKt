@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,8 +30,7 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
-import com.example.votekt.ui.components.voting_bar.VotingBar
-import com.example.votekt.ui.components.voting_bar.VotingBarParams
+import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.ResultColors
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -145,14 +145,6 @@ private fun VotingDetailsScreen_Ui(
                 style = MaterialTheme.typography.headlineMedium
             )
 
-            VotingBar(
-                params = VotingBarParams(
-                    proposal.votesFor,
-                    proposal.votesAgainst,
-                    segmentWidth = 20.dp,
-                )
-            )
-
             Text(
                 text = proposal.description,
                 style = MaterialTheme.typography.bodyLarge
@@ -162,6 +154,19 @@ private fun VotingDetailsScreen_Ui(
             Text(text = "Expires at: ${proposal.expirationTime.getFormattedDate("dd MMM yyyy / HH:mm:ss")} UTC")
 
             Spacer(Modifier.height(16.dp))
+
+
+        }
+
+        VotingActionsPanel(
+            votesFor = proposal.votesFor,
+            votesAgainst = proposal.votesAgainst,
+            modifier = Modifier.wrapContentHeight()
+        ) {
+            HorizontalVotingBar(
+                votesFor = proposal.votesFor,
+                votesAgainst = proposal.votesAgainst,
+                modifier = Modifier.height(16.dp).weight(1f))
         }
 
         Row(
