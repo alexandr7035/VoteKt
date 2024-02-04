@@ -1,0 +1,109 @@
+pragma solidity ^0.8.0;
+
+import "@openzeppelin/contracts/access/Ownable.sol";
+
+contract VotingContract is Ownable {
+    struct ProposalRaw {
+        uint id;
+        string title;
+        string description;
+        uint votesFor;
+        uint votesAgainst;
+        uint256 expirationTime;
+    }
+
+    ProposalRaw[] public proposals;
+
+    mapping(uint256 => mapping(address => bool)) public hasVoted;
+    mapping(uint256 => mapping(address => bool)) public votes;
+
+    uint256 public maxProposals = 5;
+
+    event ProposalCreated(uint256 proposalId, string title);
+    event VoteCasted(uint256 proposalId, bool inFavor);
+    event ProposalDeleted(uint256 proposalId);
+
+    modifier onlyBeforeExpiration(uint256 proposalId) {
+        require(
+            block.timestamp < proposals[proposalId].expirationTime,
+            "Voting period has expired"
+        );
+        _;
+    }
+
+    modifier onlyOnce(uint256 proposalId) {
+        require(!hasVoted[proposalId][msg.sender], "You have already voted");
+        _;
+    }
+
+    modifier checkActiveProposalsLimit() {
+        require(proposals.length < maxProposals, "Max proposals reached");
+        _;
+    }
+
+    function createProposal(
+        string memory title,
+        string memory description,
+        uint durationInDays
+    )
+        public
+        onlyOwner
+        checkActiveProposalsLimit
+    {
+        uint256 proposalId = proposals.length;
+
+        ProposalRaw memory newProposal;
+        newProposal.id = proposalId;
+        newProposal.title = title;
+        newProposal.description = description;
+
+        uint256 expiration = block.timestamp + durationInDays * 86400;
+        newProposal.expirationTime = expiration;
+
+        proposals.push(newProposal);
+        emit ProposalCreated(proposalId, title);
+    }
+
+    function deleteProposal(uint256 proposalId) public onlyOwner {
+        require(proposalId < proposals.length, "Invalid proposal ID");
+
+        delete proposals[proposalId];
+        emit ProposalDeleted(proposalId);
+    }
+
+    function vote(uint256 proposalId, bool inFavor)
+        public
+        onlyBeforeExpiration(proposalId)
+        onlyOnce(proposalId)
+    {
+        ProposalRaw storage proposal = proposals[proposalId];
+
+        if (inFavor) {
+            proposal.votesFor++;
+        } else {
+            proposal.votesAgainst++;
+        }
+
+        hasVoted[proposalId][msg.sender] = true;
+        voteChoices[proposalId][msg.sender] = choice;
+
+        emit VoteCasted(proposalId, inFavor);
+    }
+
+    function getVoteChoiceForProposal(uint256 proposalId) public view returns (bool) {
+        require(hasVoted[proposalId][msg.sender], "You have not voted for this proposal");
+        return voteChoices[proposalId][msg.sender];
+    }
+
+    function getProposalsList() public view returns (ProposalRaw[] memory) {
+        return proposals;
+    }
+
+    function getProposalDetails(uint256 proposalId)
+        public
+        view
+        returns (ProposalRaw memory)
+    {
+        return proposals[proposalId];
+    }
+}
