@@ -20,11 +20,18 @@ class AwaitingTxProcessor(
     private val web3j: Web3j,
     private val maxWaitingTime: Duration
 ): TxProcessor {
-    override fun observeTransactionResult(): Flow<TxResult> = flow {
+    override fun observeTransactionResult(hash: TxHash): Flow<TxResult> = flow {
         val startTime = SystemClock.uptimeMillis()
         emit(TxResult.AwaitingResult)
 
         while (coroutineContext.isActive) {
+            val receipt = checkTransactionReceipt(hash)
+
+            if (receipt != null) {
+                emit(TxResult.Success(receipt))
+                break
+            }
+
             if (isTimeExceeded(startTime)) {
                 emit(TxResult.TimeExceeded)
             }
