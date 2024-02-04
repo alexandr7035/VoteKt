@@ -1,35 +1,39 @@
 package com.example.votekt.ui.core
 
-import androidx.compose.material3.BottomAppBar
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBarItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.example.votekt.ui.components.bottomnav.M2BottomNavigation
+import com.example.votekt.ui.components.bottomnav.M2BottomNavigationItem
 
 @Composable
 fun AppBottomNav(navController: NavHostController) {
-
-    val bottomNavItems = listOf(
-        NavEntries.Wallet,
-        NavEntries.Proposals,
-        NavEntries.TxHistory,
-    )
-
-    BottomAppBar() {
+    M2BottomNavigation(
+        modifier = Modifier.height(72.dp),
+        backgroundColor = MaterialTheme.colorScheme.surface
+    ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
 
-        bottomNavItems.forEach { screen ->
+        NavDestinations.Primary.all().forEach { screen ->
             val isDestinationSelected = currentDestination?.hierarchy?.any { it.route == screen.route } == true
 
             // Bottom nav icons
-            NavigationBarItem(
+            M2BottomNavigationItem(
                 onClick = {
                     navController.navigate(screen.route) {
                         // Pop up to the start destination of the graph to
@@ -48,13 +52,27 @@ fun AppBottomNav(navController: NavHostController) {
                 selected = currentDestination?.hierarchy?.any { it.route == screen.route } == true,
                 icon = {
                     Icon(
-                        imageVector = screen.navIcon!!,
+                        modifier = Modifier
+                            .padding(bottom = 8.dp)
+                            .size(24.dp),
+                        painter = getDestinationIcon(isDestinationSelected, screen),
                         contentDescription = null,
-                        tint = if (isDestinationSelected) Color.Red else Color.Gray
+                        // TODO
+                        tint = if (isDestinationSelected) Color.Black else Color.Gray
                     )
                 },
                 label = { Text(text = screen.label) },
             )
         }
+    }
+}
+
+@Composable
+private fun getDestinationIcon(isSelected: Boolean, destination: NavDestinations.Primary): Painter {
+    return if (isSelected) {
+        painterResource(id = destination.filledIcon)
+    }
+    else {
+        painterResource(id = destination.outlinedIcon)
     }
 }
