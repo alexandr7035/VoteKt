@@ -81,28 +81,28 @@ fun HorizontalVotingBar_Preview() {
 
             Column(Modifier.wrapContentHeight(), Arrangement.spacedBy(12.dp)) {
                 HorizontalVotingBar(
-                    votingData = VotingData(10, 5),
+                    votingData = VotingData(10, 5, null),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    votingData = VotingData(1, 50),
+                    votingData = VotingData(1, 50, null),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    votingData = VotingData(1, 0),
+                    votingData = VotingData(1, 0, null),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)
                 )
 
                 HorizontalVotingBar(
-                    votingData = VotingData(0, 0),
+                    votingData = VotingData(0, 0, null),
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(16.dp)

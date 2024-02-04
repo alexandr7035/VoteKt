@@ -2,12 +2,9 @@ package com.example.votekt.ui.voting_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.VotingRepository
-import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.votings.VoteType
-import com.example.votekt.ui.core.ScreenState
-import com.example.votekt.ui.create_proposal.SubmitTransactionResult
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,44 +16,37 @@ class VotingDetailsViewModel(
     private val votingRepository: VotingRepository
 ) : ViewModel() {
 
-    private val _proposalUi = MutableStateFlow<ScreenState<Proposal>>(
-        ScreenState(
-            data = null,
-            isLoading = true,
-            error = null
+    private val _screenUi = MutableStateFlow(
+        ProposalDetailsScreenState(
+            isProposalLoading = true
         )
     )
-    val proposalUi = _proposalUi.asStateFlow()
 
-    private val _voteActionState = MutableStateFlow(
-        VoteActionState()
-    )
-
-    val voteActionState = _voteActionState.asStateFlow()
+    val screenUi = _screenUi.asStateFlow()
 
     fun loadProposalById(id: Long) {
         viewModelScope.launch {
-            _proposalUi.update { curr ->
+            _screenUi.update { curr ->
                 curr.copy(
-                    isLoading = true
+                    isProposalLoading = true
                 )
             }
 
             when (val res = votingRepository.getProposalById(id)) {
                 is OperationResult.Success -> {
-                    _proposalUi.update { curr ->
+                    _screenUi.update { curr ->
                         curr.copy(
-                            data = res.data,
-                            isLoading = false,
+                            proposal = res.data,
+                            isProposalLoading = false,
                             error = null
                         )
                     }
                 }
 
                 is OperationResult.Failure -> {
-                    _proposalUi.update { curr ->
+                    _screenUi.update { curr ->
                         curr.copy(
-                            isLoading = false,
+                            isProposalLoading = false,
                             error = res.error
                         )
                     }
@@ -67,39 +57,27 @@ class VotingDetailsViewModel(
 
 
     fun makeVote(proposalId: Long, voteType: VoteType) {
+        _screenUi.update {
+            it.copy(
+                isSelfVoteProcessing = true
+            )
+        }
 
         viewModelScope.launch {
-            _voteActionState.update { prev ->
-                prev.copy(isLoading = true)
-            }
-
             when (val res = votingRepository.voteOnProposal(proposalId, voteType)) {
                 is OperationResult.Success -> {
-                    _voteActionState.update { prev ->
-                        prev.copy(
-                            voteTxSubmittedEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = true,
-                                    transactionHash = res.data,
-                                    error = null
-                                )
-                            ),
-                            isLoading = false,
+                    _screenUi.update {
+                        it.copy(
+                            isSelfVoteProcessing = false,
+                            selfVoteSubmittedEvent = triggered(res.data)
                         )
                     }
                 }
 
                 is OperationResult.Failure -> {
-                    _voteActionState.update { prev ->
-                        prev.copy(
-                            voteTxSubmittedEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = false,
-                                    transactionHash = null,
-                                    error = res.error
-                                )
-                            ),
-                            isLoading = false,
+                    _screenUi.update {
+                        it.copy(
+                            error = res.error
                         )
                     }
                 }
@@ -107,10 +85,10 @@ class VotingDetailsViewModel(
         }
     }
 
-    fun onVoteCreatedEvent() {
-        _voteActionState.update { prev ->
-            prev.copy(
-                voteTxSubmittedEvent = consumed(),
+    fun onVoteSubmittedEvent() {
+        _screenUi.update {
+            it.copy(
+                selfVoteSubmittedEvent = consumed()
             )
         }
     }

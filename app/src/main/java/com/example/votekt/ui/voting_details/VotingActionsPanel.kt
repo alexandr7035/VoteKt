@@ -38,7 +38,6 @@ import com.example.votekt.ui.utils.showToast
 @Composable
 fun VotingActionsPanel(
     votingData: VotingData,
-    selfVote: VoteType? = null,
     onVote: (VoteType) -> Unit = {},
     modifier: Modifier,
     centerContent: @Composable () -> Unit = {},
@@ -46,14 +45,14 @@ fun VotingActionsPanel(
     Row(
         modifier = modifier, verticalAlignment = Alignment.CenterVertically
     ) {
-        val votingEnabled = selfVote == null
+        val votingEnabled = votingData.selfVote == null
 
         VoteButton(
             onClick = { onVote(VoteType.VOTE_AGAINST) },
             votesCount = votingData.votesAgainst,
             tint = getVoteColor(false),
             enabled = votingEnabled,
-            selected = selfVote == VoteType.VOTE_AGAINST
+            selected = votingData.selfVote == VoteType.VOTE_AGAINST
         )
 
         centerContent()
@@ -63,7 +62,7 @@ fun VotingActionsPanel(
             votesCount = votingData.votesFor,
             tint = getVoteColor(true),
             enabled = votingEnabled,
-            selected = selfVote == VoteType.VOTE_FOR
+            selected = votingData.selfVote == VoteType.VOTE_FOR
         )
     }
 }
@@ -129,7 +128,7 @@ private fun VotingActionsPanel_Preview() {
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             VotingActionsPanel(
-                votingData = VotingData(1, 2),
+                votingData = VotingData(1, 2, null),
                 modifier = Modifier.wrapContentWidth(),
                 centerContent = {
                     Text(text = "Centet content", modifier = Modifier.padding(horizontal = 40.dp))
@@ -137,8 +136,7 @@ private fun VotingActionsPanel_Preview() {
             )
 
             VotingActionsPanel(
-                selfVote = VoteType.VOTE_AGAINST,
-                votingData = VotingData(1, 2),
+                votingData = VotingData(1, 2, VoteType.VOTE_AGAINST),
                 modifier = Modifier.wrapContentWidth(),
                 centerContent = {
                     Text(text = "Centet content", modifier = Modifier.padding(horizontal = 40.dp))

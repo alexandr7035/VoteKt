@@ -5,19 +5,18 @@ import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.data.TransactionRepository
-import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.helpers.executeWeb3Call
+import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.data.model.CreateProposalReq
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TransactionType
+import com.example.votekt.data.web3_core.transactions.TxHash
 import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
@@ -28,7 +27,7 @@ import java.math.BigInteger
 
 class VotingRepositoryImpl(
     web3j: Web3j,
-    private val transactionRepository: TransactionRepository,
+    private val transactionDataSource: TransactionDataSource,
     private val dispatcher: CoroutineDispatcher,
 ) : VotingRepository {
     private val votingContract: VotingContract
@@ -80,7 +79,7 @@ class VotingRepositoryImpl(
                 req.duration.getDurationInDays().toBigInteger()
             ).send()
 
-            transactionRepository.cacheTransaction(
+            transactionDataSource.cacheTransaction(
                 Transaction(
                     type = TransactionType.CREATE_PROPOSAL,
                     hash = tx.transactionHash,
@@ -95,7 +94,7 @@ class VotingRepositoryImpl(
         }
     }
 
-    override suspend fun voteOnProposal(proposalId: Long, voteType: VoteType): OperationResult<String> = withContext(dispatcher) {
+    override suspend fun voteOnProposal(proposalId: Long, voteType: VoteType): OperationResult<TxHash> = withContext(dispatcher) {
         try {
             val isFor = when (voteType) {
                 VoteType.VOTE_FOR -> true
@@ -104,7 +103,7 @@ class VotingRepositoryImpl(
 
             val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
 
-            transactionRepository.cacheTransaction(
+            transactionDataSource.cacheTransaction(
                 Transaction(
                     type = TransactionType.VOTE,
                     hash = tx.transactionHash,
@@ -113,7 +112,7 @@ class VotingRepositoryImpl(
                 )
             )
 
-            return@withContext OperationResult.Success(tx.transactionHash)
+            return@withContext OperationResult.Success(TxHash(tx.transactionHash))
 
         } catch (e: Exception) {
             return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
@@ -126,18 +125,10 @@ class VotingRepositoryImpl(
         description = description,
         votingData = VotingData(
             votesFor = votesFor.toInt(),
-            votesAgainst = votesAgainst.toInt()
+            votesAgainst = votesAgainst.toInt(),
+            // TODO
+            selfVote = null
         ),
         expirationTime = expirationTime.toLong() * 1000,
     )
-
-    override suspend fun getVotedAddresses(): List<VoterAddress> {
-        delay(3000)
-
-        val addresses = List(12) { index ->
-            VoterAddress(address = "0x32424535esdf3242344bc${index}", votedFor = index % 2 == 0)
-        }
-
-        return addresses
-    }
 }

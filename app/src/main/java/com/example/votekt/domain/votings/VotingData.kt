@@ -3,10 +3,11 @@ package com.example.votekt.domain.votings
 data class VotingData(
     val votesFor: Int,
     val votesAgainst: Int,
+    val selfVote: VoteType?,
 ) {
-    val total: Int = votesFor + votesAgainst
-    val votesForPercentage: Float = votesFor.toFloat() / total
-    val votesAgainstPercentage: Float = votesAgainst.toFloat() / total
+    private val totalVotes: Int = votesFor + votesAgainst
+    val votesForPercentage: Float = votesFor.toFloat() / totalVotes
+    val votesAgainstPercentage: Float = votesAgainst.toFloat() / totalVotes
 
-    fun hasVotes() = total > 0
+    fun hasVotes() = totalVotes > 0
 }
