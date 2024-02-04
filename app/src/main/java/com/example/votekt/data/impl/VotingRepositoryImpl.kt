@@ -10,10 +10,12 @@ import com.example.votekt.data.VoterAddress
 import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.helpers.executeWeb3Call
 import com.example.votekt.data.model.CreateProposalReq
-import com.example.votekt.data.model.Proposal
+import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.model.TransactionType
 import com.example.votekt.data.web3_core.transactions.TxStatus
+import com.example.votekt.domain.votings.VoteType
+import com.example.votekt.domain.votings.VotingData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -56,30 +58,15 @@ class VotingRepositoryImpl(
     override suspend fun getProposalById(id: Long): OperationResult<Proposal> {
         return executeWeb3Call {
             val res = votingContract.getProposalDetails(BigInteger.valueOf(id)).send()
-            Proposal(
-                id = res.id.toLong(),
-                title = res.title,
-                description = res.description,
-                votesAgainst = res.votesAgainst.toInt(),
-                votesFor = res.votesFor.toInt(),
-                expirationTime = res.expirationTime.toLong() * 1000,
-            )
+            res.mapToDomain()
         }
     }
 
     override suspend fun getProposals(): OperationResult<List<Proposal>> {
         return executeWeb3Call {
             val raw = votingContract.proposalsList.send()
-            Log.d("DEBUG_TAG", "${raw}")
-            raw.map { it as VotingContract.ProposalRaw }.map { rawProposal ->
-                Proposal(
-                    id = rawProposal.id.toLong(),
-                    title = rawProposal.title,
-                    description = rawProposal.description,
-                    votesAgainst = rawProposal.votesAgainst.toInt(),
-                    votesFor = rawProposal.votesFor.toInt(),
-                    expirationTime = rawProposal.expirationTime.toLong() * 1000
-                )
+            raw.map { it as VotingContract.ProposalRaw }.map() { rawProposal ->
+                rawProposal.mapToDomain()
             }
         }
     }
@@ -108,8 +95,13 @@ class VotingRepositoryImpl(
         }
     }
 
-    override suspend fun voteOnProposal(proposalId: Long, isFor: Boolean): OperationResult<String> = withContext(dispatcher) {
+    override suspend fun voteOnProposal(proposalId: Long, voteType: VoteType): OperationResult<String> = withContext(dispatcher) {
         try {
+            val isFor = when (voteType) {
+                VoteType.VOTE_FOR -> true
+                VoteType.VOTE_AGAINST -> false
+            }
+
             val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
 
             transactionRepository.cacheTransaction(
@@ -127,6 +119,17 @@ class VotingRepositoryImpl(
             return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
         }
     }
+
+    private fun VotingContract.ProposalRaw.mapToDomain() = Proposal(
+        id = id.toLong(),
+        title = title,
+        description = description,
+        votingData = VotingData(
+            votesFor = votesFor.toInt(),
+            votesAgainst = votesAgainst.toInt()
+        ),
+        expirationTime = expirationTime.toLong() * 1000,
+    )
 
     override suspend fun getVotedAddresses(): List<VoterAddress> {
         delay(3000)

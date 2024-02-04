@@ -17,9 +17,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.votekt.core.extensions.getFormattedDate
-import com.example.votekt.data.model.Proposal
+import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.mock
 
 @Composable
 fun ProposalCard(
@@ -60,8 +61,7 @@ fun ProposalCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             HorizontalVotingBar(
-                votesFor = proposal.votesFor,
-                votesAgainst = proposal.votesAgainst,
+                votingData = proposal.votingData,
                 modifier = Modifier
                     .height(20.dp)
                     .fillMaxWidth()

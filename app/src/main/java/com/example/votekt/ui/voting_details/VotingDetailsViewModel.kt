@@ -4,7 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.VotingRepository
-import com.example.votekt.data.model.Proposal
+import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.ui.core.ScreenState
 import com.example.votekt.ui.create_proposal.SubmitTransactionResult
 import de.palm.composestateevents.consumed
@@ -65,14 +66,14 @@ class VotingDetailsViewModel(
     }
 
 
-    fun makeVote(proposalId: Long, isFor: Boolean) {
+    fun makeVote(proposalId: Long, voteType: VoteType) {
 
         viewModelScope.launch {
             _voteActionState.update { prev ->
                 prev.copy(isLoading = true)
             }
 
-            when (val res = votingRepository.voteOnProposal(proposalId, isFor)) {
+            when (val res = votingRepository.voteOnProposal(proposalId, voteType)) {
                 is OperationResult.Success -> {
                     _voteActionState.update { prev ->
                         prev.copy(
