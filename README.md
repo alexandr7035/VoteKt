@@ -26,6 +26,9 @@ mpx hardhat node
 # Deploy contract
 npx hardhat run --network localhost scripts/deploy.js
 
+# (Optional) When using local node, we can prepare mock proposals and votes
+npx hardhat run --network localhost scripts/mocks/mock_local_votings.js
+
 # (Optional) Interact from console
 npx hardhat console --network localhost 
 ```
