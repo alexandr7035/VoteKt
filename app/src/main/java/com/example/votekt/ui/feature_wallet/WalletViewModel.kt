@@ -4,7 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.data.account.AccountBalance
 import com.example.votekt.data.account.AccountRepository
+import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.ui.common.BalanceUi
+import com.example.votekt.ui.uiError
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -12,6 +14,7 @@ import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -28,7 +31,7 @@ class WalletViewModel(
 
     fun onWalletIntent(intent: WalletScreenIntent) {
         when (intent) {
-            is WalletScreenIntent.EnterScreen -> {}
+            is WalletScreenIntent.LoadData -> {}
             is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
         }
     }
@@ -38,6 +41,9 @@ class WalletViewModel(
             .getAccountBalance()
             .onEach {
                 reduceBalance(it)
+            }
+            .catch {
+                reduceError(ErrorType.fromThrowable(it))
             }
             .launchIn(viewModelScope)
     }
@@ -57,6 +63,12 @@ class WalletViewModel(
                 isBalanceLoading = false,
                 balance = BalanceUi.fromBalanceWithAssetType(balance)
             )
+        }
+    }
+    
+    private fun reduceError(errorType: ErrorType) {
+        _state.update { 
+            it.copy(error = errorType.uiError)
         }
     }
 

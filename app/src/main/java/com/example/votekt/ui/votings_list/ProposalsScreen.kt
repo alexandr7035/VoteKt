@@ -32,6 +32,7 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.uiError
 import com.example.votekt.ui.utils.mock
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
@@ -89,7 +90,10 @@ fun ProposalsScreen(
             }
 
             state.shouldShowFullError() -> {
-                ErrorFullScreen(appError = state.error!!, onRetry = {
+                // FIXME ui state
+                ErrorFullScreen(
+                    error = state.error?.errorType?.uiError!!,
+                    onRetry = {
                     viewModel.loadProposals()
                 })
             }

@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,9 +29,9 @@ import com.example.votekt.data.model.Transaction
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.uiError
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -43,7 +42,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
 
     Scaffold(topBar = {
         AppBar(
-            title = "Transactions",
+            title = stringResource(R.string.transactions),
             actions = {
                 IconButton(onClick = { viewModel.clearTransactions() }) {
                     Icon(
@@ -73,7 +72,8 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
                 }
 
                 state.shouldShowFullError() -> {
-                    ErrorFullScreen(appError = state.error!!, onRetry = {
+                    // FIXME ui state
+                    ErrorFullScreen(error = state.error?.errorType?.uiError!!, onRetry = {
                         viewModel.loadTransactionList()
                     })
                 }
@@ -114,8 +114,13 @@ private fun TransactionsList(
 @Composable
 private fun NoTransactionsStub() {
     Column(
-        modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "No Transactions yet", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.no_transactions_yet),
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }

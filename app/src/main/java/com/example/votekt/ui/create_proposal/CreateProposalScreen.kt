@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -45,7 +44,7 @@ import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
-import com.example.votekt.ui.defaultMessage
+import com.example.votekt.ui.uiError
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.prettifyAddress
 import de.palm.composestateevents.EventEffect
@@ -74,7 +73,7 @@ fun CreateProposalScreen(
         } else {
             onShowSnackBar.invoke(
                 // TODO ui error model
-                "Failed to submit Proposal\n\n${eventData.error?.errorType?.defaultMessage?.title}. ${eventData.error?.errorType?.defaultMessage?.message}",
+                "Failed to submit Proposal\n\n${eventData.error?.errorType?.uiError?.title}. ${eventData.error?.errorType?.uiError?.message}",
                 SnackBarMode.Negative
             )
         }

@@ -7,7 +7,7 @@ class UiErrorMessage(
     val message: String
 )
 
-val ErrorType.defaultMessage: UiErrorMessage
+val ErrorType.uiError: UiErrorMessage
     get() {
         return when (this) {
             ErrorType.NODE_CONNECTION_ERROR -> {

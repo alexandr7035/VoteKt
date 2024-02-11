@@ -35,6 +35,7 @@ import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.uiError
 import com.example.votekt.ui.utils.mock
 import com.example.votekt.ui.utils.prettifyAddress
 import de.palm.composestateevents.EventEffect
@@ -85,7 +86,8 @@ fun VotingDetailsScreen(
 
             screenState.error != null -> {
                 ErrorFullScreen(
-                    appError = screenState.error,
+                    // FIXME ui state
+                    error = screenState.error.errorType.uiError,
                     onRetry = {
                         viewModel.loadProposalById(proposalId)
                     }

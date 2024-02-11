@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.ui.common.BalanceUi
+import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -51,7 +52,7 @@ fun WalletScreen(
 
     WalletScreen_Ui(
         state = state,
-        onWalletAction = {
+        onIntent = {
             viewModel.onWalletIntent(it)
         }
     )
@@ -84,16 +85,26 @@ fun WalletScreen(
 @Composable
 private fun WalletScreen_Ui(
     state: WalletScreenState,
-    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit = {}
+    onIntent: (WalletScreenIntent) -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Header(
-            onWalletAction = onWalletAction,
-            balance = state.balance,
-            isBalanceLoading = state.isBalanceLoading
+    when {
+        state.error != null -> ErrorFullScreen(
+            error = state.error,
+            onRetry = {
+                onIntent(WalletScreenIntent.LoadData)
+            }
         )
+        else -> {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                Header(
+                    onWalletAction = onIntent,
+                    balance = state.balance,
+                    isBalanceLoading = state.isBalanceLoading
+                )
+            }
+        }
     }
 }
 

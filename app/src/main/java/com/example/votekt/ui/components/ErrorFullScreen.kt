@@ -7,20 +7,23 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.votekt.R
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.ErrorType
-import com.example.votekt.ui.defaultMessage
+import com.example.votekt.ui.UiErrorMessage
+import com.example.votekt.ui.uiError
 import com.example.votekt.ui.theme.VoteKtTheme
 
 
 //TODO design
 @Composable
 fun ErrorFullScreen(
-    appError: AppError,
+    error: UiErrorMessage,
     modifier: Modifier = Modifier,
     onRetry: (() -> Unit)? = null,
 ) {
@@ -33,7 +36,7 @@ fun ErrorFullScreen(
     ) {
 
         Text(
-            text = appError.errorType.defaultMessage.title,
+            text = error.title,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -43,7 +46,7 @@ fun ErrorFullScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = appError.errorType.defaultMessage.message,
+            text = error.message,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -55,7 +58,7 @@ fun ErrorFullScreen(
 
             PrimaryButton(
                 onClick = { onRetry.invoke() },
-                text = "Try Again"
+                text = stringResource(R.string.try_again)
             )
         }
     }
@@ -67,7 +70,7 @@ fun ErrorFullScreen(
 fun ErrorFullScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
         Surface() {
-            ErrorFullScreen(appError = AppError(ErrorType.UNKNOWN_ERROR), onRetry = {})
+            ErrorFullScreen(error = UiErrorMessage("title","message"), onRetry = {})
         }
     }
 }
