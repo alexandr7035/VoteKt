@@ -12,6 +12,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.ErrorType
+import com.example.votekt.ui.defaultMessage
 import com.example.votekt.ui.theme.VoteKtTheme
 
 
@@ -31,7 +33,7 @@ fun ErrorFullScreen(
     ) {
 
         Text(
-            text = appError.defaultMessage.title,
+            text = appError.errorType.defaultMessage.title,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -41,7 +43,7 @@ fun ErrorFullScreen(
         Spacer(modifier = Modifier.height(12.dp))
 
         Text(
-            text = appError.defaultMessage.message,
+            text = appError.errorType.defaultMessage.message,
             style = MaterialTheme.typography.titleLarge,
             color = MaterialTheme.colorScheme.onBackground,
             textAlign = TextAlign.Center,
@@ -65,7 +67,7 @@ fun ErrorFullScreen(
 fun ErrorFullScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
         Surface() {
-            ErrorFullScreen(appError = AppError.UnknownError("fd"), onRetry = {})
+            ErrorFullScreen(appError = AppError(ErrorType.UNKNOWN_ERROR), onRetry = {})
         }
     }
 }

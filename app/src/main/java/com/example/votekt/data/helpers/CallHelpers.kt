@@ -1,10 +1,10 @@
 package com.example.votekt.data.helpers
 
 import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import java.net.ConnectException
 import kotlin.coroutines.CoroutineContext
 
 suspend fun <T : Any> executeWeb3Call(
@@ -15,13 +15,8 @@ suspend fun <T : Any> executeWeb3Call(
         try {
             val response = remoteCall()
             OperationResult.Success(response)
-        } catch (ex: Exception) {
-            val error = when (ex) {
-                is ConnectException -> AppError.ConnectionError
-                else -> AppError.UnknownError(ex.stackTrace.toString())
-            }
-
-            OperationResult.Failure(error)
+        } catch (ex: Throwable) {
+            OperationResult.Failure(AppError(ErrorType.fromThrowable(ex)))
         }
     }
 }

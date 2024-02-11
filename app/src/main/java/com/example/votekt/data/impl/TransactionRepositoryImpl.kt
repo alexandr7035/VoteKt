@@ -7,6 +7,7 @@ import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxHash
 import com.example.votekt.data.web3_core.transactions.TxStatus
+import com.example.votekt.domain.core.ErrorType
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.web3j.protocol.Web3j
@@ -29,7 +30,7 @@ class TransactionRepositoryImpl(
             transactionDataSource.clearLocalTransactionHistory()
             OperationResult.Success(Unit)
         } catch (e: Exception) {
-            OperationResult.Failure(AppError.UnknownError(e.toString()))
+            OperationResult.Failure(AppError(ErrorType.UNKNOWN_ERROR))
         }
     }
 
@@ -53,7 +54,8 @@ class TransactionRepositoryImpl(
             return@withContext OperationResult.Success(txStatus)
         }
         catch (e: Exception) {
-            return@withContext OperationResult.Failure(AppError.UnknownError(e.message ?: ""))
+            // TODO errors
+            return@withContext OperationResult.Failure(AppError(ErrorType.UNKNOWN_ERROR))
         }
     }
 }

@@ -90,7 +90,7 @@ class VotingRepositoryImpl(
 
             return@withContext OperationResult.Success(tx.transactionHash)
         } catch (e: Exception) {
-            return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
+            return@withContext OperationResult.Failure(AppError.fromThrowable(e))
         }
     }
 
@@ -115,7 +115,7 @@ class VotingRepositoryImpl(
             return@withContext OperationResult.Success(TxHash(tx.transactionHash))
 
         } catch (e: Exception) {
-            return@withContext OperationResult.Failure(AppError.UnknownError(e.toString()))
+            return@withContext OperationResult.Failure(AppError.fromThrowable(e))
         }
     }
 

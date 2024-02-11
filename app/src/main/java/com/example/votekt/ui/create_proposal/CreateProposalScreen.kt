@@ -45,6 +45,7 @@ import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.defaultMessage
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.prettifyAddress
 import de.palm.composestateevents.EventEffect
@@ -72,7 +73,8 @@ fun CreateProposalScreen(
             onBack.invoke()
         } else {
             onShowSnackBar.invoke(
-                "Failed to submit Proposal\n\n${eventData.error?.defaultMessage?.title}. ${eventData.error?.defaultMessage?.message}",
+                // TODO ui error model
+                "Failed to submit Proposal\n\n${eventData.error?.errorType?.defaultMessage?.title}. ${eventData.error?.errorType?.defaultMessage?.message}",
                 SnackBarMode.Negative
             )
         }
@@ -94,7 +96,6 @@ fun CreateProposalScreen(
 
 
 @SuppressLint("RememberReturnType")
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun CreateProposalScreen_Ui(
     titleMaxLength: Int,

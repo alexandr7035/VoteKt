@@ -1,26 +1,22 @@
 package com.example.votekt.domain.core
 
-sealed class AppError() {
-    object ConnectionError : AppError()
-    data class UnknownError(val details: String) : AppError()
-
-    val defaultMessage: UiErrorMessage
-        get() {
-            return when (this) {
-                is ConnectionError -> {
-                    UiErrorMessage(
-                        title = "Connection failed", message = "Check your Internet connection and try again"
-                    )
-                }
-
-                is UnknownError -> {
-                    UiErrorMessage(
-                        title = "Unknown error", message = "Contact the developer or try again later"
-                    )
-                }
-            }
-        }
+data class AppError(val errorType: ErrorType): Exception() {
+    companion object {
+        fun fromThrowable(e: Throwable) = AppError(ErrorType.fromThrowable(e))
+    }
 }
 
-class UiErrorMessage(val title: String, val message: String)
+enum class ErrorType {
+    NODE_CONNECTION_ERROR,
+    UNKNOWN_ERROR,;
 
+    companion object {
+        fun fromThrowable(e: Throwable): ErrorType {
+            // Here may be additional mapping depending on exception type
+            return when (e) {
+                is AppError -> e.errorType
+                else -> UNKNOWN_ERROR
+            }
+        }
+    }
+}
