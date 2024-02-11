@@ -16,6 +16,10 @@ Use Android Emulator with default network settings
 
 ### Deploy and test contract
 ```
+# Setup env
+MNEMONIC="fix tape two tooth country bottom siren decide east salad music warfare"
+INFURA_API_KEY="...."
+
 # Run a node
 mpx hardhat node
 
