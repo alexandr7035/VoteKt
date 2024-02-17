@@ -15,3 +15,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Vote Kt"
 include ':app'
+include ':ethereum_core'
+include ':ethereum_impl'
