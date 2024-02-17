@@ -22,6 +22,8 @@ import kotlin.time.Duration.Companion.seconds
 
 val appModule = module {
     includes(web3Module)
+    includes(netModule)
+    includes(ethereumModule)
 
     viewModel { VotingDetailsViewModel(get()) }
     viewModel { ProposalsViewModel(get()) }
@@ -47,8 +49,8 @@ val appModule = module {
     single<AccountRepository> {
         AccountRepositoryImpl(
             dispatcher = Dispatchers.IO,
-            web3Client = get(),
-            balancePollingDelay = 5.seconds
+            ethereumRepository = get(),
+            balancePollingDelay = 5.seconds,
         )
     }
 

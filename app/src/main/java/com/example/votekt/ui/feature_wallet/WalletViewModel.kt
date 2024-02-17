@@ -2,14 +2,14 @@ package com.example.votekt.ui.feature_wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.account.AccountBalance
+import by.alexandr7035.ethereum.model.Wei
+import com.example.votekt.core.crypto.BalanceFormatter
 import com.example.votekt.data.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
-import com.example.votekt.ui.common.BalanceUi
-import com.example.votekt.ui.uiError
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
+import com.example.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.update
 
 class WalletViewModel(
     private val accountRepository: AccountRepository
-): ViewModel() {
+) : ViewModel() {
     init {
         subscribeToBalance()
     }
@@ -57,17 +57,19 @@ class WalletViewModel(
         _state.update { it.copy(navigationEvent = triggered(navigationEvent)) }
     }
 
-    private fun reduceBalance(balance: AccountBalance) {
+    private fun reduceBalance(balance: Wei) {
         _state.update {
             it.copy(
                 isBalanceLoading = false,
-                balance = BalanceUi.fromBalanceWithAssetType(balance)
+                balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
+                    balance.toEther(), "ETH"
+                )
             )
         }
     }
-    
+
     private fun reduceError(errorType: ErrorType) {
-        _state.update { 
+        _state.update {
             it.copy(error = errorType.uiError)
         }
     }

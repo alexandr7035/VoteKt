@@ -33,7 +33,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
-import com.example.votekt.ui.common.BalanceUi
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
@@ -100,7 +99,7 @@ private fun WalletScreen_Ui(
             ) {
                 Header(
                     onWalletAction = onIntent,
-                    balance = state.balance,
+                    balance = state.balanceFormatted,
                     isBalanceLoading = state.isBalanceLoading
                 )
             }
@@ -110,7 +109,7 @@ private fun WalletScreen_Ui(
 
 @Composable
 private fun Header(
-    balance: BalanceUi?,
+    balance: String?,
     isBalanceLoading: Boolean,
     onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
 ) {
@@ -135,12 +134,12 @@ private fun Header(
 
 @Composable
 private fun Balance(
-    balance: BalanceUi?,
+    balance: String?,
     isBalanceLoading: Boolean,
 ) {
     when {
         isBalanceLoading -> {
-            // TODO
+            // TODO loading
             Text(
                 style = TextStyle(
                     color = MaterialTheme.colorScheme.onPrimary,
@@ -158,7 +157,7 @@ private fun Balance(
                     fontSize = 32.sp,
                     fontWeight = FontWeight.Bold
                 ),
-                text = balance.value
+                text = balance
             )
         }
 
