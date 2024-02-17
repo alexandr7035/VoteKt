@@ -1,7 +1,7 @@
 package com.example.votekt.data.impl
 
 import android.util.Log
-import by.alexandr7035.ethereum.core.EthereumRepository
+import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.OperationResult
@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 class TransactionRepositoryImpl(
     private val transactionDataSource: TransactionDataSource,
     private val dispatcher: CoroutineDispatcher,
-    private val ethereumRepository: EthereumRepository,
+    private val ethereumClient: EthereumClient,
 ) : TransactionRepository {
     override suspend fun getTransactions(): List<Transaction> = withContext(dispatcher) {
         return@withContext transactionDataSource.getTransactions()
@@ -39,7 +39,7 @@ class TransactionRepositoryImpl(
     override suspend fun refreshTxStatus(txHash: String): OperationResult<TxStatus> = withContext(dispatcher) {
         try {
             val receipt = try {
-                ethereumRepository.getTransactionReceipt(
+                ethereumClient.getTransactionReceipt(
                     transactionHash = txHash
                 )
             } catch (e: TransactionReceiptNotFound) {

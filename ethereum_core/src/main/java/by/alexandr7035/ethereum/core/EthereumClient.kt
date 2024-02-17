@@ -7,7 +7,7 @@ import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.TransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 
-interface EthereumRepository {
+interface EthereumClient {
     suspend fun <R : EthRequest<*>> request(request: R): R
 
     suspend fun getBalance(address: Address): Wei

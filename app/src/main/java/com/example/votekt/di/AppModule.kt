@@ -49,7 +49,7 @@ val appModule = module {
     single<AccountRepository> {
         AccountRepositoryImpl(
             dispatcher = Dispatchers.IO,
-            ethereumRepository = get(),
+            ethereumClient = get(),
             balancePollingDelay = 5.seconds,
         )
     }
@@ -61,7 +61,7 @@ val appModule = module {
     single<TransactionRepository> {
         TransactionRepositoryImpl(
             transactionDataSource = get(),
-            ethereumRepository =  get(),
+            ethereumClient =  get(),
             dispatcher = Dispatchers.IO,
         )
     }

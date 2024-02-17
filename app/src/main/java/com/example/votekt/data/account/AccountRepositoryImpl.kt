@@ -1,6 +1,6 @@
 package com.example.votekt.data.account
 
-import by.alexandr7035.ethereum.core.EthereumRepository
+import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import kotlinx.coroutines.CoroutineDispatcher
@@ -15,11 +15,11 @@ import kotlin.time.Duration
 class AccountRepositoryImpl(
     private val dispatcher: CoroutineDispatcher,
     private val balancePollingDelay: Duration,
-    private val ethereumRepository: EthereumRepository,
+    private val ethereumClient: EthereumClient,
 ) : AccountRepository {
     override fun getAccountBalance(): Flow<Wei> = flow {
         while (coroutineContext.isActive) {
-            emit(ethereumRepository.getBalance(
+            emit(ethereumClient.getBalance(
                 address = Address("0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
             ))
             delay(balancePollingDelay)

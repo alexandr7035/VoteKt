@@ -1,6 +1,6 @@
 package by.alexandr7035.ethereum_impl.impl
 
-import by.alexandr7035.ethereum.core.EthereumRepository
+import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthNodeMethods
@@ -14,9 +14,9 @@ import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
 import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.ethereum_impl.model.toRpcRequest
 
-class EthereumRepositoryImpl(
+class EthereumClientImpl(
     private val api: RetrofitEthereumRpcApi
-): EthereumRepository {
+): EthereumClient {
     override suspend fun <R : EthRequest<*>> request(request: R): R {
         return request.toRpcRequest().let { rpcRequest ->
             api.post(rpcRequest.request())
