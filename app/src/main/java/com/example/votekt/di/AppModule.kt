@@ -16,6 +16,8 @@ import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
 import com.example.votekt.data.local.TransactionDataSource
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
+import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
+import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.voting_details.VotingDetailsViewModel
@@ -31,6 +33,8 @@ val appModule = module {
     includes(netModule)
     includes(ethereumModule)
 
+    viewModel { GeneratePhraseViewModel(get()) }
+    viewModel { ConfirmPhraseViewModel(get()) }
     viewModel { VotingDetailsViewModel(get()) }
     viewModel { ProposalsViewModel(get()) }
     viewModel { TransactionsViewModel(get()) }

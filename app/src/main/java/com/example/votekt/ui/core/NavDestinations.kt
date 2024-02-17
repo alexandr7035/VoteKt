@@ -40,6 +40,13 @@ sealed class NavDestinations(
         }
     }
 
+    object GeneratePhrase: NavDestinations(
+        route = "generate_phrase"
+    )
+    object ConfirmPhrase: NavDestinations(
+        route = "confirm_phrase"
+    )
+
     object NewProposal: NavDestinations(
         route = "new_proposal",
     )

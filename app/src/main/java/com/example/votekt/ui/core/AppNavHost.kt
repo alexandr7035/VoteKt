@@ -18,6 +18,8 @@ import androidx.navigation.navArgument
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.create_proposal.CreateProposalScreen
+import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
+import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_wallet.WalletScreen
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import com.example.votekt.ui.voting_details.VotingDetailsScreen
@@ -45,9 +47,23 @@ fun AppNavHost(
 
         NavHost(
             navController = navController,
-            startDestination = NavDestinations.Primary.Wallet.route,
+//            startDestination = NavDestinations.Primary.Wallet.route,
+            startDestination = NavDestinations.GeneratePhrase.route,
             modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
         ) {
+
+            composable(NavDestinations.GeneratePhrase.route) {
+                GeneratePhraseScreen(
+                    onConfirm = { words ->
+                        navController.navigate(NavDestinations.ConfirmPhrase.route)
+                    }
+                )
+            }
+
+            composable(NavDestinations.ConfirmPhrase.route) {
+                ConfirmPhraseScreen()
+            }
+
             composable(NavDestinations.Primary.Wallet.route) {
                 WalletScreen()
             }

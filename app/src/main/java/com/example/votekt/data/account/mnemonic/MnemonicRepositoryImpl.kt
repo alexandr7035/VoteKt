@@ -30,7 +30,7 @@ class MnemonicRepositoryImpl(
             confirmationWords.add(WordToConfirm(correctWord, wrongWords))
         }
 
-        return confirmationWords.sortedBy { it.correctWord.index }
+        return confirmationWords.sortedBy { it.rightWordIndex() }
     }
 
     private fun getIncorrectIndexesForWord(mnemonic: List<Word>, correctWord: Word): List<Int> {
