@@ -46,15 +46,7 @@ data class JsonRpcTransactionReceiptResult(
         @Json(name = "cumulativeGasUsed") val cumulativeGasUsed: BigInteger,
         @Json(name = "gasUsed") val gasUsed: BigInteger,
         @Json(name = "contractAddress") val contractAddress: Address?,
-        @Json(name = "logs") val logs: List<Event>
-    ) {
-        @JsonClass(generateAdapter = true)
-        data class Event(
-            @Json(name = "logIndex") val logIndex: BigInteger,
-            @Json(name = "data") val data: String,
-            @Json(name = "topics") val topics: List<String>
-        )
-    }
+    )
 }
 
 @JsonClass(generateAdapter = true)

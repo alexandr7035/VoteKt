@@ -59,7 +59,11 @@ val appModule = module {
     }
 
     single<TransactionRepository> {
-        TransactionRepositoryImpl(get(), get(), Dispatchers.IO)
+        TransactionRepositoryImpl(
+            transactionDataSource = get(),
+            ethereumRepository =  get(),
+            dispatcher = Dispatchers.IO,
+        )
     }
 
     single { TransactionDataSource(get()) }

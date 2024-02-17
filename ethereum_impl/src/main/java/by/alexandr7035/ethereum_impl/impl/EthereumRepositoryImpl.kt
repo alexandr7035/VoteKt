@@ -1,7 +1,9 @@
 package by.alexandr7035.ethereum_impl.impl
 
 import by.alexandr7035.ethereum.core.EthereumRepository
+import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
 import by.alexandr7035.ethereum.model.Address
+import by.alexandr7035.ethereum.model.EthNodeMethods
 import by.alexandr7035.ethereum.model.eth_requests.EthRequest
 import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.TransactionData
@@ -9,6 +11,7 @@ import by.alexandr7035.ethereum.model.TransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
+import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.ethereum_impl.model.toRpcRequest
 
 class EthereumRepositoryImpl(
@@ -33,7 +36,25 @@ class EthereumRepositoryImpl(
     }
 
     override suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt {
-        TODO("Not yet implemented")
+        return api.receipt(
+            JsonRpcRequest(
+                method = EthNodeMethods.FUNCTION_GET_TRANSACTION_RECEIPT,
+                params = listOf(transactionHash)
+            )
+        ).result?.let {
+            TransactionReceipt(
+                status = it.status,
+                transactionHash = it.transactionHash,
+                transactionIndex = it.transactionIndex,
+                blockHash = it.blockHash,
+                blockNumber = it.blockNumber,
+                from = it.from,
+                to = it.to,
+                cumulativeGasUsed = it.cumulativeGasUsed,
+                gasUsed = it.gasUsed,
+                contractAddress = it.contractAddress,
+            )
+        } ?: throw TransactionReceiptNotFound()
     }
 
     override suspend fun getTransactionByHash(transactionHash: String): TransactionData {

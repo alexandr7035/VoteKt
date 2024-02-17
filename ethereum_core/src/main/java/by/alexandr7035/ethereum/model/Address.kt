@@ -1,4 +1,4 @@
 package by.alexandr7035.ethereum.model
 
-@JvmInline
-value class Address(val value: String)
+// TODO value classes and Moshi
+data class Address(val value: String)

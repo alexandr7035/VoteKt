@@ -13,4 +13,6 @@ data class TransactionReceipt(
     val cumulativeGasUsed: BigInteger,
     val gasUsed: BigInteger,
     val contractAddress: Address?,
-)
+) {
+    fun isSuccessful() = status == BigInteger.ONE
+}
