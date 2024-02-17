@@ -1,10 +1,16 @@
 package com.example.votekt.di
 
 import androidx.room.Room
+import com.example.votekt.BuildConfig
 import com.example.votekt.data.TransactionRepository
 import com.example.votekt.data.VotingRepository
 import com.example.votekt.data.account.AccountRepository
 import com.example.votekt.data.account.AccountRepositoryImpl
+import com.example.votekt.data.account.mnemonic.MnemonicHelper
+import com.example.votekt.data.account.mnemonic.MnemonicHelperDebugImpl
+import com.example.votekt.data.account.mnemonic.MnemonicHelperImpl
+import com.example.votekt.data.account.mnemonic.MnemonicRepository
+import com.example.votekt.data.account.mnemonic.MnemonicRepositoryImpl
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
@@ -44,6 +50,21 @@ val appModule = module {
 
     single {
         get<TransactionsDatabase>().proposalsDao()
+    }
+
+    @Suppress("SENSELESS_COMPARISON")
+    single {
+        return@single if (BuildConfig.FLAVOR == "local") {
+            MnemonicHelperDebugImpl()
+        } else {
+            MnemonicHelperImpl()
+        }
+    }
+
+    single<MnemonicRepository> {
+        MnemonicRepositoryImpl(
+            mnemonicHelper = get()
+        )
     }
 
     single<AccountRepository> {
