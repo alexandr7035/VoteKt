@@ -1,4 +1,4 @@
-package by.alexandr7035.ethereum.model
+package by.alexandr7035.ethereum.model.eth_requests
 
 import by.alexandr7035.ethereum.errors.RequestFailedException
 import by.alexandr7035.ethereum.errors.RequestNotExecutedException
@@ -16,6 +16,7 @@ sealed class EthRequest<T>(open val id: Int) {
                     it.data
                 is Response.Failure -> {
                     val msg = it.error + (errorMsg?.let { " ($it)" } ?: "")
+                    println("$TAG eth req fail: ${msg}")
                     throw RequestFailedException(msg)
                 }
                 null ->
@@ -26,5 +27,9 @@ sealed class EthRequest<T>(open val id: Int) {
     sealed class Response<T> {
         data class Success<T>(val data: T) : Response<T>()
         data class Failure<T>(val error: String) : Response<T>()
+    }
+
+    private companion object {
+        const val TAG = "ETH_CALL"
     }
 }

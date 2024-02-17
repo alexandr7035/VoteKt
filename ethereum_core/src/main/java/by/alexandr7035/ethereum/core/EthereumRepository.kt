@@ -1,10 +1,8 @@
 package by.alexandr7035.ethereum.core
 
-import by.alexandr7035.ethereum.errors.RequestFailedException
-import by.alexandr7035.ethereum.errors.RequestNotExecutedException
 import by.alexandr7035.ethereum.model.TransactionData
 import by.alexandr7035.ethereum.model.Address
-import by.alexandr7035.ethereum.model.EthRequest
+import by.alexandr7035.ethereum.model.eth_requests.EthRequest
 import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.TransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
