@@ -1,0 +1,17 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation project(":utils")
+    implementation project(":libs:gnosis_crypto")
+
+    // Crypto specific module for key generation, signing and hashing
+    implementation "cash.z.ecc.android:kotlin-bip39:1.0.7"
+}
