@@ -10,6 +10,7 @@ import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.uiError
+import com.example.votekt.ui.utils.prettify
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,16 +19,17 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class WalletViewModel(
     private val accountRepository: AccountRepository
 ) : ViewModel() {
+    private val _state = MutableStateFlow(WalletScreenState())
+    val state = _state.asStateFlow()
+
     init {
         subscribeToBalance()
     }
-
-    private val _state = MutableStateFlow(WalletScreenState())
-    val state = _state.asStateFlow()
 
     fun onWalletIntent(intent: WalletScreenIntent) {
         when (intent) {
@@ -37,6 +39,13 @@ class WalletViewModel(
     }
 
     private fun subscribeToBalance() {
+        viewModelScope.launch {
+            val address = accountRepository.getSelfAddress()
+            _state.update {
+                it.copy(address = address)
+            }
+        }
+
         accountRepository
             .getAccountBalance()
             .onEach {

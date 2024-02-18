@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
-import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
@@ -39,6 +38,10 @@ class AccountRepositoryImpl(
             delay(balancePollingDelay)
         }
     }.flowOn(dispatcher)
+
+    override suspend fun getSelfAddress(): Address {
+        return Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY))
+    }
 
     override suspend fun createAndSaveAccount(seedPhrase: List<Word>) {
         val rawPhrase = seedPhrase.joinToString(" ") { it.value }

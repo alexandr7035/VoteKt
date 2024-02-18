@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -23,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
@@ -32,12 +35,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.R
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.copyToClipboard
+import com.example.votekt.ui.utils.prettify
 import com.example.votekt.ui.utils.showToast
 import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
@@ -100,7 +106,8 @@ private fun WalletScreen_Ui(
                 Header(
                     onWalletAction = onIntent,
                     balance = state.balanceFormatted,
-                    isBalanceLoading = state.isBalanceLoading
+                    isBalanceLoading = state.isBalanceLoading,
+                    address = state.address,
                 )
             }
         }
@@ -109,19 +116,45 @@ private fun WalletScreen_Ui(
 
 @Composable
 private fun Header(
+    address: Address,
     balance: String?,
     isBalanceLoading: Boolean,
     onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primary)
             .padding(32.dp)
             .fillMaxWidth()
             .wrapContentSize(),
-        verticalArrangement = Arrangement.spacedBy(32.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Box(
+            modifier = Modifier
+                .background(
+                    shape = RoundedCornerShape(16.dp), color = Color(0x40FFFFFF)
+                )
+                .clip(RoundedCornerShape(16.dp))
+                .clickable {
+                    context.copyToClipboard("Address", address.value)
+                    context.showToast("Address copied")
+                }
+                .padding(
+                    vertical = 8.dp, horizontal = 12.dp
+                )
+        ) {
+            Text(
+                text = address.prettify(),
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 16.sp
+                )
+            )
+        }
+        
         Balance(
             balance = balance,
             isBalanceLoading = isBalanceLoading
