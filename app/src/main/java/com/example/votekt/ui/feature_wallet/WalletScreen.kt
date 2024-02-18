@@ -126,7 +126,10 @@ private fun Header(
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primary)
-            .padding(32.dp)
+            .padding(
+                horizontal = 32.dp,
+                vertical = 20.dp
+            )
             .fillMaxWidth()
             .wrapContentSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -225,7 +228,7 @@ private fun Actions(
 @Composable
 private fun ActionBtn(
     @DrawableRes icon: Int,
-    size: Dp = 72.dp,
+    size: Dp = 48.dp,
     onClick: () -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
