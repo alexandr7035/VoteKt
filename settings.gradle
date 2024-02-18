@@ -17,3 +17,7 @@ rootProject.name = "Vote Kt"
 include ':app'
 include ':ethereum_core'
 include ':ethereum_impl'
+include ':crypto'
+include ':libs'
+include ':libs:gnosis_crypto'
+include ':utils'

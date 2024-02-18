@@ -1,0 +1,19 @@
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+dependencies {
+    implementation("org.bouncycastle:bcprov-jdk15on:1.61", {
+        exclude group: 'junit', module: 'junit'
+    })
+    implementation "com.squareup.okio:okio:2.4.1"
+
+    // Solidity types
+    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:0.8.0"
+}
