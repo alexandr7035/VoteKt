@@ -5,7 +5,7 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.asString
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
 import by.alexandr7035.ethereum.model.eth_requests.EthRequest
-import by.alexandr7035.ethereum.utils.hexAsBigIntegerOrNull
+import by.alexandr7035.utils.hexAsBigIntegerOrNull
 
 
 sealed class RpcRequest<out T : EthRequest<*>>(val raw: T) {

@@ -1,6 +1,6 @@
 package by.alexandr7035.ethereum.model
 
-import by.alexandr7035.ethereum.utils.hexAsBigInteger
+import by.alexandr7035.utils.hexAsBigInteger
 import java.math.BigInteger
 
 sealed class Transaction {
