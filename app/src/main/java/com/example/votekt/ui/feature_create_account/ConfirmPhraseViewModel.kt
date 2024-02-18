@@ -3,6 +3,7 @@ package com.example.votekt.ui.feature_create_account
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.votekt.data.account.AccountRepository
 import com.example.votekt.data.account.mnemonic.MnemonicRepository
 import com.example.votekt.data.account.mnemonic.Word
 import com.example.votekt.domain.core.ErrorType
@@ -19,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ConfirmPhraseViewModel(
-    private val mnemonicRepository: MnemonicRepository
+    private val mnemonicRepository: MnemonicRepository,
+    private val accountRepository: AccountRepository,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         ConfirmPhraseState(
@@ -80,6 +82,10 @@ class ConfirmPhraseViewModel(
                             navigationEvent = triggered(ConfirmPhraseNavigationEvent.ToHome)
                         )
                     }
+
+                    val address = accountRepository.createAndSaveAccount(
+                        _state.value.phrase
+                    )
                 }
 
                 is OperationResult.Failure -> {
