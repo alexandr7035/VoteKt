@@ -1,5 +1,8 @@
 package com.example.votekt.data.account.mnemonic
 
+import android.util.Log
+import com.example.votekt.domain.core.AppError
+import com.example.votekt.domain.core.ErrorType
 import java.security.SecureRandom
 import java.util.Random
 
@@ -31,6 +34,29 @@ class MnemonicRepositoryImpl(
         }
 
         return confirmationWords.sortedBy { it.rightWordIndex() }
+    }
+
+    override fun confirmPhrase(
+        mnemonic: List<Word>,
+        proposedWordsToConfirm: List<WordToConfirm>,
+        confirmationData: Map<Int, Word>
+    ) {
+        Log.d("WEB3_TAG", "phrase ${mnemonic}")
+        Log.d("WEB3_TAG", "proposed words ${proposedWordsToConfirm}")
+        Log.d("WEB3_TAG", "confirmation data ${confirmationData}")
+
+        proposedWordsToConfirm.forEach {
+            if (confirmationData[it.correctWord.index] == null) {
+                throw AppError(ErrorType.MNEMONIC_CONFIRMATION_INCOMPLETE)
+            }
+        }
+
+        confirmationData.forEach { (key, mnemonicWord) ->
+            // Use value as words may equal
+            if (mnemonicWord.value != mnemonic.find { it.index == key }?.value) {
+                throw AppError(ErrorType.MNEMONIC_CONFIRMATION_WRONG)
+            }
+        }
     }
 
     private fun getIncorrectIndexesForWord(mnemonic: List<Word>, correctWord: Word): List<Int> {

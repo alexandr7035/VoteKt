@@ -1,5 +1,6 @@
 package com.example.votekt.ui.core
 
+import android.util.Log
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -15,6 +16,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
+import com.example.votekt.data.account.mnemonic.Word
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.create_proposal.CreateProposalScreen
@@ -55,13 +57,38 @@ fun AppNavHost(
             composable(NavDestinations.GeneratePhrase.route) {
                 GeneratePhraseScreen(
                     onConfirm = { words ->
-                        navController.navigate(NavDestinations.ConfirmPhrase.route)
+                        val phrase = words.map {
+                            it.value
+                        }.joinToString(" ")
+
+                        navController.navigate("${NavDestinations.ConfirmPhrase.route}/$phrase")
                     }
                 )
             }
 
-            composable(NavDestinations.ConfirmPhrase.route) {
-                ConfirmPhraseScreen()
+            // TODO move logic out
+            composable(
+                route = "${NavDestinations.ConfirmPhrase.route}/{seedPhrase}",
+                arguments = listOf(navArgument("seedPhrase") {
+                    type = NavType.StringType
+                })
+            ) {
+                val phrase = it.arguments?.getString("seedPhrase")
+                    ?.split(" ")
+                    ?.mapIndexed { index, word ->
+                        Word(index, word)
+                    }.orEmpty()
+
+                ConfirmPhraseScreen(
+                    phraseToConfirm = phrase,
+                    onConfirm = {
+                        navController.navigate(NavDestinations.Primary.Wallet.route) {
+                            popUpTo(NavDestinations.ConfirmPhrase.route) {
+                                inclusive = true
+                            }
+                        }
+                    }
+                )
             }
 
             composable(NavDestinations.Primary.Wallet.route) {

@@ -52,6 +52,8 @@ fun <T> SelectorGroup(
         LaunchedEffect(initialSelect, options) {
             if (initialSelect < 0 || initialSelect > options.size - 1) {
                 throw IllegalArgumentException("Selector: invalid initial position: ${initialSelect}. Check your options size")
+            } else {
+                onSelectedChanged.invoke(options.elementAt(initialSelect))
             }
         }
 

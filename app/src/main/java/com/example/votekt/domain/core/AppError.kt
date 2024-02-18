@@ -8,7 +8,10 @@ data class AppError(val errorType: ErrorType): Exception() {
 
 enum class ErrorType {
     NODE_CONNECTION_ERROR,
-    UNKNOWN_ERROR,;
+    UNKNOWN_ERROR,
+    MNEMONIC_CONFIRMATION_INCOMPLETE,
+    MNEMONIC_CONFIRMATION_WRONG,
+    ;
 
     companion object {
         fun fromThrowable(e: Throwable): ErrorType {

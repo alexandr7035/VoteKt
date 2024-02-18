@@ -1,7 +1,7 @@
 package com.example.votekt.data.account.mnemonic
 
 data class WordToConfirm(
-    private val correctWord: Word,
+    val correctWord: Word,
     private val incorrectWords: List<Word>
 ) {
 
