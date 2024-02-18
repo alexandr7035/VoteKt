@@ -135,4 +135,7 @@ dependencies {
 
     // Bip39
     implementation "cash.z.ecc.android:kotlin-bip39:1.0.7"
+
+    // Shared prefs
+    implementation 'com.github.cioccarellia:ksprefs:2.4.0'
 }
