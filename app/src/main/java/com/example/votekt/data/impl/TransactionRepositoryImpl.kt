@@ -3,6 +3,7 @@ package com.example.votekt.data.impl
 import android.util.Log
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
+import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.TransactionRepository
@@ -57,13 +58,16 @@ class TransactionRepositoryImpl(
             if (txStatus != TxStatus.PENDING) {
                 transactionDataSource.updateCachedTransactionStatus(
                     txHash = TxHash(txHash),
-                    newStatus = txStatus
+                    newStatus = txStatus,
+                    gasUsed = receipt?.gasUsed?.let {
+                        Log.d("WEB3_TAG", "update gas used $it for ${txHash}")
+                        it
+                    }
                 )
             }
 
             return@withContext OperationResult.Success(txStatus)
-        }
-        catch (e: Exception) {
+        } catch (e: Exception) {
             throw e
             return@withContext OperationResult.Failure(AppError(ErrorType.UNKNOWN_ERROR))
         }

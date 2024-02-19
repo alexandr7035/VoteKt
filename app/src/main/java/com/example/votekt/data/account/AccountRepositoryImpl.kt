@@ -40,7 +40,7 @@ class AccountRepositoryImpl(
     }.flowOn(dispatcher)
 
     override suspend fun getSelfAddress(): Address {
-        return Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY))
+        return Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY, ""))
     }
 
     override suspend fun createAndSaveAccount(seedPhrase: List<Word>) {

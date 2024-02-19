@@ -19,18 +19,21 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.votekt.core.crypto.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.tx_history.TransactionsViewModel
+import com.example.votekt.ui.utils.mock
 import com.example.votekt.ui.utils.prettifyAddress
 import java.text.SimpleDateFormat
 import java.util.Locale
 
 @Composable
 fun TransactionCard(
-    transaction: Transaction, viewModel: TransactionsViewModel
+    viewModel: TransactionsViewModel,
+    transaction: Transaction,
 ) {
     // Set cached status as first value
     val txStatus = remember { mutableStateOf(transaction.status) }
@@ -53,7 +56,8 @@ fun TransactionCard(
 
 @Composable
 private fun TransactionCardUi(
-    transaction: Transaction, transactionStatus: TxStatus
+    transaction: Transaction,
+    transactionStatus: TxStatus
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -102,8 +106,13 @@ private fun TransactionCardUi(
                 }
 
             }
-        }
 
+            transaction.gasUsed?.let {
+                Text(
+                    text = "Gas used: ${it}"
+                )
+            }
+        }
     }
 }
 
@@ -112,7 +121,8 @@ private fun TransactionCardUi(
 fun TransactionCard_Preview() {
     VoteKtTheme {
         TransactionCardUi(
-            transaction = Transaction.mock(), transactionStatus = TxStatus.REVERTED
+            transaction = Transaction.mock(),
+            transactionStatus = TxStatus.REVERTED
         )
     }
 }
