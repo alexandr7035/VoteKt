@@ -68,3 +68,7 @@ Choose localDebug build variant and build
 
 ## Useful materials
 [Build your first Android Dapp using Web3j and Infura](https://medium.com/@madhurakunjir2611/build-your-first-android-dapp-using-web3j-and-infura-36d2596c1e2a#:~:text=The%20default%20derivation%20path%20used,account%20into%20the%20Credentials%20object.)
+
+[Ethereum Unit Converter](https://eth-converter.com/)
+
+[Infura Docs](https://docs.infura.io/api/networks/ethereum/how-to)
