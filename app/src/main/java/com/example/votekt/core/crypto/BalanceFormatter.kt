@@ -8,6 +8,7 @@ import java.util.Locale
 
 object BalanceFormatter {
 
+    private val smallValueFormatter: DecimalFormat
     private val formatter1k: DecimalFormat
     private val formatter10k: DecimalFormat
     private val formatter100k: DecimalFormat
@@ -24,7 +25,12 @@ object BalanceFormatter {
         decimalSeparator = symbols.decimalSeparator
         groupingSeparator = symbols.groupingSeparator
 
-        formatter1k = DecimalFormat("#.####", symbols).apply {
+        smallValueFormatter = DecimalFormat("#.#####", symbols).apply {
+            roundingMode = RoundingMode.DOWN
+            isGroupingUsed = false
+        }
+
+        formatter1k = DecimalFormat("#.######", symbols).apply {
             roundingMode = RoundingMode.DOWN
             isGroupingUsed = false
         }
@@ -60,6 +66,9 @@ object BalanceFormatter {
         }
         amount < LOWEST_LIMIT -> {
             "< 0${decimalSeparator}00001"
+        }
+        amount < SMALL_LIMIT -> {
+            smallValueFormatter.format(amount)
         }
         amount < THOUSAND_LIMIT -> {
             formatter1k.format(amount)
@@ -104,6 +113,7 @@ object BalanceFormatter {
     }
 
     private val LOWEST_LIMIT = BigDecimal.ONE.divide(BigDecimal.TEN.pow(5))
+    private val SMALL_LIMIT = BigDecimal.ONE
     private val THOUSAND_LIMIT = BigDecimal.TEN.pow(3)
     private val TEN_THOUSAND_LIMIT = BigDecimal.TEN.pow(4)
     private val HUNDRED_THOUSAND_LIMIT = BigDecimal.TEN.pow(5)

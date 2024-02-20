@@ -1,5 +1,6 @@
 package com.example.votekt.ui.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -15,10 +16,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.votekt.R
 import com.example.votekt.core.crypto.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
@@ -27,14 +32,13 @@ import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.utils.mock
 import com.example.votekt.ui.utils.prettifyAddress
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun TransactionCard(
     viewModel: TransactionsViewModel,
     transaction: Transaction,
 ) {
+    // TODO refactoring of tx card updates
     // Set cached status as first value
     val txStatus = remember { mutableStateOf(transaction.status) }
 
@@ -66,52 +70,61 @@ private fun TransactionCardUi(
             Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(
-                    text = transaction.type.uiMessage, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier = Modifier.weight(1f)
+                val statusUi = remember(transactionStatus) {
+                    getTxStatusMark(transactionStatus)
+                }
+
+                Image(
+                    painter = painterResource(id = statusUi.second),
+                    contentDescription = "Transaction status ${statusUi.first}",
+                    modifier = Modifier.padding(end = 4.dp)
                 )
 
-                val statusUi = getStatusUi(transactionStatus)
+                Text(
+                    text = transaction.type.uiMessage,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                )
 
                 Text(
-                    text = statusUi.first, fontSize = 18.sp, color = statusUi.second, fontWeight = FontWeight.ExtraBold
+                    text = transaction.hash.prettifyAddress(),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray,
+                )
+            }
+
+            Spacer(modifier = Modifier.height(8.dp))
+
+            transaction.gasFee?.let {
+                Text(
+                    text = "- ${
+                        BalanceFormatter.formatAmountWithSymbol(
+                            amount = it.toEther(),
+                            symbol = "ETH"
+                        )
+                    }",
+                    style = TextStyle(
+                        textAlign = TextAlign.End,
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            Row(verticalAlignment = Alignment.Top) {
-                Text(
-                    text = transaction.hash.prettifyAddress(),
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Gray,
-                    modifier = Modifier.weight(1f),
-                )
-
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = transaction.dateSent.getFormattedDate("dd MMM yyyy"),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.Gray
-                    )
-
-                    Text(
-                        text = "${transaction.dateSent.getFormattedDate("HH:mm:ss")} UTC",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = Color.Gray
-                    )
-                }
-
-            }
-
-            transaction.gasUsed?.let {
-                Text(
-                    text = "Gas used: ${it}"
-                )
-            }
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                text = transaction.dateSent.getFormattedDate("dd MMM yyyy HH:mm:ss"),
+                style = TextStyle(
+                    textAlign = TextAlign.End,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color.Gray
+                ),
+            )
         }
     }
 }
@@ -127,15 +140,11 @@ fun TransactionCard_Preview() {
     }
 }
 
-private fun getFormattedDate(timestamp: Long, format: String): String {
-    val formatter = SimpleDateFormat(format, Locale.US)
-    return formatter.format(timestamp)
-}
-
-private fun getStatusUi(txStatus: TxStatus): Pair<String, Color> {
-    return when (txStatus) {
-        TxStatus.PENDING -> Pair("Pending", Color.DarkGray)
-        TxStatus.MINED -> Pair("Completed", Color.Green)
-        TxStatus.REVERTED -> Pair("Failed", Color.Red)
+// TODO move to utils
+private fun getTxStatusMark(status: TxStatus): Pair<String, Int> {
+    return when (status) {
+        TxStatus.PENDING -> "Pending" to R.drawable.ic_status_pending
+        TxStatus.MINED -> "Completed" to R.drawable.ic_status_accepted
+        TxStatus.REVERTED -> "Failed" to R.drawable.ic_status_rejected
     }
 }

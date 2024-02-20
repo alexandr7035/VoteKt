@@ -33,5 +33,5 @@ fun Transaction.Companion.mock() = Transaction(
     hash = "abcdef1234",
     status = TxStatus.MINED,
     dateSent = 0,
-    gasUsed = BigInteger("1000")
+    gasFee = Wei(BigInteger("1000000000000000"))
 )

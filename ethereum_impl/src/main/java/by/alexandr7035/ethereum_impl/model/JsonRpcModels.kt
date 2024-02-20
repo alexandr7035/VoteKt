@@ -45,6 +45,7 @@ data class JsonRpcTransactionReceiptResult(
         @Json(name = "to") val to: Address,
         @Json(name = "cumulativeGasUsed") val cumulativeGasUsed: BigInteger,
         @Json(name = "gasUsed") val gasUsed: BigInteger,
+        @Json(name = "effectiveGasPrice") val effectiveGasPrice: BigInteger,
         @Json(name = "contractAddress") val contractAddress: Address?,
     )
 }

@@ -52,6 +52,7 @@ class EthereumClientImpl(
                 to = it.to,
                 cumulativeGasUsed = it.cumulativeGasUsed,
                 gasUsed = it.gasUsed,
+                effectiveGasPrice = it.effectiveGasPrice,
                 contractAddress = it.contractAddress,
             )
         } ?: throw TransactionReceiptNotFound()

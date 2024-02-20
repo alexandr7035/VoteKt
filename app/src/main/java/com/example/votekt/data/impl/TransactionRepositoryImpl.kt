@@ -47,7 +47,7 @@ class TransactionRepositoryImpl(
                 null
             }
 
-            Log.d("WEB3_TAG", "receipt $receipt")
+            Log.d("WEB3_TAG", "receipt ${receipt?.effectiveGasPrice}")
 
             val txStatus = when {
                 receipt == null -> TxStatus.PENDING
@@ -55,15 +55,8 @@ class TransactionRepositoryImpl(
                 else -> TxStatus.REVERTED
             }
 
-            if (txStatus != TxStatus.PENDING) {
-                transactionDataSource.updateCachedTransactionStatus(
-                    txHash = TxHash(txHash),
-                    newStatus = txStatus,
-                    gasUsed = receipt?.gasUsed?.let {
-                        Log.d("WEB3_TAG", "update gas used $it for ${txHash}")
-                        it
-                    }
-                )
+            if (receipt != null) {
+                transactionDataSource.updateCachedTransactionStatus(receipt)
             }
 
             return@withContext OperationResult.Success(txStatus)

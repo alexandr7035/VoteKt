@@ -1,5 +1,6 @@
 package com.example.votekt.data.local
 
+import by.alexandr7035.ethereum.model.TransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.data.cache.TransactionDao
 import com.example.votekt.data.cache.TransactionEntity
@@ -22,21 +23,27 @@ class TransactionDataSource(
                 hash = transaction.hash,
                 status = transaction.status,
                 dateSent = transaction.dateSent,
-                gasUsed = null
+                gasUsed = null,
+                gasFee = null,
             )
         )
     }
 
     suspend fun updateCachedTransactionStatus(
-        txHash: TxHash,
-        newStatus: TxStatus,
-        gasUsed: BigInteger?
+        receipt: TransactionReceipt
     ) {
-        val txCached = transactionsDao.getTransactionByHash(txHash.value)
+        val txCached = transactionsDao.getTransactionByHash(receipt.transactionHash)
         if (txCached != null) {
+
+            val txStatus = when {
+                receipt.isSuccessful() -> TxStatus.MINED
+                else -> TxStatus.REVERTED
+            }
+
             val updated = txCached.copy(
-                status = newStatus,
-                gasUsed = gasUsed
+                status = txStatus,
+                gasUsed = receipt.gasUsed,
+                gasFee = Wei(receipt.effectiveGasPrice * receipt.gasUsed)
             )
             transactionsDao.updateTransaction(updated)
         }

@@ -16,12 +16,13 @@ data class TransactionEntity(
     val status: TxStatus,
     val dateSent: Long,
     val gasUsed: BigInteger?,
+    val gasFee: Wei?
 ) {
     fun mapToData() = Transaction(
         type = type,
         hash = hash,
         status = status,
         dateSent = dateSent,
-        gasUsed = gasUsed
+        gasFee = gasFee
     )
 }

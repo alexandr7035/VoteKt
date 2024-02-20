@@ -85,7 +85,7 @@ class VotingRepositoryImpl(
                     hash = tx.transactionHash,
                     dateSent = System.currentTimeMillis(),
                     status = TxStatus.PENDING,
-                    gasUsed = null
+                    gasFee = null
                 )
             )
 
@@ -110,7 +110,7 @@ class VotingRepositoryImpl(
                     hash = tx.transactionHash,
                     dateSent = System.currentTimeMillis(),
                     status = TxStatus.PENDING,
-                    gasUsed = null
+                    gasFee = null
                 )
             )
 
