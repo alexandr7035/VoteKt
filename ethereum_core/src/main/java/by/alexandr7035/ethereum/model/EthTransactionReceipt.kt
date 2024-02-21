@@ -2,7 +2,7 @@ package by.alexandr7035.ethereum.model
 
 import java.math.BigInteger
 
-data class TransactionReceipt(
+data class EthTransactionReceipt(
     val status: BigInteger,
     val transactionHash: String,
     val transactionIndex: BigInteger,
@@ -17,3 +17,5 @@ data class TransactionReceipt(
 ) {
     fun isSuccessful() = status == BigInteger.ONE
 }
+
+fun EthTransactionReceipt.transactionFee() = Wei(effectiveGasPrice * gasUsed)

@@ -7,7 +7,7 @@ import by.alexandr7035.ethereum.model.EthNodeMethods
 import by.alexandr7035.ethereum.model.eth_requests.EthRequest
 import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.TransactionData
-import by.alexandr7035.ethereum.model.TransactionReceipt
+import by.alexandr7035.ethereum.model.EthTransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
@@ -35,14 +35,14 @@ class EthereumClientImpl(
         TODO("Not yet implemented")
     }
 
-    override suspend fun getTransactionReceipt(transactionHash: String): TransactionReceipt {
+    override suspend fun getTransactionReceipt(transactionHash: String): EthTransactionReceipt {
         return api.receipt(
             JsonRpcRequest(
                 method = EthNodeMethods.FUNCTION_GET_TRANSACTION_RECEIPT,
                 params = listOf(transactionHash)
             )
         ).result?.let {
-            TransactionReceipt(
+            EthTransactionReceipt(
                 status = it.status,
                 transactionHash = it.transactionHash,
                 transactionIndex = it.transactionIndex,
