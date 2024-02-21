@@ -1,13 +1,11 @@
 package com.example.votekt.data.local
 
-import by.alexandr7035.ethereum.model.TransactionReceipt
-import by.alexandr7035.ethereum.model.Wei
+import by.alexandr7035.ethereum.model.EthTransactionReceipt
+import by.alexandr7035.ethereum.model.transactionFee
 import com.example.votekt.data.cache.TransactionDao
 import com.example.votekt.data.cache.TransactionEntity
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus
-import com.example.votekt.data.web3_core.transactions.TxHash
-import java.math.BigInteger
 
 class TransactionDataSource(
     private val transactionsDao: TransactionDao
@@ -30,11 +28,10 @@ class TransactionDataSource(
     }
 
     suspend fun updateCachedTransactionStatus(
-        receipt: TransactionReceipt
+        receipt: EthTransactionReceipt
     ) {
         val txCached = transactionsDao.getTransactionByHash(receipt.transactionHash)
-        if (txCached != null) {
-
+        txCached?.let {
             val txStatus = when {
                 receipt.isSuccessful() -> TxStatus.MINED
                 else -> TxStatus.REVERTED
@@ -43,7 +40,7 @@ class TransactionDataSource(
             val updated = txCached.copy(
                 status = txStatus,
                 gasUsed = receipt.gasUsed,
-                gasFee = Wei(receipt.effectiveGasPrice * receipt.gasUsed)
+                gasFee = receipt.transactionFee()
             )
             transactionsDao.updateTransaction(updated)
         }

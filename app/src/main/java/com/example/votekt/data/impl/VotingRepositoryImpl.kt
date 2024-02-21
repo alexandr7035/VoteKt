@@ -3,6 +3,7 @@ package com.example.votekt.data.impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
+import com.example.votekt.data.TransactionRepository
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.data.VotingRepository
@@ -27,7 +28,7 @@ import java.math.BigInteger
 
 class VotingRepositoryImpl(
     web3j: Web3j,
-    private val transactionDataSource: TransactionDataSource,
+    private val transactionRepository: TransactionRepository,
     private val dispatcher: CoroutineDispatcher,
 ) : VotingRepository {
     private val votingContract: VotingContract
@@ -79,7 +80,7 @@ class VotingRepositoryImpl(
                 req.duration.getDurationInDays().toBigInteger()
             ).send()
 
-            transactionDataSource.cacheTransaction(
+            transactionRepository.cacheTransaction(
                 Transaction(
                     type = TransactionType.CREATE_PROPOSAL,
                     hash = tx.transactionHash,
@@ -104,7 +105,7 @@ class VotingRepositoryImpl(
 
             val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
 
-            transactionDataSource.cacheTransaction(
+            transactionRepository.cacheTransaction(
                 Transaction(
                     type = TransactionType.VOTE,
                     hash = tx.transactionHash,

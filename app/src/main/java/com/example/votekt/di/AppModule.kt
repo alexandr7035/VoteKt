@@ -1,6 +1,7 @@
 package com.example.votekt.di
 
 import androidx.room.Room
+import androidx.work.WorkManager
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
 import com.cioccarellia.ksprefs.KsPrefs
@@ -20,6 +21,7 @@ import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.impl.TransactionRepositoryImpl
 import com.example.votekt.data.impl.VotingRepositoryImpl
 import com.example.votekt.data.local.TransactionDataSource
+import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
@@ -32,6 +34,7 @@ import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
 
@@ -93,6 +96,19 @@ val appModule = module {
         }
     }
 
+    single {
+        WorkManager.getInstance(androidApplication().applicationContext)
+    }
+
+    worker {
+        AwaitTransactionWorker(
+            appContext = get(),
+            params = get(),
+            transactionRepository = get(),
+            ethereumClient = get()
+        )
+    }
+
     single<MnemonicRepository> {
         MnemonicRepositoryImpl(
             mnemonicHelper = get()
@@ -118,6 +134,7 @@ val appModule = module {
             transactionDataSource = get(),
             ethereumClient = get(),
             dispatcher = Dispatchers.IO,
+            workManager = get(),
         )
     }
 
