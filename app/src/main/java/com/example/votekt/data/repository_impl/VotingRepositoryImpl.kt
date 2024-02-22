@@ -3,19 +3,15 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
-import com.example.votekt.domain.transactions.TransactionRepository
-import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.domain.votings.VotingRepository
-import com.example.votekt.data.helpers.executeWeb3Call
+import com.example.votekt.domain.transactions.TransactionHash
+import com.example.votekt.domain.transactions.TransactionRepository
+import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
-import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionType
-import com.example.votekt.domain.transactions.TransactionHash
-import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
+import com.example.votekt.domain.votings.VotingRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.Bip44WalletUtils
@@ -54,15 +50,15 @@ class VotingRepositoryImpl(
         )
     }
 
-    override suspend fun getProposalById(id: Long): OperationResult<Proposal> {
-        return executeWeb3Call {
+    override suspend fun getProposalById(id: Long): OperationResult<Proposal> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
             val res = votingContract.getProposalDetails(BigInteger.valueOf(id)).send()
             res.mapToDomain()
         }
     }
 
-    override suspend fun getProposals(): OperationResult<List<Proposal>> {
-        return executeWeb3Call {
+    override suspend fun getProposals(): OperationResult<List<Proposal>> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
             val raw = votingContract.proposalsList.send()
             raw.map { it as VotingContract.ProposalRaw }.map() { rawProposal ->
                 rawProposal.mapToDomain()
@@ -72,7 +68,7 @@ class VotingRepositoryImpl(
 
 
     override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
-        try {
+        return@withContext OperationResult.runWrapped {
             val tx = votingContract.createProposal(
                 req.title,
                 req.desc,
@@ -80,24 +76,17 @@ class VotingRepositoryImpl(
             ).send()
 
             transactionRepository.addNewTransaction(
-                TransactionDomain(
-                    type = TransactionType.CREATE_PROPOSAL,
-                    hash = tx.transactionHash,
-                    dateSent = System.currentTimeMillis(),
-                    status = TransactionStatus.PENDING,
-                    gasFee = null
-                )
+                type = TransactionType.CREATE_PROPOSAL,
+                transactionHash = TransactionHash(tx.transactionHash)
             )
 
-            return@withContext OperationResult.Success(tx.transactionHash)
-        } catch (e: Exception) {
-            return@withContext OperationResult.Failure(AppError.fromThrowable(e))
+            tx.transactionHash
         }
     }
 
-    override suspend fun voteOnProposal(proposalId: Long, voteType: VoteType): OperationResult<TransactionHash> = withContext(dispatcher) {
-        try {
-            val isFor = when (voteType) {
+    override suspend fun voteOnProposal(proposalId: Long, vote: VoteType): OperationResult<TransactionHash> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
+            val isFor = when (vote) {
                 VoteType.VOTE_FOR -> true
                 VoteType.VOTE_AGAINST -> false
             }
@@ -105,19 +94,11 @@ class VotingRepositoryImpl(
             val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
 
             transactionRepository.addNewTransaction(
-                TransactionDomain(
-                    type = TransactionType.VOTE,
-                    hash = tx.transactionHash,
-                    dateSent = System.currentTimeMillis(),
-                    status = TransactionStatus.PENDING,
-                    gasFee = null
-                )
+                type = TransactionType.VOTE,
+                transactionHash = TransactionHash(tx.transactionHash)
             )
 
-            return@withContext OperationResult.Success(TransactionHash(tx.transactionHash))
-
-        } catch (e: Exception) {
-            return@withContext OperationResult.Failure(AppError.fromThrowable(e))
+            TransactionHash(tx.transactionHash)
         }
     }
 

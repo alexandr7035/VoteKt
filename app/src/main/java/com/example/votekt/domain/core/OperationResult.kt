@@ -5,15 +5,14 @@ sealed class OperationResult<out T> {
     data class Failure(val error: AppError) : OperationResult<Nothing>()
 
     companion object {
-        inline fun <R> runWrapped(block: () -> R): OperationResult<R> {
+        suspend inline fun <R> runWrapped(
+            crossinline block: suspend () -> R
+        ): OperationResult<R> {
             return try {
                 val res = block()
                 Success(res)
             } catch (e: Exception) {
-                when (e) {
-                    is AppError -> Failure(e)
-                    else -> Failure(AppError(ErrorType.fromThrowable(e)))
-                }
+                Failure(AppError.fromThrowable(e))
             }
         }
     }

@@ -24,21 +24,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.R
+import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.ui.components.DotsProgressIndicator
 import com.example.votekt.ui.components.preview.TransactionStatusPreviewProvider
 import com.example.votekt.ui.theme.VoteKtTheme
 
-enum class TransactionStatusUi {
-    CURRENTLY_AWAITED,
-    PENDING,
-    CONFIRMED,
-    FAILED,
-}
-
 @Composable
 fun TransactionPendingPanel(
     title: String,
-    statusUi: TransactionStatusUi
+    statusUi: TransactionStatus
 ) {
     Column(
         modifier = Modifier
@@ -67,19 +61,7 @@ fun TransactionPendingPanel(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             when (statusUi) {
-                TransactionStatusUi.CURRENTLY_AWAITED -> {
-                    DotsProgressIndicator(
-                        circleSize = 16.dp,
-                        travelDistance = 4.dp,
-                        spaceBetween = 4.dp
-                    )
-
-                    Text(
-                        text = "Please, wait"
-                    )
-                }
-
-                TransactionStatusUi.PENDING -> {
+                TransactionStatus.PENDING -> {
                     StatusIcon(icon = R.drawable.ic_status_pending)
 
                     Text(
@@ -87,7 +69,7 @@ fun TransactionPendingPanel(
                     )
                 }
 
-                TransactionStatusUi.CONFIRMED -> {
+                TransactionStatus.MINED -> {
                     StatusIcon(icon = R.drawable.ic_status_accepted)
 
                     Text(
@@ -95,7 +77,9 @@ fun TransactionPendingPanel(
                     )
                 }
 
-                TransactionStatusUi.FAILED -> TODO()
+                TransactionStatus.REVERTED -> {
+
+                }
             }
         }
     }
@@ -113,7 +97,7 @@ private fun StatusIcon(@DrawableRes icon: Int) {
 @Preview
 @Composable
 fun SelfVoteStatusPanel_Preview(
-    @PreviewParameter(TransactionStatusPreviewProvider::class) status: TransactionStatusUi
+    @PreviewParameter(TransactionStatusPreviewProvider::class) status: TransactionStatus
 ) {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
