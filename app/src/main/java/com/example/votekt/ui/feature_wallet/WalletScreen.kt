@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +31,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,6 +58,10 @@ fun WalletScreen(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.onWalletIntent(WalletScreenIntent.LoadData)
+    }
 
     WalletScreen_Ui(
         state = state,
@@ -99,6 +107,7 @@ private fun WalletScreen_Ui(
                 onIntent(WalletScreenIntent.LoadData)
             }
         )
+
         else -> {
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -109,6 +118,31 @@ private fun WalletScreen_Ui(
                     isBalanceLoading = state.isBalanceLoading,
                     address = state.address,
                 )
+
+                if (state.noConnection) {
+                    Row(
+                        modifier = Modifier
+                            .padding(12.dp)
+                            .background(
+                                shape = RoundedCornerShape(8.dp),
+                                color = Color(0xFFD86C6C)
+                            )
+                            .padding(vertical = 8.dp, horizontal = 12.dp)
+                            .fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = stringResource(R.string.error_node_no_connection),
+                            style = TextStyle(
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                color = Color.White
+                            )
+                        )
+
+                        // TODO retry
+                    }
+                }
             }
         }
     }
@@ -157,7 +191,7 @@ private fun Header(
                 )
             )
         }
-        
+
         Balance(
             balance = balance,
             isBalanceLoading = isBalanceLoading
@@ -263,7 +297,9 @@ private fun WalletScreen_Preview() {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
             WalletScreen_Ui(
-                state = WalletScreenState(),
+                state = WalletScreenState(
+                    noConnection = true
+                ),
             )
         }
     }

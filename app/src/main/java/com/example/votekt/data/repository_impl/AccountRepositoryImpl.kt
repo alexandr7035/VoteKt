@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
+import java.math.BigInteger
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
@@ -32,10 +33,18 @@ class AccountRepositoryImpl(
     }
 
     override fun getAccountBalance(): Flow<Wei> = flow {
+        val recentBalance = ksPrefs.pull(PrefKeys.RECENT_BALANCE, "")
+        if (recentBalance.isNotBlank()) {
+            // TODO extensions
+            emit(Wei(BigInteger(recentBalance)))
+        }
+
         while (coroutineContext.isActive) {
-            emit(ethereumClient.getBalance(
+            val updatedBalance = ethereumClient.getBalance(
                 address = Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY))
-            ))
+            )
+            ksPrefs.push(PrefKeys.RECENT_BALANCE, updatedBalance.value.toString())
+            emit(updatedBalance)
             delay(balancePollingDelay)
         }
     }.flowOn(dispatcher)

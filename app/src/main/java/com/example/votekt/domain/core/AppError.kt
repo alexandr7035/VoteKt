@@ -1,6 +1,7 @@
 package com.example.votekt.domain.core
 
 import android.util.Log
+import java.net.ConnectException
 
 data class AppError(val errorType: ErrorType): Exception() {
     companion object {
@@ -23,6 +24,7 @@ enum class ErrorType {
             // Here may be additional mapping depending on exception type
             return when (e) {
                 is AppError -> e.errorType
+                is ConnectException -> NODE_CONNECTION_ERROR
                 else -> UNKNOWN_ERROR
             }
         }

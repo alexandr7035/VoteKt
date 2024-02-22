@@ -10,5 +10,6 @@ data class WalletScreenState(
     val address: Address = Address(""),
     val balanceFormatted: String? = null,
     val navigationEvent: StateEventWithContent<WalletScreenNavigationEvent> = consumed(),
-    val error: UiErrorMessage? = null
+    val noConnection: Boolean = false,
+    val error: UiErrorMessage? = null,
 )
