@@ -18,7 +18,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -35,10 +34,6 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel()) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
-
-    LaunchedEffect(Unit) {
-        viewModel.loadTransactionList()
-    }
 
     Scaffold(topBar = {
         AppBar(
@@ -74,7 +69,8 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
                 state.shouldShowFullError() -> {
                     // FIXME ui state
                     ErrorFullScreen(error = state.error?.errorType?.uiError!!, onRetry = {
-                        viewModel.loadTransactionList()
+                        // TODO
+//                        viewModel.loadTransactionList()
                     })
                 }
 
@@ -100,8 +96,7 @@ private fun TransactionsList(
         content = {
             items(transactions.size) {
                 TransactionCard(
-                    transaction = transactions[it],
-                    viewModel = viewModel
+                    transaction = transactions[it]
                 )
             }
 

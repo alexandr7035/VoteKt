@@ -5,9 +5,10 @@ import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxHash
 import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.domain.core.OperationResult
+import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
-    suspend fun getTransactions(): List<Transaction>
+    fun getTransactions(): Flow<List<Transaction>>
 
     suspend fun cacheTransaction(transaction: Transaction)
 

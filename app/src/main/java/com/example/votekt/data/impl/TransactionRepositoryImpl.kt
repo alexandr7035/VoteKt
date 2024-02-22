@@ -20,6 +20,8 @@ import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
@@ -29,8 +31,8 @@ class TransactionRepositoryImpl(
     private val ethereumClient: EthereumClient,
     private val workManager: WorkManager,
 ) : TransactionRepository {
-    override suspend fun getTransactions(): List<Transaction> = withContext(dispatcher) {
-        return@withContext transactionDataSource.getTransactions()
+    override fun getTransactions(): Flow<List<Transaction>> {
+        return transactionDataSource.getTransactions().flowOn(dispatcher)
     }
 
     override suspend fun cacheTransaction(transaction: Transaction) {

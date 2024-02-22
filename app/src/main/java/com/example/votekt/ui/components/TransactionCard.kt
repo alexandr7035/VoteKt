@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -29,39 +28,21 @@ import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.utils.mock
 import com.example.votekt.ui.utils.prettifyAddress
 
 @Composable
 fun TransactionCard(
-    viewModel: TransactionsViewModel,
     transaction: Transaction,
 ) {
-    // TODO refactoring of tx card updates
-    // Set cached status as first value
-    val txStatus = remember { mutableStateOf(transaction.status) }
-
-    LaunchedEffect(transaction.hash) {
-        if (transaction.status == TxStatus.PENDING) {
-            val flow = viewModel.observeTransactionStatus(transaction.hash)
-            // Collect the latest transaction status and update the state
-            flow.collect { latestStatus ->
-                txStatus.value = latestStatus
-            }
-        }
-    }
-
     TransactionCardUi(
         transaction = transaction,
-        transactionStatus = txStatus.value
     )
 }
 
 @Composable
 private fun TransactionCardUi(
-    transaction: Transaction,
-    transactionStatus: TxStatus
+    transaction: Transaction
 ) {
     Card(
         modifier = Modifier.fillMaxWidth()
@@ -70,8 +51,8 @@ private fun TransactionCardUi(
             Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
-                val statusUi = remember(transactionStatus) {
-                    getTxStatusMark(transactionStatus)
+                val statusUi = remember(transaction.status) {
+                    getTxStatusMark(transaction.status)
                 }
 
                 Image(
@@ -135,7 +116,6 @@ fun TransactionCard_Preview() {
     VoteKtTheme {
         TransactionCardUi(
             transaction = Transaction.mock(),
-            transactionStatus = TxStatus.REVERTED
         )
     }
 }

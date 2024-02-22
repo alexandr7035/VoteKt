@@ -6,12 +6,16 @@ import com.example.votekt.data.cache.TransactionDao
 import com.example.votekt.data.cache.TransactionEntity
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class TransactionDataSource(
     private val transactionsDao: TransactionDao
 ) {
-    suspend fun getTransactions(): List<Transaction> {
-        return transactionsDao.getTransactions().map { it.mapToData() }
+    fun getTransactions(): Flow<List<Transaction>> {
+        return transactionsDao.getTransactions().map { list ->
+            list.map { it.mapToData() }
+        }
     }
 
     suspend fun cacheTransaction(transaction: Transaction) {
