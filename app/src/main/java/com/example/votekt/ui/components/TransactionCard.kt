@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,6 +19,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.R
@@ -27,9 +27,12 @@ import com.example.votekt.core.crypto.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.data.model.Transaction
 import com.example.votekt.data.web3_core.transactions.TxStatus
+import com.example.votekt.ui.components.preview.TransactionPreviewProvider
+import com.example.votekt.ui.components.preview.TransactionStatusPreviewProvider
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.mock
 import com.example.votekt.ui.utils.prettifyAddress
+import com.example.votekt.ui.voting_details.TransactionStatusUi
 
 @Composable
 fun TransactionCard(
@@ -112,10 +115,12 @@ private fun TransactionCardUi(
 
 @Preview
 @Composable
-fun TransactionCard_Preview() {
+fun TransactionCard_Preview(
+    @PreviewParameter(TransactionPreviewProvider::class) transaction: Transaction
+) {
     VoteKtTheme {
         TransactionCardUi(
-            transaction = Transaction.mock(),
+            transaction = transaction
         )
     }
 }
