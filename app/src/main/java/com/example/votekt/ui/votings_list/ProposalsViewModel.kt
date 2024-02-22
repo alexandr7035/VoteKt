@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.data.VotingRepository
+import com.example.votekt.domain.votings.VotingRepository
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow

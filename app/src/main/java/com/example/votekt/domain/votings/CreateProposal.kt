@@ -1,6 +1,6 @@
-package com.example.votekt.data.model
+package com.example.votekt.domain.votings
 
-data class CreateProposalReq(
+data class CreateProposal(
     val title: String,
     val desc: String,
     val duration: ProposalDuration

@@ -24,7 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
-import com.example.votekt.data.model.Transaction
+import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
 import com.example.votekt.ui.core.AppBar
@@ -86,7 +86,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
 
 @Composable
 private fun TransactionsList(
-    transactions: List<Transaction>,
+    transactions: List<TransactionDomain>,
     viewModel: TransactionsViewModel
 ) {
     LazyColumn(modifier = Modifier

@@ -3,9 +3,9 @@ package com.example.votekt.ui.feature_create_account
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.account.AccountRepository
-import com.example.votekt.data.account.mnemonic.MnemonicRepository
-import com.example.votekt.data.account.mnemonic.Word
+import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.ui.feature_create_account.model.ConfirmPhraseIntent
@@ -30,7 +30,7 @@ class ConfirmPhraseViewModel(
     )
     val state = _state.asStateFlow()
 
-    private val confirmationSelection: MutableMap<Int, Word> = mutableMapOf()
+    private val confirmationSelection: MutableMap<Int, MnemonicWord> = mutableMapOf()
 
     fun emitIntent(intent: ConfirmPhraseIntent) {
         when (intent) {
@@ -57,7 +57,7 @@ class ConfirmPhraseViewModel(
         }
     }
 
-    private fun reduceSelectConfirmation(index: Int, word: Word) {
+    private fun reduceSelectConfirmation(index: Int, word: MnemonicWord) {
         confirmationSelection[index] = word
         // Clear error
         _state.update {

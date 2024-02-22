@@ -35,8 +35,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.BuildConfig
 import com.example.votekt.R
 import com.example.votekt.core.config.ProposalConfig
-import com.example.votekt.data.model.CreateProposalReq
-import com.example.votekt.data.model.ProposalDuration
+import com.example.votekt.domain.votings.CreateProposal
+import com.example.votekt.domain.votings.ProposalDuration
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
@@ -83,7 +83,7 @@ fun CreateProposalScreen(
         onBack = onBack,
         onSubmit = { title, desc, duration ->
             viewModel.createProposal(
-                CreateProposalReq(title, desc, duration)
+                CreateProposal(title, desc, duration)
             )
         },
         titleMaxLength = state.titleMaxLength,

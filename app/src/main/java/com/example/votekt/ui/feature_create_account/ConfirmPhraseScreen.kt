@@ -21,8 +21,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.votekt.data.account.mnemonic.Word
-import com.example.votekt.data.account.mnemonic.WordToConfirm
+import com.example.votekt.domain.account.MnemonicWord
+import com.example.votekt.domain.account.MnemonicWordConfirm
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.selector_group.SelectorOption
@@ -36,7 +36,7 @@ import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ConfirmPhraseScreen(
-    phraseToConfirm: List<Word>,
+    phraseToConfirm: List<MnemonicWord>,
     viewModel: ConfirmPhraseViewModel = koinViewModel(),
     onConfirm: () -> Unit
 ) {
@@ -141,7 +141,7 @@ private fun ConfirmPhraseScreen_Ui(
 private fun GeneratedPhraseScreen_Preview() {
     VoteKtTheme {
         val data = List(3) {
-            WordToConfirm.mock()
+            MnemonicWordConfirm.mock()
         }
 
         Surface(

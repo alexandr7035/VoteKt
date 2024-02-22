@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
-import com.example.votekt.data.TransactionRepository
+import com.example.votekt.domain.transactions.TransactionRepository
 
 class AwaitTransactionWorker(
     appContext: Context,
@@ -22,7 +22,7 @@ class AwaitTransactionWorker(
 
         return try {
             val receipt = ethereumClient.getTransactionReceipt(transactionHash)
-            transactionRepository.updateTransactionIfExists(receipt)
+            transactionRepository.updateTransaction(receipt)
             Log.d(TAG, "Completed for $transactionHash")
             Result.success()
         } catch (e: TransactionReceiptNotFound) {

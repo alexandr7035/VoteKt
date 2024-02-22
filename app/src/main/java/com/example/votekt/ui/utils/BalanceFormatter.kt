@@ -1,4 +1,4 @@
-package com.example.votekt.core.crypto
+package com.example.votekt.ui.utils
 
 import java.math.BigDecimal
 import java.math.RoundingMode

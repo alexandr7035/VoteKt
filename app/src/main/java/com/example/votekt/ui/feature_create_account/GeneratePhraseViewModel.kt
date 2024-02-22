@@ -2,7 +2,7 @@ package com.example.votekt.ui.feature_create_account
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.account.mnemonic.MnemonicRepository
+import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.ui.feature_create_account.model.GeneratePhraseNavigationEvent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedIntent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedState

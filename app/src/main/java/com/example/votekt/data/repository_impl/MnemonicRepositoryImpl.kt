@@ -1,6 +1,10 @@
-package com.example.votekt.data.account.mnemonic
+package com.example.votekt.data.repository_impl
 
 import android.util.Log
+import com.example.votekt.data.helpers.MnemonicHelper
+import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.account.MnemonicWord
+import com.example.votekt.domain.account.MnemonicWordConfirm
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.ErrorType
 import java.security.SecureRandom
@@ -11,16 +15,16 @@ class MnemonicRepositoryImpl(
 ) : MnemonicRepository {
     private val secureRandom = SecureRandom()
 
-    override fun generateMnemonic(): List<Word> {
+    override fun generateMnemonic(): List<MnemonicWord> {
         return mnemonicHelper.generateMnemonic()
     }
 
-    override fun getRandomMnemonicWords(mnemonic: List<Word>): List<WordToConfirm> {
+    override fun getRandomMnemonicWords(mnemonic: List<MnemonicWord>): List<MnemonicWordConfirm> {
         return generateConfirmationWords(mnemonic)
     }
 
-    private fun generateConfirmationWords(mnemonic: List<Word>): List<WordToConfirm> {
-        val confirmationWords = mutableListOf<WordToConfirm>()
+    private fun generateConfirmationWords(mnemonic: List<MnemonicWord>): List<MnemonicWordConfirm> {
+        val confirmationWords = mutableListOf<MnemonicWordConfirm>()
 
         val correctIndexes = getCorrectWordIndexes(mnemonic.size)
 
@@ -30,16 +34,16 @@ class MnemonicRepositoryImpl(
                 mnemonic[incorrectIndex]
             }
 
-            confirmationWords.add(WordToConfirm(correctWord, wrongWords))
+            confirmationWords.add(MnemonicWordConfirm(correctWord, wrongWords))
         }
 
         return confirmationWords.sortedBy { it.rightWordIndex() }
     }
 
     override fun confirmPhrase(
-        mnemonic: List<Word>,
-        proposedWordsToConfirm: List<WordToConfirm>,
-        confirmationData: Map<Int, Word>
+        mnemonic: List<MnemonicWord>,
+        proposedWordsToConfirm: List<MnemonicWordConfirm>,
+        confirmationData: Map<Int, MnemonicWord>
     ) {
         Log.d("WEB3_TAG", "phrase ${mnemonic}")
         Log.d("WEB3_TAG", "proposed words ${proposedWordsToConfirm}")
@@ -59,7 +63,7 @@ class MnemonicRepositoryImpl(
         }
     }
 
-    private fun getIncorrectIndexesForWord(mnemonic: List<Word>, correctWord: Word): List<Int> {
+    private fun getIncorrectIndexesForWord(mnemonic: List<MnemonicWord>, correctWord: MnemonicWord): List<Int> {
         val incorrectWords = mutableListOf<Int>()
 
         while (incorrectWords.size < INCORRECT_WORDS_COUNT) {

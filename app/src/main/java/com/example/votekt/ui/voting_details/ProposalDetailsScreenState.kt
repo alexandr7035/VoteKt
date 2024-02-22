@@ -1,6 +1,6 @@
 package com.example.votekt.ui.voting_details
 
-import com.example.votekt.data.web3_core.transactions.TxHash
+import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.votings.Proposal
 import de.palm.composestateevents.StateEventWithContent
@@ -11,5 +11,5 @@ data class ProposalDetailsScreenState(
     val proposal: Proposal? = null,
     val error: AppError? = null,
     val isSelfVoteProcessing: Boolean = false,
-    val selfVoteSubmittedEvent: StateEventWithContent<TxHash> = consumed()
+    val selfVoteSubmittedEvent: StateEventWithContent<TransactionHash> = consumed()
 )

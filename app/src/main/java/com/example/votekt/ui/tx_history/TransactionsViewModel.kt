@@ -2,8 +2,8 @@ package com.example.votekt.ui.tx_history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.TransactionRepository
-import com.example.votekt.data.model.Transaction
+import com.example.votekt.domain.transactions.TransactionRepository
+import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.ui.core.ScreenState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +18,7 @@ class TransactionsViewModel(
     private val transactionRepository: TransactionRepository
 ) : ViewModel() {
     private val _state = MutableStateFlow(
-        ScreenState<List<Transaction>>(
+        ScreenState<List<TransactionDomain>>(
             data = null,
             error = null,
             isLoading = true

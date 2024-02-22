@@ -1,4 +1,4 @@
-package com.example.votekt.data.model
+package com.example.votekt.domain.votings
 
 enum class ProposalDuration {
     DURATION_24_HOURS,

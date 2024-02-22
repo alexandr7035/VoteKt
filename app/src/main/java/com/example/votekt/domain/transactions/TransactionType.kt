@@ -1,4 +1,4 @@
-package com.example.votekt.data.model
+package com.example.votekt.domain.transactions
 
 enum class TransactionType {
     CREATE_PROPOSAL,

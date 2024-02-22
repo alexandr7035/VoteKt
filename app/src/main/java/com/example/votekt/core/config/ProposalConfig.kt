@@ -5,8 +5,8 @@ import com.example.votekt.R
 import kotlin.random.Random
 
 object ProposalConfig {
-    val titleMaxLength = 100
-    val descMaxLength = 500
+    const val titleMaxLength = 100
+    const val descMaxLength = 500
 
     fun getRandomMockProposalText(context: Context): Pair<String, String> {
         val variants = listOf(

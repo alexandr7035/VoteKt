@@ -1,7 +1,7 @@
 package com.example.votekt.ui.utils
 
-import com.example.votekt.data.account.mnemonic.Word
-import com.example.votekt.data.account.mnemonic.WordToConfirm
+import com.example.votekt.domain.account.MnemonicWord
+import com.example.votekt.domain.account.MnemonicWordConfirm
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
@@ -16,9 +16,9 @@ fun Proposal.Companion.mock(): Proposal {
     )
 }
 
-fun WordToConfirm.Companion.mock() = WordToConfirm(
-    correctWord = Word(0, "Lorem"), incorrectWords = listOf(
-        Word(5, "Wrong1"),
-        Word(10, "Wrong2"),
+fun MnemonicWordConfirm.Companion.mock() = MnemonicWordConfirm(
+    correctWord = MnemonicWord(0, "Lorem"), incorrectWords = listOf(
+        MnemonicWord(5, "Wrong1"),
+        MnemonicWord(10, "Wrong2"),
     )
 )

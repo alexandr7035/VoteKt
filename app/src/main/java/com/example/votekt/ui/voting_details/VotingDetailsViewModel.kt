@@ -2,7 +2,7 @@ package com.example.votekt.ui.voting_details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.votekt.data.VotingRepository
+import com.example.votekt.domain.votings.VotingRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.votings.VoteType
 import de.palm.composestateevents.consumed

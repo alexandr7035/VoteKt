@@ -3,14 +3,13 @@ package com.example.votekt.ui.feature_wallet
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.model.Wei
-import com.example.votekt.core.crypto.BalanceFormatter
-import com.example.votekt.data.account.AccountRepository
+import com.example.votekt.ui.utils.BalanceFormatter
+import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.uiError
-import com.example.votekt.ui.utils.prettify
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow

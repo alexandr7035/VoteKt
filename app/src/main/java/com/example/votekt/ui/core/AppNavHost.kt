@@ -17,7 +17,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import com.example.votekt.data.account.mnemonic.Word
+import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
@@ -104,7 +104,7 @@ fun AppNavHost(
                         val phrase = it.arguments?.getString("seedPhrase")
                             ?.split(" ")
                             ?.mapIndexed { index, word ->
-                                Word(index, word)
+                                MnemonicWord(index, word)
                             }.orEmpty()
 
                         ConfirmPhraseScreen(

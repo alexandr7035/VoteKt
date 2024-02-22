@@ -24,7 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.votekt.data.account.mnemonic.Word
+import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.ui.components.FlowRow
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.feature_create_account.model.GeneratePhraseNavigationEvent
@@ -37,7 +37,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun GeneratePhraseScreen(
     viewModel: GeneratePhraseViewModel = koinViewModel(),
-    onConfirm: (words: List<Word>) -> Unit
+    onConfirm: (words: List<MnemonicWord>) -> Unit
 ) {
     LaunchedEffect(Unit) {
         viewModel.emitIntent(GenerateSeedIntent.Load)
@@ -105,7 +105,7 @@ private fun GeneratePhraseScreen_Ui(
 }
 
 @Composable
-private fun WordItem(word: Word) {
+private fun WordItem(word: MnemonicWord) {
     Box(
         modifier = Modifier
             .clip(RoundedCornerShape(16.dp))
@@ -134,7 +134,7 @@ private fun GeneratePhraseScreen_Preview() {
             GeneratePhraseScreen_Ui(
                 state = GenerateSeedState(
                     words = List(12) {
-                        Word(0, "Sample")
+                        MnemonicWord(0, "Sample")
                     }
                 )
             )

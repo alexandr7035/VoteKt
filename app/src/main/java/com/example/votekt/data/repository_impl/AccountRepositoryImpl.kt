@@ -1,4 +1,4 @@
-package com.example.votekt.data.account
+package com.example.votekt.data.repository_impl
 
 import android.util.Log
 import by.alexandr7035.crypto.CryptoHelper
@@ -7,8 +7,9 @@ import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import cash.z.ecc.android.bip39.Mnemonics
 import com.cioccarellia.ksprefs.KsPrefs
-import com.example.votekt.data.account.mnemonic.Word
-import com.example.votekt.data.model.PrefKeys
+import com.example.votekt.domain.account.MnemonicWord
+import com.example.votekt.data.cache.PrefKeys
+import com.example.votekt.domain.account.AccountRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -43,7 +44,7 @@ class AccountRepositoryImpl(
         return Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY, ""))
     }
 
-    override suspend fun createAndSaveAccount(seedPhrase: List<Word>) {
+    override suspend fun createAndSaveAccount(seedPhrase: List<MnemonicWord>) {
         val rawPhrase = seedPhrase.joinToString(" ") { it.value }
         val mnemonicCode = Mnemonics.MnemonicCode(rawPhrase)
         val credentials = cryptoHelper.generateCredentialsFromMnemonic(mnemonicCode)

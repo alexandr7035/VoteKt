@@ -9,18 +9,17 @@ import com.cioccarellia.ksprefs.config.EncryptionType
 import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
 import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import com.example.votekt.BuildConfig
-import com.example.votekt.data.TransactionRepository
-import com.example.votekt.data.VotingRepository
-import com.example.votekt.data.account.AccountRepository
-import com.example.votekt.data.account.AccountRepositoryImpl
-import com.example.votekt.data.account.mnemonic.MnemonicHelperDebugImpl
-import com.example.votekt.data.account.mnemonic.MnemonicHelperImpl
-import com.example.votekt.data.account.mnemonic.MnemonicRepository
-import com.example.votekt.data.account.mnemonic.MnemonicRepositoryImpl
+import com.example.votekt.domain.transactions.TransactionRepository
+import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.data.repository_impl.AccountRepositoryImpl
+import com.example.votekt.data.helpers.MnemonicHelperDebugImpl
+import com.example.votekt.data.helpers.MnemonicHelperImpl
+import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.cache.TransactionsDatabase
-import com.example.votekt.data.impl.TransactionRepositoryImpl
-import com.example.votekt.data.impl.VotingRepositoryImpl
-import com.example.votekt.data.local.TransactionDataSource
+import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
+import com.example.votekt.data.repository_impl.VotingRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
@@ -131,12 +130,9 @@ val appModule = module {
 
     single<TransactionRepository> {
         TransactionRepositoryImpl(
-            transactionDataSource = get(),
-            ethereumClient = get(),
+            transactionDao = get(),
             dispatcher = Dispatchers.IO,
             workManager = get(),
         )
     }
-
-    single { TransactionDataSource(get()) }
 }
