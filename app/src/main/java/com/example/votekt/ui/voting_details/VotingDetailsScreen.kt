@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -43,6 +44,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.space.ui.components.debug.debugPlaceholder
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
@@ -56,6 +58,7 @@ import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.AvatarHelper
 import com.example.votekt.ui.utils.prettifyAddress
 import com.example.votekt.ui.voting_details.model.ProposalStatusUi
 import com.example.votekt.ui.voting_details.model.getStatusUi
@@ -207,8 +210,9 @@ fun VotingPostCard(proposal: Proposal) {
             )
         )
 
-        // FIXME
-        Creator(address = "0x123...ab4c")
+        proposal.creatorAddress?.let {
+            Creator(address = it.value)
+        }
 
         val descriptionExpanded = remember {
             mutableStateOf(false)
@@ -231,10 +235,18 @@ fun VotingPostCard(proposal: Proposal) {
             proposal.getStatusUi()
         }
 
-        Box(
+        Row(
             modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.CenterEnd
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            if (proposal is Proposal.Deployed) {
+                Text(
+                    text = "#${proposal.blockchainId}"
+                )
+            }
+
+            Spacer(modifier = Modifier.weight(1f))
+
             ProposalStatusMark(uiStatus)
         }
     }
@@ -278,15 +290,14 @@ private fun Creator(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
-        // FIXME
-        val sample = "https://api.dicebear.com/6.x/identicon/svg?seed=${address}"
+        val sample = AvatarHelper.getAvatarUrl(identifier = address)
         val imageReq = ImageRequest.Builder(LocalContext.current)
             .data(sample)
             .decoderFactory(SvgDecoder.Factory())
             .crossfade(true).build()
 
         Text(
-            text = "Creator:",
+            text = stringResource(R.string.creator),
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
             )
@@ -294,7 +305,7 @@ private fun Creator(
 
         AsyncImage(
             model = imageReq,
-            contentDescription = "Image",
+            contentDescription = stringResource(R.string.cd_user_avatar),
             contentScale = ContentScale.FillHeight,
 
             modifier = Modifier
@@ -305,6 +316,7 @@ private fun Creator(
 
         Text(
             text = if (isSelf) {
+                // TODO contract update
                 "${address.prettifyAddress()} (You)"
             } else {
                 address.prettifyAddress()
