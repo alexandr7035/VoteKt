@@ -1,9 +1,9 @@
 # README.md
 
 ## Notes
-Infura limits (Free):
-100,000 Total Requests/Day
-25,000 Ethereum Mainnet Archive Requests/Day
+Infura limits (Free):  
+100,000 Total Requests/Day  
+25,000 Ethereum Mainnet Archive Requests/Day  
 
 [Dashboard | Create a key](https://app.infura.io/)  
 [See all info about limits](https://support.infura.io/hc/en-us/articles/10650822554395-What-are-Infura-s-daily-limits-)  
