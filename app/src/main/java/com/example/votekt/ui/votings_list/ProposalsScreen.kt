@@ -1,6 +1,5 @@
 package com.example.votekt.ui.votings_list
 
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -13,14 +12,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -32,16 +29,11 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.uiError
-import com.example.votekt.ui.utils.mock
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProposalsScreen(
-    onProposalClick: (proposalId: Long) -> Unit = {},
+    onProposalClick: (proposalId: Int) -> Unit = {},
     onNewProposalClick: () -> Unit = {},
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
@@ -62,40 +54,32 @@ fun ProposalsScreen(
             )
         }) { pv ->
 
-        val state = viewModel.proposalsListUi.collectAsStateWithLifecycle().value
-        Log.d("TEST", state.toString())
-
-        LaunchedEffect(Unit) {
-            while (this.isActive) {
-                viewModel.loadProposals()
-                delay(5000)
-            }
-        }
+        val state = viewModel.state.collectAsStateWithLifecycle().value
 
         when {
-            state.shouldShowFullLoading() -> {
+            state.isLoading -> {
                 FullscreenProgressBar(backgroundColor = Color.Transparent)
             }
 
-            state.shouldShowData() -> {
-                if (state.data!!.isNotEmpty()) {
+            state.error != null -> {
+                ErrorFullScreen(
+                    error = state.error,
+                    onRetry = {
+                        // TODO
+                    }
+                )
+            }
+
+            else -> {
+                if (state.proposals.isNotEmpty()) {
                     ProposalsList(
-                        proposals = state.data,
+                        proposals = state.proposals,
                         pv = pv,
                         onProposalClick = onProposalClick,
                     )
                 } else {
                     NoProposalsStub(pv = pv)
                 }
-            }
-
-            state.shouldShowFullError() -> {
-                // FIXME ui state
-                ErrorFullScreen(
-                    error = state.error?.errorType?.uiError!!,
-                    onRetry = {
-                    viewModel.loadProposals()
-                })
             }
         }
     }
@@ -105,7 +89,7 @@ fun ProposalsScreen(
 private fun ProposalsList(
     proposals: List<Proposal>,
     pv: PaddingValues,
-    onProposalClick: (proposalId: Long) -> Unit,
+    onProposalClick: (proposalId: Int) -> Unit,
 ) {
     LazyColumn(modifier = Modifier
         .background(MaterialTheme.colorScheme.background)
@@ -148,10 +132,11 @@ private fun NoProposalsStub(pv: PaddingValues) {
     }
 }
 
+// TODO
 @Composable
 @Preview()
 fun ProposalsScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
-        ProposalsList(proposals = List(5) { Proposal.mock() }, pv = PaddingValues(12.dp), onProposalClick = {})
+//        ProposalsList(proposals = List(5) { Proposal.mock() }, pv = PaddingValues(12.dp), onProposalClick = {})
     }
 }

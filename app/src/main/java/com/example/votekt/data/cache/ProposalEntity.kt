@@ -1,6 +1,5 @@
 package com.example.votekt.data.cache
 
-import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.votekt.domain.votings.VoteType
@@ -8,19 +7,15 @@ import com.example.votekt.domain.votings.VoteType
 @Entity(tableName = "proposals")
 data class ProposalEntity(
     @PrimaryKey(autoGenerate = true)
-    val id: Long,
-    val remoteId: Long,
+    val id: Int = 0,
+    val deployTransactionHash: String?,
+    val remoteId: Long? = null,
+    val createdAt: Long,
+    val expiresAt: Long? = null,
     val title: String,
     val description: String,
-    val expiresAt: Long,
-    @Embedded
-    val votingData: VotingDataEntity?,
-    val isCreationPending: Boolean?,
+    val votesFor: Int = 0,
+    val votesAgainst: Int = 0,
+    val selfVote: VoteType? = null,
+    val selfVoteTransactionHash: String? = null,
 )
-
-data class VotingDataEntity(
-    val votesFor: Int,
-    val votesAgainst: Int,
-    val selfVote: VoteType?,
-)
-

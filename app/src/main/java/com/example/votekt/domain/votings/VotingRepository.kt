@@ -2,10 +2,11 @@ package com.example.votekt.domain.votings
 
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
+import kotlinx.coroutines.flow.Flow
 
 interface VotingRepository {
-    suspend fun getProposalById(id: Long): OperationResult<Proposal>
-    suspend fun getProposals(): OperationResult<List<Proposal>>
+    fun getProposals(): Flow<List<Proposal>>
+    fun getProposalById(id: Int): Flow<Proposal>
     suspend fun createProposal(req: CreateProposal): OperationResult<String>
     suspend fun voteOnProposal(proposalId: Long, vote: VoteType): OperationResult<TransactionHash>
 }

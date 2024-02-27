@@ -1,15 +1,15 @@
 package com.example.votekt.ui.voting_details
 
 import com.example.votekt.domain.transactions.TransactionHash
-import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 
 data class ProposalDetailsScreenState(
     val isProposalLoading: Boolean = false,
     val proposal: Proposal? = null,
-    val error: AppError? = null,
+    val error: UiErrorMessage? = null,
     val isSelfVoteProcessing: Boolean = false,
     val selfVoteSubmittedEvent: StateEventWithContent<TransactionHash> = consumed()
 )

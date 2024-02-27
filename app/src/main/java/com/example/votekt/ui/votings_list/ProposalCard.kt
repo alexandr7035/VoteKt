@@ -15,17 +15,18 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.utils.mock
 
 @Composable
 fun ProposalCard(
     proposal: Proposal,
-    onClick: (proposalId: Long) -> Unit = {}
+    onClick: (proposalId: Int) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
@@ -45,11 +46,14 @@ fun ProposalCard(
                     vertical = 8.dp,
                     horizontal = 12.dp),
         ) {
-            // TODO date
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = proposal.expirationTime.getFormattedDate("dd MMM yyyy"),
-            )
+
+            if (proposal is Proposal.Deployed) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = proposal.expirationTime.getFormattedDate("dd MMM yyyy"),
+                )
+
+            }
 
             Spacer(modifier = Modifier.height(4.dp))
 
@@ -60,32 +64,40 @@ fun ProposalCard(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            HorizontalVotingBar(
-                votingData = proposal.votingData,
-                modifier = Modifier
-                    .height(20.dp)
-                    .fillMaxWidth()
-            )
+            when (proposal) {
+                is Proposal.Deployed -> {
+                    HorizontalVotingBar(
+                        votingData = proposal.votingData,
+                        modifier = Modifier
+                            .height(20.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
+                is Proposal.Draft -> {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        text = "Draft",
+                        style = TextStyle(
+                            textAlign = TextAlign.Center
+                        )
+                    )
+                }
+            }
 
             Spacer(modifier = Modifier.height(8.dp))
-
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = "Expires at: " + proposal.expirationTime.getFormattedDate("dd MMM yyyy"),
-                style = TextStyle(
-                    textAlign = TextAlign.End
-                )
-            )
         }
     }
 }
 
 @Composable
 @Preview
-fun ProposalCard_Preview() {
+fun ProposalCard_Preview(
+    @PreviewParameter(ProposalPreviewProvider::class) proposal: Proposal
+) {
     VoteKtTheme {
         ProposalCard(
-            proposal = Proposal.mock()
+            proposal = proposal
         )
     }
 }

@@ -16,7 +16,7 @@ data class TransactionEntity(
     val status: TransactionStatus,
     val dateSent: Long,
     val gasUsed: BigInteger?,
-    val gasFee: Wei?
+    val gasFee: Wei?,
 ) {
     fun mapToData() = TransactionDomain(
         type = type,

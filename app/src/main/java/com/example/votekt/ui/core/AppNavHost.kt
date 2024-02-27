@@ -149,10 +149,10 @@ fun AppNavHost(
 
                     composable(
                         route = "${NavDestinations.VotingDetails.route}/{proposalId}",
-                        arguments = listOf(navArgument("proposalId") { type = NavType.LongType })
+                        arguments = listOf(navArgument("proposalId") { type = NavType.IntType })
                     ) {
                         VotingDetailsScreen(
-                            proposalId = it.arguments?.getLong("proposalId")!!,
+                            proposalId = it.arguments?.getInt("proposalId")!!,
                             onBack = { navController.popBackStack() },
                             onShowSnackBar = { msg, mode ->
                                 hostCoroutineScope.launch {

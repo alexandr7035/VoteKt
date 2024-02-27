@@ -3,27 +3,33 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
+import com.example.votekt.data.cache.ProposalEntity
+import com.example.votekt.data.cache.ProposalWithTransaction
+import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
+import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
-import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.domain.votings.VotingRepository
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.response.NoOpProcessor
-import java.math.BigInteger
 
 class VotingRepositoryImpl(
     web3j: Web3j,
     private val transactionRepository: TransactionRepository,
+    private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
 ) : VotingRepository {
     private val votingContract: VotingContract
@@ -50,22 +56,17 @@ class VotingRepositoryImpl(
         )
     }
 
-    override suspend fun getProposalById(id: Long): OperationResult<Proposal> = withContext(dispatcher) {
-        return@withContext OperationResult.runWrapped {
-            val res = votingContract.getProposalDetails(BigInteger.valueOf(id)).send()
-            res.mapToDomain()
+    override fun getProposalById(id: Int): Flow<Proposal> {
+        return proposalsDao.getProposalById(id).flowOn(dispatcher).map {
+            it.mapToDomain()
         }
     }
 
-    override suspend fun getProposals(): OperationResult<List<Proposal>> = withContext(dispatcher) {
-        return@withContext OperationResult.runWrapped {
-            val raw = votingContract.proposalsList.send()
-            raw.map { it as VotingContract.ProposalRaw }.map() { rawProposal ->
-                rawProposal.mapToDomain()
-            }
+    override fun getProposals(): Flow<List<Proposal>> {
+        return proposalsDao.getProposals().flowOn(dispatcher).map { list ->
+            list.map { it.mapToDomain() }
         }
     }
-
 
     override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
@@ -78,6 +79,15 @@ class VotingRepositoryImpl(
             transactionRepository.addNewTransaction(
                 type = TransactionType.CREATE_PROPOSAL,
                 transactionHash = TransactionHash(tx.transactionHash)
+            )
+
+            proposalsDao.cacheProposal(
+                ProposalEntity(
+                    title = req.title,
+                    description = req.desc,
+                    deployTransactionHash = tx.transactionHash,
+                    createdAt = System.currentTimeMillis()
+                )
             )
 
             tx.transactionHash
@@ -102,16 +112,29 @@ class VotingRepositoryImpl(
         }
     }
 
-    private fun VotingContract.ProposalRaw.mapToDomain() = Proposal(
-        id = id.toLong(),
-        title = title,
-        description = description,
-        votingData = VotingData(
-            votesFor = votesFor.toInt(),
-            votesAgainst = votesAgainst.toInt(),
-            // TODO
-            selfVote = null
-        ),
-        expirationTime = expirationTime.toLong() * 1000,
-    )
+    private fun ProposalWithTransaction.mapToDomain(): Proposal {
+        return when (deploymentTransaction?.status) {
+            TransactionStatus.MINED -> {
+                Proposal.Deployed(
+                    id = proposal.id,
+                    title = proposal.title,
+                    description = proposal.description,
+//                    blockchainId = proposal.remoteId!!,
+                    blockchainId = 0,
+//                    expirationTime = proposal.expiresAt!!,
+                    expirationTime = 0,
+                    votesFor = proposal.votesFor,
+                    votesAgainst = proposal.votesAgainst,
+                )
+            }
+            else -> {
+                Proposal.Draft(
+                    id = proposal.id,
+                    deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
+                    title = proposal.title,
+                    description = proposal.description
+                )
+            }
+        }
+    }
 }

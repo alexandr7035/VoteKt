@@ -36,6 +36,11 @@ class TransactionRepositoryImpl(
         }.flowOn(dispatcher)
     }
 
+    override suspend fun getTransactionStatus(transactionHash: TransactionHash): TransactionStatus? {
+        // TODO
+        return null
+    }
+
     override suspend fun addNewTransaction(
         transactionHash: TransactionHash,
         type: TransactionType,
@@ -63,7 +68,6 @@ class TransactionRepositoryImpl(
                     .build()
             )
             .setInitialDelay(5, TimeUnit.SECONDS)
-//            .setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
             .setInputData(data)
             .build()

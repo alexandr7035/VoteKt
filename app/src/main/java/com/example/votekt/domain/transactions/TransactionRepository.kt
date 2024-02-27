@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.Flow
 interface TransactionRepository {
     fun getTransactions(): Flow<List<TransactionDomain>>
 
+    suspend fun getTransactionStatus(transactionHash: TransactionHash): TransactionStatus?
+
     suspend fun addNewTransaction(
         transactionHash: TransactionHash,
         type: TransactionType,

@@ -34,6 +34,7 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.workmanager.dsl.worker
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,6 +72,10 @@ val appModule = module {
 
     single {
         get<TransactionsDatabase>().transactionDao()
+    }
+
+    single {
+        get<TransactionsDatabase>().proposalsDao()
     }
 
     single {
@@ -125,7 +130,7 @@ val appModule = module {
     }
 
     single<VotingRepository> {
-        VotingRepositoryImpl(get(), get(), Dispatchers.IO)
+        VotingRepositoryImpl(get(), get(), get(), Dispatchers.IO)
     }
 
     single<TransactionRepository> {
