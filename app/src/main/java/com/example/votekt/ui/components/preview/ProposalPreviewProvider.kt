@@ -13,7 +13,19 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             deploymentTransactionHash = TransactionHash("0x12334"),
             creatorAddress = Address("0x12345678abcd"),
-            isSelfCreated = true
+            isSelfCreated = true,
+            shouldDeploy = true,
+            deployFailed = true
+        ),
+        Proposal.Draft(
+            id = 0,
+            title = "Lorem ipsum Lorem ipsum - Test",
+            description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
+            deploymentTransactionHash = TransactionHash("0x12334"),
+            creatorAddress = Address("0x12345678abcd"),
+            isSelfCreated = true,
+            shouldDeploy = false,
+            deployFailed = false
         ),
         Proposal.Deployed(
             id = 0,

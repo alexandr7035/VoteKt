@@ -18,6 +18,8 @@ sealed class Proposal(
        override val creatorAddress: Address,
        override val isSelfCreated: Boolean,
        val deploymentTransactionHash: TransactionHash?,
+       val shouldDeploy: Boolean,
+       val deployFailed: Boolean,
    ): Proposal(id, title, description, creatorAddress, isSelfCreated)
 
     data class Deployed(

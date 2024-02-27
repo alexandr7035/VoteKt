@@ -21,5 +21,6 @@
     <string name="draft">Draft</string>
     <string name="creator">Creator:</string>
     <string name="cd_user_avatar">user avatar</string>
+    <string name="draft_proposal">Draft proposal</string>
 
 </resources>

@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="proposal_title_template">Proposal #%1$d</string>
+</resources>

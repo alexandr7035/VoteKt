@@ -53,6 +53,7 @@ import com.example.votekt.R
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
@@ -78,17 +79,6 @@ fun VotingDetailsScreen(
         viewModel.loadProposalById(proposalId)
     }
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            AppBar(
-                title = "Proposal #${proposalId}",
-                onBack = {
-                    onBack.invoke()
-                }
-            )
-        }) { pv ->
-
         val screenState = viewModel.state.collectAsStateWithLifecycle().value
 
         when {
@@ -97,7 +87,6 @@ fun VotingDetailsScreen(
             screenState.proposal != null -> {
                 VotingDetailsScreen_Ui(
                     proposal = screenState.proposal,
-                    pv = pv,
                     onVote = { vote ->
                         // TODO non local id
                         viewModel.makeVote(proposalId, vote)
@@ -123,65 +112,81 @@ fun VotingDetailsScreen(
                 SnackBarMode.Neutral
             )
         }
-    }
 }
 
 
 @Composable
 private fun VotingDetailsScreen_Ui(
     proposal: Proposal,
-    pv: PaddingValues,
-    onVote: (VoteType) -> Unit
+    onVote: (VoteType) -> Unit,
+    onBack: () -> Unit = {}
 ) {
-    Column(
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = pv.calculateTopPadding() + 16.dp),
-    ) {
-        Column(
-            modifier =
-            Modifier
-                .fillMaxSize()
-                .verticalScroll(rememberScrollState())
-                .weight(1f),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-        ) {
-
-            VotingPostCard(
-                proposal = proposal
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        topBar = {
+            AppBar(
+                title = when (proposal) {
+                    is Proposal.Draft -> {
+                        stringResource(R.string.draft_proposal)
+                    }
+                    is Proposal.Deployed -> {
+                        stringResource(id = R.string.proposal_title_template, proposal.blockchainId)
+                    }
+                },
+                onBack = {
+                    onBack.invoke()
+                }
             )
+        }) { pv ->
 
-//            Text(
-//                text = proposal.title,
-//                style = MaterialTheme.typography.headlineMedium
-//            )
-//
-//            HorizontalVotingBar(
-//                votingData = proposal.votingData,
-//                modifier = Modifier.height(8.dp),
-//                corners = 4.dp
-//            )
-//
-//            Text(
-//                text = proposal.description,
-//                style = MaterialTheme.typography.bodyLarge
-//            )
-//
-//            // TODO timer
-//            Text(text = "Expires at: ${proposal.expirationTime.getFormattedDate("dd MMM yyyy / HH:mm:ss")} UTC")
-//
-//            Box(
-//                Modifier.fillMaxWidth(),
-//                contentAlignment = Alignment.CenterEnd
-//            ) {
-//                VotingActionsPanel(
-//                    votingData = proposal.votingData,
-//                    modifier = Modifier.wrapContentHeight(),
-//                    onVote = onVote
-//                ) {
-//                    Spacer(Modifier.width(20.dp))
-//                }
-//            }
-//
-//            Spacer(Modifier.height(16.dp))
+        Column(
+            modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = pv.calculateTopPadding() + 16.dp),
+        ) {
+            Column(
+                modifier =
+                Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .weight(1f),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+            ) {
+
+                VotingPostCard(
+                    proposal = proposal
+                )
+
+                when (proposal) {
+                    is Proposal.Deployed -> {
+
+                    }
+
+                    is Proposal.Draft -> {
+                        if (proposal.shouldDeploy) {
+
+                            if (proposal.deployFailed) {
+                                Text(
+                                    text = "Deploy failed",
+                                    style = TextStyle(
+                                        color = MaterialTheme.colorScheme.error
+                                    )
+                                )
+                            }
+
+                            PrimaryButton(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "Deploy proposal",
+                                onClick = {
+
+                                }
+                            )
+                        } else {
+                            Text(
+                                text = "Proposal on deploy"
+                            )
+                        }
+                    }
+                }
+            }
         }
     }
 }
@@ -334,7 +339,6 @@ fun VotingDetailsScreen_Preview(
         Surface(color = MaterialTheme.colorScheme.background) {
             VotingDetailsScreen_Ui(
                 proposal = proposal,
-                pv = PaddingValues(16.dp),
                 onVote = {}
             )
         }

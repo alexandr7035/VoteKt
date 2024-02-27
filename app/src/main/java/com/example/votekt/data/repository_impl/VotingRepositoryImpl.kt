@@ -135,7 +135,7 @@ class VotingRepositoryImpl(
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
                     creatorAddress = Address(proposal.creatorAddress),
-                    isSelfCreated = proposalSelfCreated
+                    isSelfCreated = proposalSelfCreated,
                 )
             }
 
@@ -146,7 +146,10 @@ class VotingRepositoryImpl(
                     title = proposal.title,
                     description = proposal.description,
                     creatorAddress = Address(proposal.creatorAddress),
-                    isSelfCreated = true
+                    isSelfCreated = true,
+                    shouldDeploy = proposal.deployTransactionHash == null
+                            || deploymentTransaction?.status == TransactionStatus.REVERTED,
+                    deployFailed = deploymentTransaction?.status == TransactionStatus.REVERTED,
                 )
             }
         }
