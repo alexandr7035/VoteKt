@@ -19,5 +19,7 @@
     <string name="no_transactions_yet">No Transactions yet</string>
     <string name="error_node_no_connection">No connection to node</string>
     <string name="draft">Draft</string>
+    <string name="creator">Creator:</string>
+    <string name="cd_user_avatar">user avatar</string>
 
 </resources>

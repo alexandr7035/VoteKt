@@ -1,11 +1,13 @@
 package com.example.votekt.data.repository_impl
 
 import android.util.Log
+import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.BuildConfig
 import com.example.votekt.contracts.VotingContract
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransaction
 import com.example.votekt.data.cache.ProposalsDao
+import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
@@ -29,6 +31,7 @@ import org.web3j.tx.response.NoOpProcessor
 class VotingRepositoryImpl(
     web3j: Web3j,
     private val transactionRepository: TransactionRepository,
+    private val accountRepository: AccountRepository,
     private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
 ) : VotingRepository {
@@ -86,7 +89,9 @@ class VotingRepositoryImpl(
                     title = req.title,
                     description = req.desc,
                     deployTransactionHash = tx.transactionHash,
-                    createdAt = System.currentTimeMillis()
+                    createdAt = System.currentTimeMillis(),
+                    // TODO contract update for other's address
+                    creatorAddress = accountRepository.getSelfAddress().value,
                 )
             )
 
@@ -112,27 +117,36 @@ class VotingRepositoryImpl(
         }
     }
 
-    private fun ProposalWithTransaction.mapToDomain(): Proposal {
-        return when (deploymentTransaction?.status) {
+    private suspend fun ProposalWithTransaction.mapToDomain(): Proposal = withContext(dispatcher) {
+        return@withContext when (deploymentTransaction?.status) {
             TransactionStatus.MINED -> {
+                // TODO optimize
+                val self = accountRepository.getSelfAddress()
+                val proposalSelfCreated = self == Address(proposal.creatorAddress)
+
                 Proposal.Deployed(
                     id = proposal.id,
                     title = proposal.title,
                     description = proposal.description,
-//                    blockchainId = proposal.remoteId!!,
+    //                    blockchainId = proposal.remoteId!!,
                     blockchainId = 0,
-//                    expirationTime = proposal.expiresAt!!,
+    //                    expirationTime = proposal.expiresAt!!,
                     expirationTime = 0,
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
+                    creatorAddress = Address(proposal.creatorAddress),
+                    isSelfCreated = proposalSelfCreated
                 )
             }
+
             else -> {
                 Proposal.Draft(
                     id = proposal.id,
                     deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
                     title = proposal.title,
-                    description = proposal.description
+                    description = proposal.description,
+                    creatorAddress = Address(proposal.creatorAddress),
+                    isSelfCreated = true
                 )
             }
         }

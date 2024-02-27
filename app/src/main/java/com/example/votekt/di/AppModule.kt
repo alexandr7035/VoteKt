@@ -129,8 +129,9 @@ val appModule = module {
         )
     }
 
+    // TODO dispatcher annotation
     single<VotingRepository> {
-        VotingRepositoryImpl(get(), get(), get(), Dispatchers.IO)
+        VotingRepositoryImpl(get(), get(), get(), get(), Dispatchers.IO)
     }
 
     single<TransactionRepository> {

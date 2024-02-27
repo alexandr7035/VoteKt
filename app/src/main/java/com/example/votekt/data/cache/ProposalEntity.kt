@@ -8,6 +8,7 @@ import com.example.votekt.domain.votings.VoteType
 data class ProposalEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Int = 0,
+    val creatorAddress: String,
     val deployTransactionHash: String?,
     val remoteId: Long? = null,
     val createdAt: Long,
