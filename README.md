@@ -72,3 +72,5 @@ Choose localDebug build variant and build
 [Ethereum Unit Converter](https://eth-converter.com/)
 
 [Infura Docs](https://docs.infura.io/api/networks/ethereum/how-to)
+
+[Understanding Ethereum Transaction Statuses](https://medium.com/@nicholaschn/understanding-ethereum-transaction-statuses-5c505b2b123b)
