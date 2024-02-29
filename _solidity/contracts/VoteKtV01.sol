@@ -4,7 +4,8 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VotingContract is Ownable {
     struct ProposalRaw {
-        uint id;
+        uint number;
+        string uuid;
         string title;
         string description;
         uint votesFor;
@@ -14,22 +15,24 @@ contract VotingContract is Ownable {
 
     ProposalRaw[] public proposals;
     mapping(uint256 => mapping(address => bool)) public hasVoted;
-    uint256 public maxProposals = 5;
+    uint256 public maxProposals = 10;
 
-    event ProposalCreated(uint256 proposalId, string title);
-    event VoteCasted(uint256 proposalId, bool inFavor);
-    event ProposalDeleted(uint256 proposalId);
+    mapping(string => bool) private uuidExists;
+    
+    event ProposalCreated(uint256 proposalNumber, string title);
+    event VoteCasted(uint256 proposalNumber, bool inFavor);
+    event ProposalDeleted(uint256 proposalNumber);
 
-    modifier onlyBeforeExpiration(uint256 proposalId) {
+    modifier onlyBeforeExpiration(uint256 proposalNumber) {
         require(
-            block.timestamp < proposals[proposalId].expirationTime,
+            block.timestamp < proposals[proposalNumber].expirationTime,
             "Voting period has expired"
         );
         _;
     }
 
-    modifier onlyOnce(uint256 proposalId) {
-        require(!hasVoted[proposalId][msg.sender], "You have already voted");
+    modifier onlyOnce(uint256 proposalNumber) {
+        require(!hasVoted[proposalNumber][msg.sender], "You have already voted");
         _;
     }
 
@@ -39,6 +42,7 @@ contract VotingContract is Ownable {
     }
 
     function createProposal(
+        string memory uuid,
         string memory title,
         string memory description,
         uint durationInDays
@@ -47,10 +51,12 @@ contract VotingContract is Ownable {
         onlyOwner
         checkActiveProposalsLimit
     {
-        uint256 proposalId = proposals.length;
+        require(!uuidExists[uuid], "Proposal with this UUID already exists");
+
+        uint256 proposalNumber = proposals.length;
 
         ProposalRaw memory newProposal;
-        newProposal.id = proposalId;
+        newProposal.number = proposalNumber;
         newProposal.title = title;
         newProposal.description = description;
 
@@ -58,22 +64,24 @@ contract VotingContract is Ownable {
         newProposal.expirationTime = expiration;
 
         proposals.push(newProposal);
-        emit ProposalCreated(proposalId, title);
+        emit ProposalCreated(proposalNumber, title);
+
+        uuidExists[uuid] = true;
     }
 
-    function deleteProposal(uint256 proposalId) public onlyOwner {
-        require(proposalId < proposals.length, "Invalid proposal ID");
+    function deleteProposal(uint256 proposalNumber) public onlyOwner {
+        require(proposalNumber < proposals.length, "Invalid proposal number");
 
-        delete proposals[proposalId];
-        emit ProposalDeleted(proposalId);
+        delete proposals[proposalNumber];
+        emit ProposalDeleted(proposalNumber);
     }
 
-    function vote(uint256 proposalId, bool inFavor)
+    function vote(uint256 proposalNumber, bool inFavor)
         public
-        onlyBeforeExpiration(proposalId)
-        onlyOnce(proposalId)
+        onlyBeforeExpiration(proposalNumber)
+        onlyOnce(proposalNumber)
     {
-        ProposalRaw storage proposal = proposals[proposalId];
+        ProposalRaw storage proposal = proposals[proposalNumber];
 
         if (inFavor) {
             proposal.votesFor++;
@@ -81,19 +89,19 @@ contract VotingContract is Ownable {
             proposal.votesAgainst++;
         }
 
-        hasVoted[proposalId][msg.sender] = true;
-        emit VoteCasted(proposalId, inFavor);
+        hasVoted[proposalNumber][msg.sender] = true;
+        emit VoteCasted(proposalNumber, inFavor);
     }
 
     function getProposalsList() public view returns (ProposalRaw[] memory) {
         return proposals;
     }
 
-    function getProposalDetails(uint256 proposalId)
+    function getProposalDetails(uint256 proposalNumber)
         public
         view
         returns (ProposalRaw memory)
     {
-        return proposals[proposalId];
+        return proposals[proposalNumber];
     }
 }
