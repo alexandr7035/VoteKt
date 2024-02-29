@@ -59,6 +59,7 @@ contract VotingContract is Ownable {
         newProposal.number = proposalNumber;
         newProposal.title = title;
         newProposal.description = description;
+        newProposal.uuid = uuid;
 
         uint256 expiration = block.timestamp + durationInDays * 86400;
         newProposal.expirationTime = expiration;
