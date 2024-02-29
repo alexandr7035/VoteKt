@@ -8,7 +8,7 @@ import com.example.votekt.domain.votings.Proposal
 class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
     override val values: Sequence<Proposal> = sequenceOf(
         Proposal.Draft(
-            id = 0,
+            uuid = "123",
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             deploymentTransactionHash = TransactionHash("0x12334"),
@@ -18,7 +18,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deployFailed = true
         ),
         Proposal.Draft(
-            id = 0,
+            uuid = "123",
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             deploymentTransactionHash = TransactionHash("0x12334"),
@@ -28,8 +28,8 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deployFailed = false
         ),
         Proposal.Deployed(
-            id = 0,
-            blockchainId = 123,
+            uuid = "123",
+            proposalNumber = 123,
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             expirationTime = 1000_000_000_000_000,
@@ -39,8 +39,8 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             isSelfCreated = true
         ),
         Proposal.Deployed(
-            id = 0,
-            blockchainId = 123,
+            uuid = "123",
+            proposalNumber = 123,
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             expirationTime = 0,

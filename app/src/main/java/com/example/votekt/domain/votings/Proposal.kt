@@ -4,7 +4,7 @@ import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.domain.transactions.TransactionHash
 
 sealed class Proposal(
-    open val id: Int,
+    open val uuid: String,
     open val title: String,
     open val description: String,
     // TODO implement in contract
@@ -12,7 +12,7 @@ sealed class Proposal(
     open val isSelfCreated: Boolean,
 ) {
    data class Draft(
-       override val id: Int,
+       override val uuid: String,
        override val title: String,
        override val description: String,
        override val creatorAddress: Address,
@@ -20,21 +20,21 @@ sealed class Proposal(
        val deploymentTransactionHash: TransactionHash?,
        val shouldDeploy: Boolean,
        val deployFailed: Boolean,
-   ): Proposal(id, title, description, creatorAddress, isSelfCreated)
+   ): Proposal(uuid, title, description, creatorAddress, isSelfCreated)
 
     data class Deployed(
-        override val id: Int,
+        override val uuid: String,
         override val title: String,
         override val description: String,
         override val creatorAddress: Address,
         override val isSelfCreated: Boolean,
-        val blockchainId: Long,
+        val proposalNumber: Long,
         val expirationTime: Long,
         private val votesFor: Int,
         private val votesAgainst: Int,
         val selfVote: VoteType? = null,
         val selfVoteTransaction: TransactionHash? = null,
-    ): Proposal(id, title, description, creatorAddress, isSelfCreated) {
+    ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
         val isFinished
             get() = this.expirationTime < System.currentTimeMillis()
 

@@ -26,14 +26,14 @@ import com.example.votekt.ui.theme.VoteKtTheme
 @Composable
 fun ProposalCard(
     proposal: Proposal,
-    onClick: (proposalId: Int) -> Unit = {}
+    onClick: (proposalId: String) -> Unit = {}
 ) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .wrapContentHeight(),
         onClick = {
-            onClick.invoke(proposal.id)
+            onClick.invoke(proposal.uuid)
         },
         elevation = CardDefaults.cardElevation(
             defaultElevation = 8.dp,

@@ -1,6 +1,5 @@
 package com.example.votekt.data.repository_impl
 
-import android.util.Log
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.Data
@@ -13,6 +12,7 @@ import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.data.cache.TransactionDao
 import com.example.votekt.data.cache.TransactionEntity
 import com.example.votekt.data.workers.AwaitTransactionWorker
+import com.example.votekt.data.workers.RefreshProposalsData
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
@@ -20,6 +20,7 @@ import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.transactions.TransactionType
+import com.example.votekt.domain.transactions.isContractInteraction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -44,11 +45,11 @@ class TransactionRepositoryImpl(
 
     override suspend fun addNewTransaction(
         transactionHash: TransactionHash,
-        type: TransactionType,
+        transactionType: TransactionType,
     ) {
         transactionDao.cacheTransaction(
             TransactionEntity(
-                type = type,
+                type = transactionType,
                 hash = transactionHash.value,
                 status = TransactionStatus.PENDING,
                 dateSent = System.currentTimeMillis(),
@@ -61,7 +62,7 @@ class TransactionRepositoryImpl(
             .putString(AwaitTransactionWorker.TRANSACTION_HASH, transactionHash.value)
             .build()
 
-        val request = OneTimeWorkRequestBuilder<AwaitTransactionWorker>()
+        val checkForReceiptWork = OneTimeWorkRequestBuilder<AwaitTransactionWorker>()
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -73,7 +74,26 @@ class TransactionRepositoryImpl(
             .setInputData(data)
             .build()
 
-        workManager.enqueue(request)
+        val postTransactionWork = OneTimeWorkRequestBuilder<RefreshProposalsData>()
+            .setConstraints(
+                Constraints.Builder()
+                    .setRequiredNetworkType(NetworkType.CONNECTED)
+                    .setRequiresBatteryNotLow(false)
+                    .build()
+            )
+            .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
+            .setInputData(data)
+            .build()
+
+        if (transactionType.isContractInteraction()) {
+            workManager
+                .beginWith(checkForReceiptWork)
+                .then(postTransactionWork)
+                .enqueue()
+        } else {
+            workManager
+                .enqueue(checkForReceiptWork)
+        }
     }
 
     override suspend fun updateTransaction(receipt: EthTransactionReceipt) {
@@ -91,6 +111,10 @@ class TransactionRepositoryImpl(
             )
             transactionDao.updateTransaction(updated)
         }
+    }
+
+    override suspend fun getTransactionType(transactionHash: TransactionHash): TransactionType? {
+        return transactionDao.getTransactionType(transactionHash.value)
     }
 
     override suspend fun clearTransactions(): OperationResult<Unit> {

@@ -12,3 +12,6 @@ enum class TransactionType {
             }
         }
 }
+
+fun TransactionType.isContractInteraction() = this == TransactionType.VOTE
+        || this ==TransactionType.CREATE_PROPOSAL

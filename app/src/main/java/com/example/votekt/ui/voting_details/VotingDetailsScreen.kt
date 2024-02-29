@@ -7,7 +7,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -44,7 +43,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.space.ui.components.debug.debugPlaceholder
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
@@ -69,7 +67,7 @@ import org.koin.androidx.compose.koinViewModel
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun VotingDetailsScreen(
-    proposalId: Int,
+    proposalId: String,
     onBack: () -> Unit = {},
     onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
     viewModel: VotingDetailsViewModel = koinViewModel(),
@@ -89,7 +87,7 @@ fun VotingDetailsScreen(
                     proposal = screenState.proposal,
                     onVote = { vote ->
                         // TODO non local id
-                        viewModel.makeVote(proposalId, vote)
+//                        viewModel.makeVote(proposalId, vote)
                     }
                 )
             }
@@ -130,7 +128,7 @@ private fun VotingDetailsScreen_Ui(
                         stringResource(R.string.draft_proposal)
                     }
                     is Proposal.Deployed -> {
-                        stringResource(id = R.string.proposal_title_template, proposal.blockchainId)
+                        stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
                     }
                 },
                 onBack = {
@@ -246,7 +244,7 @@ fun VotingPostCard(proposal: Proposal) {
         ) {
             if (proposal is Proposal.Deployed) {
                 Text(
-                    text = "#${proposal.blockchainId}"
+                    text = "#${proposal.proposalNumber}"
                 )
             }
 

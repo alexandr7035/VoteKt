@@ -14,12 +14,12 @@ interface ProposalsDao {
     fun getProposals(): Flow<List<ProposalWithTransaction>>
 
     @Transaction
-    @Query("SELECT * FROM proposals WHERE id = :id")
-    fun getProposalById(id: Int): Flow<ProposalWithTransaction>
+    @Query("SELECT * FROM proposals WHERE uuid = :id")
+    fun getProposalById(id: String): Flow<ProposalWithTransaction>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun cacheProposal(proposal: ProposalEntity)
 
-    @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE id = :proposalId")
-    fun updateDeployTransactionHash(proposalId: Int, newDeployTransactionHash: String)
+    @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE uuid = :proposalId")
+    fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
 }

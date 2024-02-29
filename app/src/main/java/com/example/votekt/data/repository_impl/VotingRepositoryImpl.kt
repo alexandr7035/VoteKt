@@ -27,6 +27,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.response.NoOpProcessor
+import java.util.UUID
 
 class VotingRepositoryImpl(
     web3j: Web3j,
@@ -59,7 +60,7 @@ class VotingRepositoryImpl(
         )
     }
 
-    override fun getProposalById(id: Int): Flow<Proposal> {
+    override fun getProposalById(id: String): Flow<Proposal> {
         return proposalsDao.getProposalById(id).flowOn(dispatcher).map {
             it.mapToDomain()
         }
@@ -73,19 +74,23 @@ class VotingRepositoryImpl(
 
     override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
+            val uuid = UUID.randomUUID().toString()
+
             val tx = votingContract.createProposal(
+                uuid,
                 req.title,
                 req.desc,
                 req.duration.getDurationInDays().toBigInteger()
             ).send()
 
             transactionRepository.addNewTransaction(
-                type = TransactionType.CREATE_PROPOSAL,
+                transactionType = TransactionType.CREATE_PROPOSAL,
                 transactionHash = TransactionHash(tx.transactionHash)
             )
 
             proposalsDao.cacheProposal(
                 ProposalEntity(
+                    uuid = uuid,
                     title = req.title,
                     description = req.desc,
                     deployTransactionHash = tx.transactionHash,
@@ -109,7 +114,7 @@ class VotingRepositoryImpl(
             val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
 
             transactionRepository.addNewTransaction(
-                type = TransactionType.VOTE,
+                transactionType = TransactionType.VOTE,
                 transactionHash = TransactionHash(tx.transactionHash)
             )
 
@@ -125,12 +130,12 @@ class VotingRepositoryImpl(
                 val proposalSelfCreated = self == Address(proposal.creatorAddress)
 
                 Proposal.Deployed(
-                    id = proposal.id,
+                    uuid = proposal.uuid,
                     title = proposal.title,
                     description = proposal.description,
-    //                    blockchainId = proposal.remoteId!!,
-                    blockchainId = 0,
-    //                    expirationTime = proposal.expiresAt!!,
+                    //                    blockchainId = proposal.remoteId!!,
+                    proposalNumber = 0,
+                    //                    expirationTime = proposal.expiresAt!!,
                     expirationTime = 0,
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
@@ -141,7 +146,7 @@ class VotingRepositoryImpl(
 
             else -> {
                 Proposal.Draft(
-                    id = proposal.id,
+                    uuid = proposal.uuid,
                     deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
                     title = proposal.title,
                     description = proposal.description,

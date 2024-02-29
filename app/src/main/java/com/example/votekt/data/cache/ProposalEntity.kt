@@ -6,8 +6,8 @@ import com.example.votekt.domain.votings.VoteType
 
 @Entity(tableName = "proposals")
 data class ProposalEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Int = 0,
+    @PrimaryKey(autoGenerate = false)
+    val uuid: String,
     val creatorAddress: String,
     val deployTransactionHash: String?,
     val remoteId: Long? = null,

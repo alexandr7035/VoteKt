@@ -29,7 +29,7 @@ class VotingDetailsViewModel(
 
     val state = _state.asStateFlow()
 
-    fun loadProposalById(id: Int) {
+    fun loadProposalById(id: String) {
         votingRepository
             .getProposalById(id)
             .catch { error ->
