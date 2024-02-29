@@ -1,4 +1,4 @@
-package com.example.votekt.contracts;
+package by.alexandr7035.web3j_contracts;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
@@ -81,7 +81,7 @@ public class Box extends Contract {
     }
 
     public static List<OwnershipTransferredEventResponse> getOwnershipTransferredEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, transactionReceipt);
         ArrayList<OwnershipTransferredEventResponse> responses = new ArrayList<OwnershipTransferredEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             OwnershipTransferredEventResponse typedResponse = new OwnershipTransferredEventResponse();
@@ -114,7 +114,7 @@ public class Box extends Contract {
     }
 
     public static List<ValueChangedEventResponse> getValueChangedEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(VALUECHANGED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(VALUECHANGED_EVENT, transactionReceipt);
         ArrayList<ValueChangedEventResponse> responses = new ArrayList<ValueChangedEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             ValueChangedEventResponse typedResponse = new ValueChangedEventResponse();
@@ -203,21 +203,21 @@ public class Box extends Contract {
     }
 
     public static RemoteCall<Box> deploy(Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(Box.class, web3j, credentials, contractGasProvider, BINARY, "");
+        return Contract.deployRemoteCall(Box.class, web3j, credentials, contractGasProvider, BINARY, "");
     }
 
     @Deprecated
     public static RemoteCall<Box> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(Box.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
+        return Contract.deployRemoteCall(Box.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
     }
 
     public static RemoteCall<Box> deploy(Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(Box.class, web3j, transactionManager, contractGasProvider, BINARY, "");
+        return Contract.deployRemoteCall(Box.class, web3j, transactionManager, contractGasProvider, BINARY, "");
     }
 
     @Deprecated
     public static RemoteCall<Box> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(Box.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
+        return Contract.deployRemoteCall(Box.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
     }
 
     public static class OwnershipTransferredEventResponse extends BaseEventResponse {

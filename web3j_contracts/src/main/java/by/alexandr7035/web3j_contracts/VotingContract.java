@@ -1,4 +1,4 @@
-package com.example.votekt.contracts;
+package by.alexandr7035.web3j_contracts;
 
 import io.reactivex.Flowable;
 import io.reactivex.functions.Function;
@@ -102,7 +102,7 @@ public class VotingContract extends Contract {
     }
 
     public static List<OwnershipTransferredEventResponse> getOwnershipTransferredEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(OWNERSHIPTRANSFERRED_EVENT, transactionReceipt);
         ArrayList<OwnershipTransferredEventResponse> responses = new ArrayList<OwnershipTransferredEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             OwnershipTransferredEventResponse typedResponse = new OwnershipTransferredEventResponse();
@@ -135,7 +135,7 @@ public class VotingContract extends Contract {
     }
 
     public static List<ProposalCreatedEventResponse> getProposalCreatedEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(PROPOSALCREATED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(PROPOSALCREATED_EVENT, transactionReceipt);
         ArrayList<ProposalCreatedEventResponse> responses = new ArrayList<ProposalCreatedEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             ProposalCreatedEventResponse typedResponse = new ProposalCreatedEventResponse();
@@ -168,7 +168,7 @@ public class VotingContract extends Contract {
     }
 
     public static List<ProposalDeletedEventResponse> getProposalDeletedEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(PROPOSALDELETED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(PROPOSALDELETED_EVENT, transactionReceipt);
         ArrayList<ProposalDeletedEventResponse> responses = new ArrayList<ProposalDeletedEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             ProposalDeletedEventResponse typedResponse = new ProposalDeletedEventResponse();
@@ -199,7 +199,7 @@ public class VotingContract extends Contract {
     }
 
     public static List<VoteCastedEventResponse> getVoteCastedEvents(TransactionReceipt transactionReceipt) {
-        List<Contract.EventValuesWithLog> valueList = staticExtractEventParametersWithLog(VOTECASTED_EVENT, transactionReceipt);
+        List<Contract.EventValuesWithLog> valueList = Contract.staticExtractEventParametersWithLog(VOTECASTED_EVENT, transactionReceipt);
         ArrayList<VoteCastedEventResponse> responses = new ArrayList<VoteCastedEventResponse>(valueList.size());
         for (Contract.EventValuesWithLog eventValues : valueList) {
             VoteCastedEventResponse typedResponse = new VoteCastedEventResponse();
@@ -267,7 +267,7 @@ public class VotingContract extends Contract {
                     @SuppressWarnings("unchecked")
                     public List call() throws Exception {
                         List<Type> result = (List<Type>) executeCallSingleValueReturn(function, List.class);
-                        return convertToNative(result);
+                        return Contract.convertToNative(result);
                     }
                 });
     }
@@ -359,21 +359,21 @@ public class VotingContract extends Contract {
     }
 
     public static RemoteCall<VotingContract> deploy(Web3j web3j, Credentials credentials, ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(VotingContract.class, web3j, credentials, contractGasProvider, BINARY, "");
+        return Contract.deployRemoteCall(VotingContract.class, web3j, credentials, contractGasProvider, BINARY, "");
     }
 
     @Deprecated
     public static RemoteCall<VotingContract> deploy(Web3j web3j, Credentials credentials, BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(VotingContract.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
+        return Contract.deployRemoteCall(VotingContract.class, web3j, credentials, gasPrice, gasLimit, BINARY, "");
     }
 
     public static RemoteCall<VotingContract> deploy(Web3j web3j, TransactionManager transactionManager, ContractGasProvider contractGasProvider) {
-        return deployRemoteCall(VotingContract.class, web3j, transactionManager, contractGasProvider, BINARY, "");
+        return Contract.deployRemoteCall(VotingContract.class, web3j, transactionManager, contractGasProvider, BINARY, "");
     }
 
     @Deprecated
     public static RemoteCall<VotingContract> deploy(Web3j web3j, TransactionManager transactionManager, BigInteger gasPrice, BigInteger gasLimit) {
-        return deployRemoteCall(VotingContract.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
+        return Contract.deployRemoteCall(VotingContract.class, web3j, transactionManager, gasPrice, gasLimit, BINARY, "");
     }
 
     public static class ProposalRaw extends DynamicStruct {

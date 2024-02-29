@@ -3,7 +3,7 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.BuildConfig
-import com.example.votekt.contracts.VotingContract
+import by.alexandr7035.web3j_contracts.VotingContract
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransaction
 import com.example.votekt.data.cache.ProposalsDao
