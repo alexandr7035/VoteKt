@@ -7,6 +7,9 @@ import by.alexandr7035.web3j_contracts.VotingContract
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransaction
 import com.example.votekt.data.cache.ProposalsDao
+import com.example.votekt.data.cache.isDeployFailed
+import com.example.votekt.data.cache.isDeployedAndSynced
+import com.example.votekt.data.cache.shouldBeDeployed
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
@@ -61,13 +64,13 @@ class VotingRepositoryImpl(
     }
 
     override fun getProposalById(id: String): Flow<Proposal> {
-        return proposalsDao.getProposalById(id).flowOn(dispatcher).map {
+        return proposalsDao.observeProposalByUuid(id).flowOn(dispatcher).map {
             it.mapToDomain()
         }
     }
 
     override fun getProposals(): Flow<List<Proposal>> {
-        return proposalsDao.getProposals().flowOn(dispatcher).map { list ->
+        return proposalsDao.observeProposals().flowOn(dispatcher).map { list ->
             list.map { it.mapToDomain() }
         }
     }
@@ -75,6 +78,7 @@ class VotingRepositoryImpl(
     override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val uuid = UUID.randomUUID().toString()
+            Log.d("DEBUG_TAG", "Create proposal with ${uuid}")
 
             val tx = votingContract.createProposal(
                 uuid,
@@ -122,41 +126,69 @@ class VotingRepositoryImpl(
         }
     }
 
+    override suspend fun syncProposalsWithContract() = withContext(dispatcher) {
+        votingContract.proposalsList
+            .send()
+            .forEach { raw ->
+                raw as VotingContract.ProposalRaw
+                val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid)
+                cached?.let {
+                    proposalsDao.updateProposal(
+                        cached.copy(
+                            number = raw.number.toInt(),
+                            votesFor = raw.votesFor.toInt(),
+                            votesAgainst = raw.votesAgainst.toInt(),
+                            expiresAt = raw.expirationTime.toLong(),
+                        )
+                    )
+                } ?: run {
+                    proposalsDao.cacheProposal(
+                        ProposalEntity(
+                            uuid = raw.uuid,
+                            votesFor = raw.votesFor.toInt(),
+                            votesAgainst = raw.votesAgainst.toInt(),
+                            expiresAt = raw.expirationTime.toLong(),
+                            // TODO update contract
+                            createdAt = System.currentTimeMillis(),
+                            deployTransactionHash = null,
+                            // TODO update contract
+                            creatorAddress = "TODO",
+                            title = raw.title,
+                            description = raw.description
+                        )
+                    )
+                }
+            }
+    }
+
     private suspend fun ProposalWithTransaction.mapToDomain(): Proposal = withContext(dispatcher) {
-        return@withContext when (deploymentTransaction?.status) {
-            TransactionStatus.MINED -> {
-                // TODO optimize
-                val self = accountRepository.getSelfAddress()
-                val proposalSelfCreated = self == Address(proposal.creatorAddress)
+        // TODO optimize
+        val self = accountRepository.getSelfAddress()
+        val proposalSelfCreated = self == Address(proposal.creatorAddress)
 
-                Proposal.Deployed(
-                    uuid = proposal.uuid,
-                    title = proposal.title,
-                    description = proposal.description,
-                    //                    blockchainId = proposal.remoteId!!,
-                    proposalNumber = 0,
-                    //                    expirationTime = proposal.expiresAt!!,
-                    expirationTime = 0,
-                    votesFor = proposal.votesFor,
-                    votesAgainst = proposal.votesAgainst,
-                    creatorAddress = Address(proposal.creatorAddress),
-                    isSelfCreated = proposalSelfCreated,
-                )
-            }
-
-            else -> {
-                Proposal.Draft(
-                    uuid = proposal.uuid,
-                    deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
-                    title = proposal.title,
-                    description = proposal.description,
-                    creatorAddress = Address(proposal.creatorAddress),
-                    isSelfCreated = true,
-                    shouldDeploy = proposal.deployTransactionHash == null
-                            || deploymentTransaction?.status == TransactionStatus.REVERTED,
-                    deployFailed = deploymentTransaction?.status == TransactionStatus.REVERTED,
-                )
-            }
+        return@withContext if (isDeployedAndSynced()) {
+            Proposal.Deployed(
+                uuid = proposal.uuid,
+                title = proposal.title,
+                description = proposal.description,
+                proposalNumber = proposal.number!!,
+                expirationTime = proposal.expiresAt!!,
+                votesFor = proposal.votesFor,
+                votesAgainst = proposal.votesAgainst,
+                creatorAddress = Address(proposal.creatorAddress),
+                isSelfCreated = proposalSelfCreated,
+            )
+        } else {
+            Proposal.Draft(
+                uuid = proposal.uuid,
+                deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
+                title = proposal.title,
+                description = proposal.description,
+                creatorAddress = Address(proposal.creatorAddress),
+                isSelfCreated = true,
+                shouldDeploy = shouldBeDeployed(proposalSelfCreated),
+                deployFailed = isDeployFailed(),
+            )
         }
     }
 }

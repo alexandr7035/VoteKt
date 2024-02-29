@@ -10,7 +10,7 @@ data class ProposalEntity(
     val uuid: String,
     val creatorAddress: String,
     val deployTransactionHash: String?,
-    val remoteId: Long? = null,
+    val number: Int? = null,
     val createdAt: Long,
     val expiresAt: Long? = null,
     val title: String,

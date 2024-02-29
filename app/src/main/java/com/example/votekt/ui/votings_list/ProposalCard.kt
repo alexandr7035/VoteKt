@@ -1,6 +1,8 @@
 package com.example.votekt.ui.votings_list
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,11 +50,18 @@ fun ProposalCard(
         ) {
 
             if (proposal is Proposal.Deployed) {
-                Text(
+                Row(
                     modifier = Modifier.fillMaxWidth(),
-                    text = proposal.expirationTime.getFormattedDate("dd MMM yyyy"),
-                )
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "#${proposal.proposalNumber}",
+                    )
 
+                    Text(
+                        text = proposal.expirationTime.getFormattedDate("dd MMM yyyy"),
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.height(4.dp))

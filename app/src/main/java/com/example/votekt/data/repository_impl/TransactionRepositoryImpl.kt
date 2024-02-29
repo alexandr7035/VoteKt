@@ -12,7 +12,7 @@ import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.data.cache.TransactionDao
 import com.example.votekt.data.cache.TransactionEntity
 import com.example.votekt.data.workers.AwaitTransactionWorker
-import com.example.votekt.data.workers.RefreshProposalsData
+import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
@@ -58,10 +58,6 @@ class TransactionRepositoryImpl(
             )
         )
 
-        val data = Data.Builder()
-            .putString(AwaitTransactionWorker.TRANSACTION_HASH, transactionHash.value)
-            .build()
-
         val checkForReceiptWork = OneTimeWorkRequestBuilder<AwaitTransactionWorker>()
             .setConstraints(
                 Constraints.Builder()
@@ -71,10 +67,14 @@ class TransactionRepositoryImpl(
             )
             .setInitialDelay(5, TimeUnit.SECONDS)
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
-            .setInputData(data)
+            .setInputData(
+                Data.Builder()
+                    .putString(AwaitTransactionWorker.TRANSACTION_HASH, transactionHash.value)
+                    .build()
+            )
             .build()
 
-        val postTransactionWork = OneTimeWorkRequestBuilder<RefreshProposalsData>()
+        val postTransactionWork = OneTimeWorkRequestBuilder<SyncProposalsWorker>()
             .setConstraints(
                 Constraints.Builder()
                     .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -82,7 +82,6 @@ class TransactionRepositoryImpl(
                     .build()
             )
             .setBackoffCriteria(BackoffPolicy.LINEAR, 10, TimeUnit.SECONDS)
-            .setInputData(data)
             .build()
 
         if (transactionType.isContractInteraction()) {

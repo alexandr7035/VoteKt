@@ -5,6 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
+import com.example.votekt.domain.transactions.TransactionType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -23,4 +24,7 @@ interface TransactionDao {
 
     @Query("DELETE FROM transactions")
     suspend fun clearTransactionHistory()
+
+    @Query("SELECT type FROM transactions WHERE hash = :transactionHash")
+    fun getTransactionType(transactionHash: String): TransactionType?
 }

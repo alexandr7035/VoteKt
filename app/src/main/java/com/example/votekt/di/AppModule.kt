@@ -21,6 +21,7 @@ import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
+import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
@@ -34,7 +35,6 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.workmanager.dsl.worker
-import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
 
@@ -110,6 +110,14 @@ val appModule = module {
             params = get(),
             transactionRepository = get(),
             ethereumClient = get()
+        )
+    }
+
+    worker {
+        SyncProposalsWorker(
+            appContext = get(),
+            params = get(),
+            votingRepository = get()
         )
     }
 

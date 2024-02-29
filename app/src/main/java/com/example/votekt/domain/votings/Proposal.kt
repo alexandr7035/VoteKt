@@ -28,7 +28,7 @@ sealed class Proposal(
         override val description: String,
         override val creatorAddress: Address,
         override val isSelfCreated: Boolean,
-        val proposalNumber: Long,
+        val proposalNumber: Int,
         val expirationTime: Long,
         private val votesFor: Int,
         private val votesAgainst: Int,
