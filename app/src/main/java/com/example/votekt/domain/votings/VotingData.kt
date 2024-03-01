@@ -5,7 +5,8 @@ data class VotingData(
     val votesAgainst: Int,
     val selfVote: VoteType?,
 ) {
-    private val totalVotes: Int = votesFor + votesAgainst
+    private val totalVotes: Int
+        get() = votesFor + votesAgainst
     val votesForPercentage: Float = votesFor.toFloat() / totalVotes
     val votesAgainstPercentage: Float = votesAgainst.toFloat() / totalVotes
 

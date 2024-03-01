@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -55,6 +56,7 @@ import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
+import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.AvatarHelper
@@ -77,39 +79,39 @@ fun VotingDetailsScreen(
         viewModel.loadProposalById(proposalId)
     }
 
-        val screenState = viewModel.state.collectAsStateWithLifecycle().value
+    val screenState = viewModel.state.collectAsStateWithLifecycle().value
 
-        when {
-            screenState.isProposalLoading -> FullscreenProgressBar(backgroundColor = Color.Transparent)
+    when {
+        screenState.isProposalLoading -> FullscreenProgressBar(backgroundColor = Color.Transparent)
 
-            screenState.proposal != null -> {
-                VotingDetailsScreen_Ui(
-                    proposal = screenState.proposal,
-                    onVote = { vote ->
-                        // TODO non local id
+        screenState.proposal != null -> {
+            VotingDetailsScreen_Ui(
+                proposal = screenState.proposal,
+                onVote = { vote ->
+                    // TODO non local id
 //                        viewModel.makeVote(proposalId, vote)
-                    }
-                )
-            }
-
-            screenState.error != null -> {
-                ErrorFullScreen(
-                    error = screenState.error,
-                    onRetry = {
-                        viewModel.loadProposalById(proposalId)
-                    }
-                )
-            }
-        }
-
-        EventEffect(
-            event = screenState.selfVoteSubmittedEvent, onConsumed = viewModel::onVoteSubmittedEvent
-        ) { transactionHash ->
-            onShowSnackBar.invoke(
-                "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}",
-                SnackBarMode.Neutral
+                }
             )
         }
+
+        screenState.error != null -> {
+            ErrorFullScreen(
+                error = screenState.error,
+                onRetry = {
+                    viewModel.loadProposalById(proposalId)
+                }
+            )
+        }
+    }
+
+    EventEffect(
+        event = screenState.selfVoteSubmittedEvent, onConsumed = viewModel::onVoteSubmittedEvent
+    ) { transactionHash ->
+        onShowSnackBar.invoke(
+            "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}",
+            SnackBarMode.Neutral
+        )
+    }
 }
 
 
@@ -127,6 +129,7 @@ private fun VotingDetailsScreen_Ui(
                     is Proposal.Draft -> {
                         stringResource(R.string.draft_proposal)
                     }
+
                     is Proposal.Deployed -> {
                         stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
                     }
@@ -213,9 +216,7 @@ fun VotingPostCard(proposal: Proposal) {
             )
         )
 
-        proposal.creatorAddress?.let {
-            Creator(address = it.value)
-        }
+        Creator(address = proposal.creatorAddress.value)
 
         val descriptionExpanded = remember {
             mutableStateOf(false)
@@ -233,6 +234,8 @@ fun VotingPostCard(proposal: Proposal) {
                 descriptionExpanded.value = !descriptionExpanded.value
             }
         )
+
+        VotingBar(proposal = proposal)
 
         val uiStatus = remember(proposal) {
             proposal.getStatusUi()
@@ -259,28 +262,28 @@ fun VotingPostCard(proposal: Proposal) {
 private fun ProposalStatusMark(
     proposalStatusUi: ProposalStatusUi
 ) {
-        Box(
-            modifier = Modifier
-                .wrapContentSize()
-                .border(
-                    width = 1.dp,
-                    color = proposalStatusUi.color,
-                    shape = RoundedCornerShape(4.dp)
-                )
-                .padding(
-                    vertical = 8.dp,
-                    horizontal = 12.dp
-                )
-        ) {
-            Text(
-                text = proposalStatusUi.title,
-                style = TextStyle(
-                    color = proposalStatusUi.color,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
+    Box(
+        modifier = Modifier
+            .wrapContentSize()
+            .border(
+                width = 1.dp,
+                color = proposalStatusUi.color,
+                shape = RoundedCornerShape(4.dp)
             )
-        }
+            .padding(
+                vertical = 8.dp,
+                horizontal = 12.dp
+            )
+    ) {
+        Text(
+            text = proposalStatusUi.title,
+            style = TextStyle(
+                color = proposalStatusUi.color,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        )
+    }
 }
 
 @Composable
@@ -325,6 +328,23 @@ private fun Creator(
                 address.prettifyAddress()
             }
         )
+    }
+}
+
+@Composable
+private fun VotingBar(proposal: Proposal) {
+    if (proposal is Proposal.Deployed) {
+        if (proposal.hasVotes()) {
+            HorizontalVotingBar(
+                votingData = proposal.votingData,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp),
+                corners = 4.dp
+            )
+        } else {
+            // TODO
+        }
     }
 }
 

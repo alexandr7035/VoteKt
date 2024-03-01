@@ -11,6 +11,8 @@ sealed class Proposal(
     open val creatorAddress: Address,
     open val isSelfCreated: Boolean,
 ) {
+    fun hasVotes() = this is Deployed && this.votingData.hasVotes()
+
    data class Draft(
        override val uuid: String,
        override val title: String,
