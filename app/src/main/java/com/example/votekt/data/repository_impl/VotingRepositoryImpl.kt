@@ -14,7 +14,6 @@ import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
-import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
@@ -99,7 +98,6 @@ class VotingRepositoryImpl(
                     description = req.desc,
                     deployTransactionHash = tx.transactionHash,
                     createdAt = System.currentTimeMillis(),
-                    // TODO contract update for other's address
                     creatorAddress = accountRepository.getSelfAddress().value,
                 )
             )
@@ -127,6 +125,8 @@ class VotingRepositoryImpl(
     }
 
     override suspend fun syncProposalsWithContract() = withContext(dispatcher) {
+        val contractOwner = votingContract.owner().send()
+
         votingContract.proposalsList
             .send()
             .forEach { raw ->
@@ -138,21 +138,22 @@ class VotingRepositoryImpl(
                             number = raw.number.toInt(),
                             votesFor = raw.votesFor.toInt(),
                             votesAgainst = raw.votesAgainst.toInt(),
-                            expiresAt = raw.expirationTime.toLong(),
+                            expiresAt = raw.expirationTime.toLong() * 1000L,
+                            creatorAddress = contractOwner,
+                            createdAt = raw.creationTime.toLong() * 1000L,
                         )
                     )
                 } ?: run {
                     proposalsDao.cacheProposal(
                         ProposalEntity(
                             uuid = raw.uuid,
+                            number = raw.number.toInt(),
                             votesFor = raw.votesFor.toInt(),
                             votesAgainst = raw.votesAgainst.toInt(),
                             expiresAt = raw.expirationTime.toLong(),
-                            // TODO update contract
-                            createdAt = System.currentTimeMillis(),
+                            createdAt = raw.creationTime.toLong(),
                             deployTransactionHash = null,
-                            // TODO update contract
-                            creatorAddress = "TODO",
+                            creatorAddress = contractOwner,
                             title = raw.title,
                             description = raw.description
                         )
