@@ -10,6 +10,7 @@ contract VotingContract is Ownable {
         string description;
         uint votesFor;
         uint votesAgainst;
+        uint256 creationTime;
         uint256 expirationTime;
     }
 
@@ -60,6 +61,7 @@ contract VotingContract is Ownable {
         newProposal.title = title;
         newProposal.description = description;
         newProposal.uuid = uuid;
+        newProposal.creationTime = block.timestamp;
 
         uint256 expiration = block.timestamp + durationInDays * 86400;
         newProposal.expirationTime = expiration;

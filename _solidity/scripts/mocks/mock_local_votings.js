@@ -20,7 +20,8 @@ async function main () {
     for (const proposal of mockProposals) {
         const randomDayCount = Math.floor(Math.random() * 10) + 1;
         const { title, description } = proposal;
-        await c.createProposal(title, description, randomDayCount);
+        // Mock UUID with day count and proposal count
+        await c.createProposal(`${randomDayCount}${proposalsCount}`, title, description, randomDayCount);
         proposalsCount++;
     }
 }
