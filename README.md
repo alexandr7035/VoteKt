@@ -74,3 +74,7 @@ Choose localDebug build variant and build
 [Infura Docs](https://docs.infura.io/api/networks/ethereum/how-to)
 
 [Understanding Ethereum Transaction Statuses](https://medium.com/@nicholaschn/understanding-ethereum-transaction-statuses-5c505b2b123b)
+
+[How to use Time in a Smart Contract?](https://medium.com/coinmonks/how-to-use-time-in-a-smart-contract-1c8d063b6a2b)
+
+[Ethereum RPCs, Methods, and Calls](https://dzone.com/articles/ethereum-rpcs-methods-and-calls)
