@@ -78,3 +78,5 @@ Choose localDebug build variant and build
 [How to use Time in a Smart Contract?](https://medium.com/coinmonks/how-to-use-time-in-a-smart-contract-1c8d063b6a2b)
 
 [Ethereum RPCs, Methods, and Calls](https://dzone.com/articles/ethereum-rpcs-methods-and-calls)
+
+[Subscribing to smart contract events with web3.js](https://support.chainstack.com/hc/en-us/articles/4403518123161-Subscribing-to-smart-contract-events-with-web3-js)
