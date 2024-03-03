@@ -1,4 +1,4 @@
-package com.example.votekt.ui.votings_list
+package com.example.votekt.ui.feature_proposals.proposals_list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

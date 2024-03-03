@@ -1,4 +1,4 @@
-package com.example.votekt.ui.voting_details.model
+package com.example.votekt.ui.feature_proposals.model
 
 import androidx.compose.ui.graphics.Color
 import com.example.votekt.domain.votings.Proposal

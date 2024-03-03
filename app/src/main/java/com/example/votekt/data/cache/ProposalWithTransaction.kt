@@ -13,24 +13,14 @@ data class ProposalWithTransaction(
     val deploymentTransaction: TransactionEntity?
 )
 
-fun ProposalWithTransaction.isDeployedAndSynced(): Boolean {
-    return if (deploymentTransaction != null) {
-        deploymentTransaction.status == TransactionStatus.MINED &&
-                proposal.number != null && proposal.expiresAt != null
-    } else {
-        proposal.number != null && proposal.expiresAt != null
-    }
-}
-
 fun ProposalWithTransaction.isDeployFailed(): Boolean {
     return deploymentTransaction?.status == TransactionStatus.REVERTED
 }
 
-fun ProposalWithTransaction.shouldBeDeployed(isSelf: Boolean): Boolean {
-    return if (isSelf) {
-        (proposal.deployTransactionHash == null
-                || deploymentTransaction?.status == TransactionStatus.REVERTED)
+fun ProposalWithTransaction.shouldBeDeployed(): Boolean {
+    return if (deploymentTransaction?.status == null) {
+        proposal.isDraft
     } else {
-        false
+        proposal.isDraft && deploymentTransaction.status == TransactionStatus.REVERTED
     }
 }

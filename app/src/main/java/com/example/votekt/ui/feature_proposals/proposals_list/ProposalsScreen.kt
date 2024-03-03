@@ -1,4 +1,4 @@
-package com.example.votekt.ui.votings_list
+package com.example.votekt.ui.feature_proposals.proposals_list
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
+import androidx.compose.material3.Card
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -106,10 +108,13 @@ private fun ProposalsList(
                     proposal.uuid
                 }
             )  { _, proposal ->
-                ProposalCard(
-                    proposal = proposal,
+                Card(
                     onClick = { onProposalClick(proposal.uuid) }
-                )
+                ) {
+                    VotingPostCard(
+                        proposal = proposal
+                    )
+                }
             }
 
             item {

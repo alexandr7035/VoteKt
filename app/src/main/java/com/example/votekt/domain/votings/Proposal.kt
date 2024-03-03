@@ -1,15 +1,16 @@
 package com.example.votekt.domain.votings
 
 import by.alexandr7035.ethereum.model.Address
+import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionHash
+import com.example.votekt.domain.transactions.TransactionStatus
 
 sealed class Proposal(
     open val uuid: String,
     open val title: String,
     open val description: String,
-    // TODO implement in contract
     open val creatorAddress: Address,
-    open val isSelfCreated: Boolean,
+    open val isSelfCreated: Boolean = false,
 ) {
     fun hasVotes() = this is Deployed && this.votingData.hasVotes()
 
@@ -19,10 +20,12 @@ sealed class Proposal(
        override val description: String,
        override val creatorAddress: Address,
        override val isSelfCreated: Boolean,
-       val deploymentTransactionHash: TransactionHash?,
+       val deploymentTransaction: TransactionDomain?,
        val shouldDeploy: Boolean,
        val deployFailed: Boolean,
-   ): Proposal(uuid, title, description, creatorAddress, isSelfCreated)
+   ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
+       fun isDeployPending() = deploymentTransaction?.status == TransactionStatus.PENDING
+   }
 
     data class Deployed(
         override val uuid: String,
@@ -32,20 +35,11 @@ sealed class Proposal(
         override val isSelfCreated: Boolean,
         val proposalNumber: Int,
         val expirationTime: Long,
-        private val votesFor: Int,
-        private val votesAgainst: Int,
+        val votingData: VotingData,
         val selfVote: VoteType? = null,
         val selfVoteTransaction: TransactionHash? = null,
     ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
         val isFinished
             get() = this.expirationTime < System.currentTimeMillis()
-
-        // TODO refactoring
-        val votingData
-            get() = VotingData(
-                votesFor = votesFor,
-                votesAgainst = votesAgainst,
-                selfVote = selfVote
-            )
     }
 }

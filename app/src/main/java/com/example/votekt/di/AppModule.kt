@@ -28,8 +28,8 @@ import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
-import com.example.votekt.ui.voting_details.VotingDetailsViewModel
-import com.example.votekt.ui.votings_list.ProposalsViewModel
+import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
+import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext

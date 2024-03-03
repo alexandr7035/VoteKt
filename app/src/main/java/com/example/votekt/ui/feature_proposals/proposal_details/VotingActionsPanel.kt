@@ -1,4 +1,4 @@
-package com.example.votekt.ui.voting_details
+package com.example.votekt.ui.feature_proposals.proposal_details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

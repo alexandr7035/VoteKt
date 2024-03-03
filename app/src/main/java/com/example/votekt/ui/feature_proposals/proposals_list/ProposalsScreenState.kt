@@ -1,4 +1,4 @@
-package com.example.votekt.ui.votings_list
+package com.example.votekt.ui.feature_proposals.proposals_list
 
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.UiErrorMessage

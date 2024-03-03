@@ -22,13 +22,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.votekt.R
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.ui.components.preview.TransactionPreviewProvider
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
 
 @Composable
@@ -52,12 +51,12 @@ private fun TransactionCardUi(
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val statusUi = remember(transaction.status) {
-                    getTxStatusMark(transaction.status)
+                    transaction.status.getTransactionStatusUi()
                 }
 
                 Image(
-                    painter = painterResource(id = statusUi.second),
-                    contentDescription = "Transaction status ${statusUi.first}",
+                    painter = painterResource(id = statusUi.iconRes),
+                    contentDescription = "Transaction status ${statusUi.status}",
                     modifier = Modifier.padding(end = 4.dp)
                 )
 
@@ -122,11 +121,3 @@ fun TransactionCard_Preview(
     }
 }
 
-// TODO move to utils
-private fun getTxStatusMark(status: TransactionStatus): Pair<String, Int> {
-    return when (status) {
-        TransactionStatus.PENDING -> "Pending" to R.drawable.ic_status_pending
-        TransactionStatus.MINED -> "Completed" to R.drawable.ic_status_accepted
-        TransactionStatus.REVERTED -> "Failed" to R.drawable.ic_status_rejected
-    }
-}

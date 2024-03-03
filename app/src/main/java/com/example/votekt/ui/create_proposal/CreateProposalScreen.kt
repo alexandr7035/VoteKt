@@ -44,9 +44,9 @@ import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
-import com.example.votekt.ui.uiError
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.utils.prettifyAddress
+import com.example.votekt.ui.uiError
+import com.example.votekt.ui.utils.showToast
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
 
@@ -56,19 +56,15 @@ fun CreateProposalScreen(
     onBack: () -> Unit = {},
     onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
 ) {
+    val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
-
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     EventEffect(
         event = state.submitProposalEvent, onConsumed = viewModel::onProposalCreatedEvent
     ) { eventData ->
         if (eventData.isTransactionSubmitted) {
-            onShowSnackBar.invoke(
-                "Transaction submitted! Wait for the transaction result\n\nHash: ${eventData.transactionHash!!.prettifyAddress()}",
-                SnackBarMode.Positive
-            )
-            
+            context.showToast("Transaction submitted!")
             onBack.invoke()
         } else {
             onShowSnackBar.invoke(

@@ -2,16 +2,31 @@ package com.example.votekt.ui.components.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.Address
+import by.alexandr7035.ethereum.model.Wei
+import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionHash
+import com.example.votekt.domain.transactions.TransactionStatus
+import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.domain.votings.VoteType
+import com.example.votekt.domain.votings.VotingData
+import java.math.BigInteger
 
 class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
+    private val mockDeployTransaction = TransactionDomain(
+        type = TransactionType.CREATE_PROPOSAL,
+        hash = "0x12334",
+        dateSent = 0,
+        status = TransactionStatus.PENDING,
+        gasFee = Wei(BigInteger("0"))
+    )
+
     override val values: Sequence<Proposal> = sequenceOf(
         Proposal.Draft(
             uuid = "123",
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
-            deploymentTransactionHash = TransactionHash("0x12334"),
+            deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
             shouldDeploy = true,
@@ -21,7 +36,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             uuid = "123",
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
-            deploymentTransactionHash = TransactionHash("0x12334"),
+            deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
             shouldDeploy = false,
@@ -33,8 +48,11 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             expirationTime = 1000_000_000_000_000,
-            votesAgainst = 100,
-            votesFor = 50,
+            votingData = VotingData(
+                votesAgainst = 100,
+                votesFor = 50,
+                selfVote = VoteType.VOTE_FOR
+            ),
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true
         ),
@@ -44,8 +62,11 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             title = "Lorem ipsum Lorem ipsum - Test",
             description = "Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities.",
             expirationTime = 0,
-            votesAgainst = 25,
-            votesFor = 100,
+            votingData = VotingData(
+                votesAgainst = 25,
+                votesFor = 50,
+                selfVote = null,
+            ),
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = false
         )

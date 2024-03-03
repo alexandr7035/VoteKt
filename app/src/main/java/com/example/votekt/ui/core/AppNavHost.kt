@@ -27,8 +27,8 @@ import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_wallet.WalletScreen
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
-import com.example.votekt.ui.voting_details.VotingDetailsScreen
-import com.example.votekt.ui.votings_list.ProposalsScreen
+import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
+import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 

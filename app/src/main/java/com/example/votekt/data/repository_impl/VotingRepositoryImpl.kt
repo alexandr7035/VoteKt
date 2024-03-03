@@ -8,7 +8,6 @@ import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransaction
 import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.data.cache.isDeployFailed
-import com.example.votekt.data.cache.isDeployedAndSynced
 import com.example.votekt.data.cache.shouldBeDeployed
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
@@ -18,6 +17,7 @@ import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
+import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.domain.votings.VotingRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -94,6 +94,8 @@ class VotingRepositoryImpl(
             proposalsDao.cacheProposal(
                 ProposalEntity(
                     uuid = uuid,
+                    isDraft = true,
+                    isSelfCreated = true,
                     title = req.title,
                     description = req.desc,
                     deployTransactionHash = tx.transactionHash,
@@ -137,6 +139,7 @@ class VotingRepositoryImpl(
                         cached.copy(
                             number = raw.number.toInt(),
                             votesFor = raw.votesFor.toInt(),
+                            isDraft = false,
                             votesAgainst = raw.votesAgainst.toInt(),
                             expiresAt = raw.expirationTime.toLong() * 1000L,
                             creatorAddress = contractOwner,
@@ -148,6 +151,7 @@ class VotingRepositoryImpl(
                         ProposalEntity(
                             uuid = raw.uuid,
                             number = raw.number.toInt(),
+                            isDraft = false,
                             votesFor = raw.votesFor.toInt(),
                             votesAgainst = raw.votesAgainst.toInt(),
                             expiresAt = raw.expirationTime.toLong(),
@@ -163,31 +167,30 @@ class VotingRepositoryImpl(
     }
 
     private suspend fun ProposalWithTransaction.mapToDomain(): Proposal = withContext(dispatcher) {
-        // TODO optimize
-        val self = accountRepository.getSelfAddress()
-        val proposalSelfCreated = self == Address(proposal.creatorAddress)
-
-        return@withContext if (isDeployedAndSynced()) {
+        return@withContext if (!proposal.isDraft) {
             Proposal.Deployed(
                 uuid = proposal.uuid,
                 title = proposal.title,
                 description = proposal.description,
                 proposalNumber = proposal.number!!,
                 expirationTime = proposal.expiresAt!!,
-                votesFor = proposal.votesFor,
-                votesAgainst = proposal.votesAgainst,
+                votingData = VotingData(
+                    votesFor = proposal.votesFor,
+                    votesAgainst = proposal.votesAgainst,
+                    selfVote = null
+                ),
                 creatorAddress = Address(proposal.creatorAddress),
-                isSelfCreated = proposalSelfCreated,
+                isSelfCreated = proposal.isSelfCreated,
             )
         } else {
             Proposal.Draft(
                 uuid = proposal.uuid,
-                deploymentTransactionHash = deploymentTransaction?.hash?.let { TransactionHash(it) },
+                deploymentTransaction = deploymentTransaction?.mapToData(),
                 title = proposal.title,
                 description = proposal.description,
                 creatorAddress = Address(proposal.creatorAddress),
                 isSelfCreated = true,
-                shouldDeploy = shouldBeDeployed(proposalSelfCreated),
+                shouldDeploy = shouldBeDeployed(),
                 deployFailed = isDeployFailed(),
             )
         }

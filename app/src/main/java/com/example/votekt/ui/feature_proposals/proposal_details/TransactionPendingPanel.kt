@@ -1,6 +1,7 @@
-package com.example.votekt.ui.voting_details
+package com.example.votekt.ui.feature_proposals.proposal_details
 
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,11 +10,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -23,16 +24,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.votekt.R
 import com.example.votekt.domain.transactions.TransactionStatus
-import com.example.votekt.ui.components.DotsProgressIndicator
 import com.example.votekt.ui.components.preview.TransactionStatusPreviewProvider
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.getTransactionStatusUi
 
 @Composable
 fun TransactionPendingPanel(
     title: String,
-    statusUi: TransactionStatus
+    transactionStatus: TransactionStatus
 ) {
     Column(
         modifier = Modifier
@@ -60,35 +60,20 @@ fun TransactionPendingPanel(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            when (statusUi) {
-                TransactionStatus.PENDING -> {
-                    StatusIcon(icon = R.drawable.ic_status_pending)
-
-                    Text(
-                        text = "Your transaction is pending on blockchain"
-                    )
-                }
-
-                TransactionStatus.MINED -> {
-                    StatusIcon(icon = R.drawable.ic_status_accepted)
-
-                    Text(
-                        text = "Your transaction is pending on blockchain"
-                    )
-                }
-
-                TransactionStatus.REVERTED -> {
-
-                }
+            val statusUi = remember (transactionStatus) {
+                transactionStatus.getTransactionStatusUi()
             }
+
+            StatusIcon(icon = statusUi.iconRes)
+            Text(text = statusUi.statusExplained)
         }
     }
 }
 
 @Composable
 private fun StatusIcon(@DrawableRes icon: Int) {
-    Icon(
-        modifier = Modifier.size(56.dp),
+    Image(
+        modifier = Modifier.size(32.dp),
         painter = painterResource(id = icon),
         contentDescription = null
     )
@@ -103,7 +88,7 @@ fun SelfVoteStatusPanel_Preview(
         Surface(color = MaterialTheme.colorScheme.background) {
             TransactionPendingPanel(
                 title = "Your vote",
-                 statusUi = status
+                 transactionStatus = status
             )
         }
     }
