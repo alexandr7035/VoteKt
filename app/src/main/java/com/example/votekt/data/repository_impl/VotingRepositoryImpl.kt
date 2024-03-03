@@ -23,6 +23,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
@@ -69,9 +70,16 @@ class VotingRepositoryImpl(
     }
 
     override fun getProposals(): Flow<List<Proposal>> {
-        return proposalsDao.observeProposals().flowOn(dispatcher).map { list ->
-            list.map { it.mapToDomain() }
-        }
+        return proposalsDao.observeProposals()
+            .flowOn(dispatcher)
+            .onStart {
+                withContext(dispatcher) {
+                    syncProposalsWithContract()
+                }
+            }
+            .map { list ->
+                list.map { it.mapToDomain() }
+            }
     }
 
     override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
@@ -126,44 +134,47 @@ class VotingRepositoryImpl(
         }
     }
 
-    override suspend fun syncProposalsWithContract() = withContext(dispatcher) {
+    override suspend fun syncProposalsWithContract(): Unit = withContext(dispatcher) {
         val contractOwner = votingContract.owner().send()
 
-        votingContract.proposalsList
+        val contractProposals = votingContract.proposalsList
             .send()
-            .forEach { raw ->
-                raw as VotingContract.ProposalRaw
-                val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid)
-                cached?.let {
-                    proposalsDao.updateProposal(
-                        cached.copy(
-                            number = raw.number.toInt(),
-                            votesFor = raw.votesFor.toInt(),
-                            isDraft = false,
-                            votesAgainst = raw.votesAgainst.toInt(),
-                            expiresAt = raw.expirationTime.toLong() * 1000L,
-                            creatorAddress = contractOwner,
-                            createdAt = raw.creationTime.toLong() * 1000L,
-                        )
+            .map { it as VotingContract.ProposalRaw }
+
+        contractProposals.forEach { raw ->
+            val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid)
+            cached?.let {
+                proposalsDao.updateProposal(
+                    cached.copy(
+                        number = raw.number.toInt(),
+                        votesFor = raw.votesFor.toInt(),
+                        isDraft = false,
+                        votesAgainst = raw.votesAgainst.toInt(),
+                        expiresAt = raw.expirationTime.toLong() * 1000L,
+                        creatorAddress = contractOwner,
+                        createdAt = raw.creationTime.toLong() * 1000L,
                     )
-                } ?: run {
-                    proposalsDao.cacheProposal(
-                        ProposalEntity(
-                            uuid = raw.uuid,
-                            number = raw.number.toInt(),
-                            isDraft = false,
-                            votesFor = raw.votesFor.toInt(),
-                            votesAgainst = raw.votesAgainst.toInt(),
-                            expiresAt = raw.expirationTime.toLong(),
-                            createdAt = raw.creationTime.toLong(),
-                            deployTransactionHash = null,
-                            creatorAddress = contractOwner,
-                            title = raw.title,
-                            description = raw.description
-                        )
+                )
+            } ?: run {
+                proposalsDao.cacheProposal(
+                    ProposalEntity(
+                        uuid = raw.uuid,
+                        number = raw.number.toInt(),
+                        isDraft = false,
+                        votesFor = raw.votesFor.toInt(),
+                        votesAgainst = raw.votesAgainst.toInt(),
+                        expiresAt = raw.expirationTime.toLong() * 1000L,
+                        createdAt = raw.creationTime.toLong() * 1000L,
+                        deployTransactionHash = null,
+                        creatorAddress = contractOwner,
+                        title = raw.title,
+                        description = raw.description
                     )
-                }
+                )
             }
+        }
+
+        proposalsDao.cleanUpProposals(remainingProposals = contractProposals.map { it.uuid })
     }
 
     private suspend fun ProposalWithTransaction.mapToDomain(): Proposal = withContext(dispatcher) {

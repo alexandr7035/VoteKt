@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.votekt.domain.transactions.TransactionHash
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -35,4 +34,7 @@ interface ProposalsDao {
 
     @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE uuid = :proposalId")
     fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
+
+    @Query("DELETE FROM proposals WHERE NOT isDraft AND uuid NOT IN (:remainingProposals)")
+    suspend fun cleanUpProposals(remainingProposals: List<String>)
 }
