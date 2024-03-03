@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="proposal_title_template">Proposal #%1$d</string>
+    <string name="proposal_time_left_template">%1$s left</string>
 </resources>

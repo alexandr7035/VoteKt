@@ -26,8 +26,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -60,10 +62,12 @@ import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.AvatarHelper
+import com.example.votekt.ui.utils.DateFormatters
 import com.example.votekt.ui.utils.prettifyAddress
 import com.example.votekt.ui.voting_details.model.ProposalStatusUi
 import com.example.votekt.ui.voting_details.model.getStatusUi
 import de.palm.composestateevents.EventEffect
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -85,22 +89,16 @@ fun VotingDetailsScreen(
         screenState.isProposalLoading -> FullscreenProgressBar(backgroundColor = Color.Transparent)
 
         screenState.proposal != null -> {
-            VotingDetailsScreen_Ui(
-                proposal = screenState.proposal,
-                onVote = { vote ->
-                    // TODO non local id
+            VotingDetailsScreen_Ui(proposal = screenState.proposal, onVote = { vote ->
+                // TODO non local id
 //                        viewModel.makeVote(proposalId, vote)
-                }
-            )
+            })
         }
 
         screenState.error != null -> {
-            ErrorFullScreen(
-                error = screenState.error,
-                onRetry = {
-                    viewModel.loadProposalById(proposalId)
-                }
-            )
+            ErrorFullScreen(error = screenState.error, onRetry = {
+                viewModel.loadProposalById(proposalId)
+            })
         }
     }
 
@@ -108,8 +106,7 @@ fun VotingDetailsScreen(
         event = screenState.selfVoteSubmittedEvent, onConsumed = viewModel::onVoteSubmittedEvent
     ) { transactionHash ->
         onShowSnackBar.invoke(
-            "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}",
-            SnackBarMode.Neutral
+            "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}", SnackBarMode.Neutral
         )
     }
 }
@@ -117,35 +114,27 @@ fun VotingDetailsScreen(
 
 @Composable
 private fun VotingDetailsScreen_Ui(
-    proposal: Proposal,
-    onVote: (VoteType) -> Unit,
-    onBack: () -> Unit = {}
+    proposal: Proposal, onVote: (VoteType) -> Unit, onBack: () -> Unit = {}
 ) {
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        topBar = {
-            AppBar(
-                title = when (proposal) {
-                    is Proposal.Draft -> {
-                        stringResource(R.string.draft_proposal)
-                    }
+    Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
+        AppBar(title = when (proposal) {
+            is Proposal.Draft -> {
+                stringResource(R.string.draft_proposal)
+            }
 
-                    is Proposal.Deployed -> {
-                        stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
-                    }
-                },
-                onBack = {
-                    onBack.invoke()
-                }
-            )
-        }) { pv ->
+            is Proposal.Deployed -> {
+                stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
+            }
+        }, onBack = {
+            onBack.invoke()
+        })
+    }) { pv ->
 
         Column(
             modifier = Modifier.padding(start = 16.dp, end = 16.dp, top = pv.calculateTopPadding() + 16.dp),
         ) {
             Column(
-                modifier =
-                Modifier
+                modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .weight(1f),
@@ -166,20 +155,15 @@ private fun VotingDetailsScreen_Ui(
 
                             if (proposal.deployFailed) {
                                 Text(
-                                    text = "Deploy failed",
-                                    style = TextStyle(
+                                    text = "Deploy failed", style = TextStyle(
                                         color = MaterialTheme.colorScheme.error
                                     )
                                 )
                             }
 
-                            PrimaryButton(
-                                modifier = Modifier.fillMaxWidth(),
-                                text = "Deploy proposal",
-                                onClick = {
+                            PrimaryButton(modifier = Modifier.fillMaxWidth(), text = "Deploy proposal", onClick = {
 
-                                }
-                            )
+                            })
                         } else {
                             Text(
                                 text = "Proposal on deploy"
@@ -199,18 +183,20 @@ fun VotingPostCard(proposal: Proposal) {
             .fillMaxWidth()
             .wrapContentHeight()
             .background(
-                color = Color.White,
-                shape = RoundedCornerShape(4.dp)
+                color = Color.White, shape = RoundedCornerShape(4.dp)
             )
             .padding(
-                vertical = 12.dp,
-                horizontal = 8.dp
-            ),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
+                vertical = 12.dp, horizontal = 8.dp
+            ), verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        if (proposal is Proposal.Deployed) {
+            Text(
+                text = "#${proposal.proposalNumber}"
+            )
+        }
+
         Text(
-            text = proposal.title,
-            style = TextStyle(
+            text = proposal.title, style = TextStyle(
                 fontSize = 22.sp,
                 fontWeight = FontWeight.SemiBold,
             )
@@ -222,18 +208,15 @@ fun VotingPostCard(proposal: Proposal) {
             mutableStateOf(false)
         }
 
-        Text(
-            text = proposal.description,
+        Text(text = proposal.description,
             maxLines = if (descriptionExpanded.value) Int.MAX_VALUE else 3,
             overflow = TextOverflow.Ellipsis,
             style = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Medium
+                fontSize = 16.sp, fontWeight = FontWeight.Medium
             ),
             modifier = Modifier.clickable {
                 descriptionExpanded.value = !descriptionExpanded.value
-            }
-        )
+            })
 
         VotingBar(proposal = proposal)
 
@@ -242,12 +225,11 @@ fun VotingPostCard(proposal: Proposal) {
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             if (proposal is Proposal.Deployed) {
-                Text(
-                    text = "#${proposal.proposalNumber}"
+                RemainingTimeText(
+                    time = proposal.expirationTime,
                 )
             }
 
@@ -266,21 +248,15 @@ private fun ProposalStatusMark(
         modifier = Modifier
             .wrapContentSize()
             .border(
-                width = 1.dp,
-                color = proposalStatusUi.color,
-                shape = RoundedCornerShape(4.dp)
+                width = 1.dp, color = proposalStatusUi.color, shape = RoundedCornerShape(4.dp)
             )
             .padding(
-                vertical = 8.dp,
-                horizontal = 12.dp
+                vertical = 8.dp, horizontal = 12.dp
             )
     ) {
         Text(
-            text = proposalStatusUi.title,
-            style = TextStyle(
-                color = proposalStatusUi.color,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+            text = proposalStatusUi.title, style = TextStyle(
+                color = proposalStatusUi.color, fontSize = 16.sp, fontWeight = FontWeight.SemiBold
             )
         )
     }
@@ -288,36 +264,26 @@ private fun ProposalStatusMark(
 
 @Composable
 private fun Creator(
-    address: String,
-    imageSize: Dp = 24.dp,
-    isSelf: Boolean = true
+    address: String, imageSize: Dp = 24.dp, isSelf: Boolean = true
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         val sample = AvatarHelper.getAvatarUrl(identifier = address)
-        val imageReq = ImageRequest.Builder(LocalContext.current)
-            .data(sample)
-            .decoderFactory(SvgDecoder.Factory())
-            .crossfade(true).build()
+        val imageReq = ImageRequest.Builder(LocalContext.current).data(sample).decoderFactory(SvgDecoder.Factory()).crossfade(true).build()
 
         Text(
-            text = stringResource(R.string.creator),
-            style = TextStyle(
+            text = stringResource(R.string.creator), style = TextStyle(
                 fontWeight = FontWeight.Bold,
             )
         )
 
         AsyncImage(
-            model = imageReq,
-            contentDescription = stringResource(R.string.cd_user_avatar),
-            contentScale = ContentScale.FillHeight,
+            model = imageReq, contentDescription = stringResource(R.string.cd_user_avatar), contentScale = ContentScale.FillHeight,
 
             modifier = Modifier
                 .size(imageSize)
-                .clip(CircleShape),
-            placeholder = debugPlaceholder(debugPreview = R.drawable.sample_avatar)
+                .clip(CircleShape), placeholder = debugPlaceholder(debugPreview = R.drawable.sample_avatar)
         )
 
         Text(
@@ -332,15 +298,33 @@ private fun Creator(
 }
 
 @Composable
+private fun RemainingTimeText(time: Long) {
+    val context = LocalContext.current
+    var timeLeft by remember { mutableStateOf(time) }
+
+    LaunchedEffect(key1 = timeLeft) {
+        while (timeLeft > 0) {
+            delay(200L)
+            timeLeft--
+        }
+    }
+
+    Text(
+        text = stringResource(
+            id = R.string.proposal_time_left_template,
+            DateFormatters.formatRemainingTime(timeLeft, context)
+        )
+    )
+}
+
+@Composable
 private fun VotingBar(proposal: Proposal) {
     if (proposal is Proposal.Deployed) {
         if (proposal.hasVotes()) {
             HorizontalVotingBar(
-                votingData = proposal.votingData,
-                modifier = Modifier
+                votingData = proposal.votingData, modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp),
-                corners = 4.dp
+                    .height(12.dp), corners = 4.dp
             )
         } else {
             // TODO
@@ -355,10 +339,7 @@ fun VotingDetailsScreen_Preview(
 ) {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
-            VotingDetailsScreen_Ui(
-                proposal = proposal,
-                onVote = {}
-            )
+            VotingDetailsScreen_Ui(proposal = proposal, onVote = {})
         }
     }
 }
