@@ -4,15 +4,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -22,11 +21,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.votekt.R
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.components.preview.ProposalListPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -41,7 +44,7 @@ fun ProposalsScreen(
 ) {
     Scaffold(
         topBar = {
-            AppBar(title = "Proposals")
+            AppBar(title = stringResource(R.string.proposals))
         },
         floatingActionButton = {
             ExtendedFloatingActionButton(
@@ -49,10 +52,10 @@ fun ProposalsScreen(
                 icon = {
                     Icon(
                         Icons.Outlined.Add,
-                        contentDescription = "Favorite"
+                        contentDescription = stringResource(R.string.add)
                     )
                 },
-                text = { Text("Create") }
+                text = { Text(stringResource(R.string.create)) }
             )
         }) { pv ->
 
@@ -67,7 +70,7 @@ fun ProposalsScreen(
                 ErrorFullScreen(
                     error = state.error,
                     onRetry = {
-                        // TODO
+                        viewModel.subscribeToProposals()
                     }
                 )
             }
@@ -93,34 +96,29 @@ private fun ProposalsList(
     pv: PaddingValues,
     onProposalClick: (proposalId: String) -> Unit,
 ) {
-    LazyColumn(modifier = Modifier
-        .background(MaterialTheme.colorScheme.background)
-        .padding(top = pv.calculateTopPadding(), start = 12.dp, end = 12.dp, bottom = pv.calculateBottomPadding()),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        content = {
-            item {
-                Spacer(Modifier.height(8.dp))
+    LazyColumn(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background)
+            .padding(top = pv.calculateTopPadding()),
+        contentPadding = PaddingValues(12.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        itemsIndexed(
+            items = proposals,
+            key = { _, proposal ->
+                proposal.uuid
             }
-
-            itemsIndexed(
-                items = proposals,
-                key = { _, proposal ->
-                    proposal.uuid
-                }
-            )  { _, proposal ->
-                Card(
-                    onClick = { onProposalClick(proposal.uuid) }
-                ) {
-                    VotingPostCard(
-                        proposal = proposal
-                    )
-                }
+        ) { _, proposal ->
+            Card(
+                onClick = { onProposalClick(proposal.uuid) },
+                elevation = CardDefaults.cardElevation(4.dp)
+            ) {
+                VotingPostCard(
+                    proposal = proposal
+                )
             }
-
-            item {
-                Spacer(Modifier.height(12.dp))
-            }
-        })
+        }
+    }
 }
 
 
@@ -130,18 +128,29 @@ private fun NoProposalsStub(pv: PaddingValues) {
         modifier = Modifier
             .fillMaxSize()
             .padding(
-                top = pv.calculateTopPadding(), bottom = pv.calculateBottomPadding()
-            ), verticalArrangement = Arrangement.Center, horizontalAlignment = Alignment.CenterHorizontally
+                top = pv.calculateTopPadding(),
+                bottom = pv.calculateBottomPadding()
+            ),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(text = "No Proposals yet", style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = stringResource(R.string.no_proposals_yet),
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
-// TODO
 @Composable
 @Preview()
-fun ProposalsScreen_Preview() {
+fun ProposalsScreen_Preview(
+    @PreviewParameter(ProposalListPreviewProvider::class) proposals: List<Proposal>
+) {
     VoteKtTheme(darkTheme = false) {
-//        ProposalsList(proposals = List(5) { Proposal.mock() }, pv = PaddingValues(12.dp), onProposalClick = {})
+        ProposalsList(
+            proposals = proposals,
+            pv = PaddingValues(),
+            onProposalClick = {}
+        )
     }
 }

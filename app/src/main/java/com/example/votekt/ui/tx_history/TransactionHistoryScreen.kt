@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -89,21 +90,18 @@ private fun TransactionsList(
     transactions: List<TransactionDomain>,
     viewModel: TransactionsViewModel
 ) {
-    LazyColumn(modifier = Modifier
-        .background(MaterialTheme.colorScheme.background)
-        .padding(horizontal = 12.dp, vertical = 12.dp),
+    LazyColumn(
+        modifier = Modifier
+            .background(MaterialTheme.colorScheme.background),
         verticalArrangement = Arrangement.spacedBy(16.dp),
-        content = {
-            items(transactions.size) {
-                TransactionCard(
-                    transaction = transactions[it]
-                )
-            }
-
-            item {
-                Spacer(Modifier.height(12.dp))
-            }
-        })
+        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp))
+    {
+        items(transactions.size) {
+            TransactionCard(
+                transaction = transactions[it]
+            )
+        }
+    }
 }
 
 @Composable

@@ -24,3 +24,7 @@ fun ProposalWithTransaction.shouldBeDeployed(): Boolean {
         proposal.isDraft && deploymentTransaction.status == TransactionStatus.REVERTED
     }
 }
+
+fun ProposalWithTransaction.isDeployPending(): Boolean {
+    return deploymentTransaction?.status == TransactionStatus.PENDING
+}

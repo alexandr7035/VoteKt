@@ -8,6 +8,7 @@ import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransaction
 import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.data.cache.isDeployFailed
+import com.example.votekt.data.cache.isDeployPending
 import com.example.votekt.data.cache.shouldBeDeployed
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
@@ -201,8 +202,9 @@ class VotingRepositoryImpl(
                 description = proposal.description,
                 creatorAddress = Address(proposal.creatorAddress),
                 isSelfCreated = true,
-                shouldDeploy = shouldBeDeployed(),
-                deployFailed = isDeployFailed(),
+                shouldBeDeployed = shouldBeDeployed(),
+                isDeployFailed = isDeployFailed(),
+                isDeployPending = isDeployPending(),
             )
         }
     }

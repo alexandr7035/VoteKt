@@ -4,7 +4,6 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.Proposal
@@ -29,8 +28,9 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            shouldDeploy = true,
-            deployFailed = true
+            shouldBeDeployed = true,
+            isDeployFailed = true,
+            isDeployPending = false,
         ),
         Proposal.Draft(
             uuid = "123",
@@ -39,8 +39,9 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            shouldDeploy = false,
-            deployFailed = false
+            shouldBeDeployed = false,
+            isDeployFailed = false,
+            isDeployPending = true,
         ),
         Proposal.Deployed(
             uuid = "123",

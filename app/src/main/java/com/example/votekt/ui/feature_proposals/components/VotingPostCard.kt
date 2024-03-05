@@ -1,8 +1,8 @@
 package com.example.votekt.ui.feature_proposals.components
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
@@ -29,6 +30,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -99,7 +101,8 @@ fun VotingPostCard(
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             if (proposal is Proposal.Deployed) {
                 RemainingTimeText(
@@ -108,6 +111,15 @@ fun VotingPostCard(
             }
 
             Spacer(modifier = Modifier.weight(1f))
+
+            if (proposal is Proposal.Draft && proposal.isDeployFailed && !isExpanded) {
+                Image(
+                    modifier = Modifier.size(24.dp),
+                    painter = painterResource(id = R.drawable.ic_status_rejected),
+                    contentDescription = stringResource(R.string.proposal_is_failed_to_deploy)
+                )
+                Spacer(Modifier.width(12.dp))
+            }
 
             ProposalStatusMark(uiStatus)
         }

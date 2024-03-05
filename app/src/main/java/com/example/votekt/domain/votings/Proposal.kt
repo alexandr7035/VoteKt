@@ -3,7 +3,6 @@ package com.example.votekt.domain.votings
 import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionHash
-import com.example.votekt.domain.transactions.TransactionStatus
 
 sealed class Proposal(
     open val uuid: String,
@@ -21,11 +20,10 @@ sealed class Proposal(
        override val creatorAddress: Address,
        override val isSelfCreated: Boolean,
        val deploymentTransaction: TransactionDomain?,
-       val shouldDeploy: Boolean,
-       val deployFailed: Boolean,
-   ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
-       fun isDeployPending() = deploymentTransaction?.status == TransactionStatus.PENDING
-   }
+       val shouldBeDeployed: Boolean,
+       val isDeployFailed: Boolean,
+       val isDeployPending: Boolean,
+   ): Proposal(uuid, title, description, creatorAddress, isSelfCreated)
 
     data class Deployed(
         override val uuid: String,

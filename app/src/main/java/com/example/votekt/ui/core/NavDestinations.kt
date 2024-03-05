@@ -11,26 +11,22 @@ sealed class NavDestinations(
         override val route: String,
         val label: String,
         @DrawableRes val filledIcon: Int,
-        @DrawableRes val outlinedIcon: Int
     ): NavDestinations(route) {
         object Wallet: Primary(
             route = "wallet",
             filledIcon = R.drawable.ic_wallet,
-            outlinedIcon = R.drawable.ic_wallet,
             label = "Wallet"
         )
 
         object Proposals: Primary(
             route = "proposals",
             filledIcon = R.drawable.ic_votings,
-            outlinedIcon = R.drawable.ic_vote_outlined,
             label = "Proposals"
         )
 
         object Transactions: Primary(
             route = "transactions",
-            filledIcon = R.drawable.ic_votings,
-            outlinedIcon = R.drawable.ic_vote_outlined,
+            filledIcon = R.drawable.ic_transactions,
             label = "History"
         )
 

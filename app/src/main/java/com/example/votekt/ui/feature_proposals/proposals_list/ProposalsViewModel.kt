@@ -17,6 +17,10 @@ class ProposalsViewModel(private val votingRepository: VotingRepository) : ViewM
     val state = _state.asStateFlow()
 
     init {
+        subscribeToProposals()
+    }
+
+    fun subscribeToProposals() {
         votingRepository
             .getProposals()
             .onEach { proposals ->

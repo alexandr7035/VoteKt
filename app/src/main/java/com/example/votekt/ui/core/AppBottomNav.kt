@@ -23,7 +23,7 @@ import com.example.votekt.ui.components.bottomnav.M2BottomNavigationItem
 @Composable
 fun AppBottomNav(navController: NavHostController) {
     M2BottomNavigation(
-        modifier = Modifier.height(72.dp),
+        modifier = Modifier.height(60.dp),
         backgroundColor = MaterialTheme.colorScheme.surface
     ) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -55,7 +55,7 @@ fun AppBottomNav(navController: NavHostController) {
                         modifier = Modifier
                             .padding(bottom = 8.dp)
                             .size(24.dp),
-                        painter = getDestinationIcon(isDestinationSelected, screen),
+                        painter = painterResource(id = screen.filledIcon),
                         contentDescription = null,
                         // TODO
                         tint = if (isDestinationSelected) Color.Black else Color.Gray
@@ -64,15 +64,5 @@ fun AppBottomNav(navController: NavHostController) {
                 label = { Text(text = screen.label) },
             )
         }
-    }
-}
-
-@Composable
-private fun getDestinationIcon(isSelected: Boolean, destination: NavDestinations.Primary): Painter {
-    return if (isSelected) {
-        painterResource(id = destination.filledIcon)
-    }
-    else {
-        painterResource(id = destination.outlinedIcon)
     }
 }
