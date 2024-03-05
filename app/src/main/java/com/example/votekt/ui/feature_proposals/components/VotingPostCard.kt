@@ -104,7 +104,7 @@ fun VotingPostCard(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (proposal is Proposal.Deployed) {
+            if (proposal is Proposal.Deployed && !proposal.isFinished) {
                 RemainingTimeText(
                     time = proposal.expirationTime,
                 )
@@ -169,12 +169,12 @@ private fun Creator(
 
             modifier = Modifier
                 .size(imageSize)
-                .clip(CircleShape), placeholder = debugPlaceholder(debugPreview = R.drawable.sample_avatar)
+                .clip(CircleShape),
+            placeholder = debugPlaceholder(debugPreview = R.drawable.sample_avatar)
         )
 
         Text(
             text = if (isSelf) {
-                // TODO contract update
                 "${address.prettifyAddress()} (You)"
             } else {
                 address.prettifyAddress()

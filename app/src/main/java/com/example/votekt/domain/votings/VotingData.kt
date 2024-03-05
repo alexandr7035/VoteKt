@@ -7,8 +7,14 @@ data class VotingData(
 ) {
     private val totalVotes: Int
         get() = votesFor + votesAgainst
-    val votesForPercentage: Float = votesFor.toFloat() / totalVotes
-    val votesAgainstPercentage: Float = votesAgainst.toFloat() / totalVotes
+
+    val votesForPercentage: Float
+        get() = votesFor.toFloat() / totalVotes
+    val votesAgainstPercentage: Float
+        get() = votesAgainst.toFloat() / totalVotes
+
+    val isSupported: Boolean
+        get() = votesForPercentage > votesAgainstPercentage
 
     fun hasVotes() = totalVotes > 0
 }
