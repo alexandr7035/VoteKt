@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface ProposalsDao {
     @Transaction
-    @Query("SELECT * FROM proposals ORDER by createdAt DESC")
+    @Query("SELECT * FROM proposals ORDER BY CASE WHEN number IS NULL THEN 0 ELSE 1 END, number DESC, createdAt DESC")
     fun observeProposals(): Flow<List<ProposalWithTransaction>>
 
     @Transaction
