@@ -53,7 +53,7 @@ class VotingDetailsViewModel(
     }
 
     // TODO FIX ID
-    fun makeVote(proposalId: Int, voteType: VoteType) {
+    fun makeVote(proposalNumber: Int, voteType: VoteType) {
         _state.update {
             it.copy(
                 isSelfVoteProcessing = true
@@ -61,7 +61,7 @@ class VotingDetailsViewModel(
         }
 
         viewModelScope.launch {
-            when (val res = votingRepository.voteOnProposal(proposalId.toLong(), voteType)) {
+            when (val res = votingRepository.voteOnProposal(proposalNumber, voteType)) {
                 is OperationResult.Success -> {
                     _state.update {
                         it.copy(

@@ -2,4 +2,5 @@
 <resources>
     <string name="proposal_title_template">Proposal #%1$d</string>
     <string name="proposal_time_left_template">%1$s left</string>
+    <string name="proposal_self_votes_count">(+%1$d)</string>
 </resources>

@@ -20,6 +20,14 @@ class ProposalListPreviewProvider: PreviewParameterProvider<List<Proposal>> {
         gasFee = Wei(BigInteger("0"))
     )
 
+    private val mockVoteTransaction = TransactionDomain(
+        type = TransactionType.VOTE,
+        hash = "0x12334",
+        dateSent = 0,
+        status = TransactionStatus.MINED,
+        gasFee = Wei(BigInteger("0"))
+    )
+
     override val values: Sequence<List<Proposal>>
         get() = sequenceOf(
             listOf(
@@ -46,7 +54,11 @@ class ProposalListPreviewProvider: PreviewParameterProvider<List<Proposal>> {
                         selfVote = VoteType.VOTE_FOR
                     ),
                     creatorAddress = Address("0x12345678abcd"),
-                    isSelfCreated = true
+                    isSelfCreated = true,
+                    voteTransaction = mockVoteTransaction,
+                    isVotePending = false,
+                    canVote = false,
+                    isVoteFailed = false,
                 ),
             )
         )

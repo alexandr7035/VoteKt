@@ -31,5 +31,10 @@
     <string name="deploy_failed">Deploy failed</string>
     <string name="proposal_is_not_deployed">Proposal is not deployed</string>
     <string name="proposal_is_failed_to_deploy">Proposal is failed to deploy</string>
-
+    <string name="make_your_vote">Make your vote!</string>
+    <string name="your_vote">Your vote</string>
+    <string name="reject">Reject</string>
+    <string name="support">Support</string>
+    <string name="supported">Supported</string>
+    <string name="not_supported">Not supported</string>
 </resources>

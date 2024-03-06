@@ -1,15 +1,22 @@
 package com.example.votekt.ui.feature_proposals.proposal_details
 
 import android.annotation.SuppressLint
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -18,8 +25,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -31,6 +41,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
+import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
@@ -40,6 +51,7 @@ import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.getVoteColor
 import com.example.votekt.ui.utils.prettifyAddress
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
@@ -67,8 +79,12 @@ fun VotingDetailsScreen(
                 onBack = onBack,
                 proposal = screenState.proposal,
                 onVote = { vote ->
-                    // TODO non local id
-//                        viewModel.makeVote(proposalId, vote)
+                    if (screenState.proposal is Proposal.Deployed) {
+                        viewModel.makeVote(
+                            proposalNumber = screenState.proposal.proposalNumber,
+                            voteType = vote
+                        )
+                    }
                 })
         }
 
@@ -140,7 +156,12 @@ private fun VotingDetailsScreen_Ui(
                 }
 
                 is Proposal.Deployed -> {
-
+                    VoteStatusPanel(
+                        proposal = proposal,
+                        onVote = {
+                            onVote(it)
+                        }
+                    )
                 }
             }
         }
@@ -155,6 +176,7 @@ private fun ProposalActionCard(
     Card(
         elevation = CardDefaults.cardElevation(4.dp),
         shape = RoundedCornerShape(16.dp),
+        modifier = Modifier.fillMaxWidth()
     ) {
         Column(
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp),
@@ -211,8 +233,133 @@ fun DeployStatusPanel(proposal: Proposal.Draft) {
 }
 
 @Composable
-fun VoteStatusPanel(proposal: Proposal.Deployed) {
+fun VoteStatusPanel(
+    proposal: Proposal.Deployed,
+    onVote: (VoteType) -> Unit,
+) {
+    ProposalActionCard(
+        title = if (proposal.votingData.selfVote == null) {
+            stringResource(R.string.make_your_vote)
+        } else {
+            stringResource(R.string.your_vote)
+        }
+    ) {
+        if (proposal.votingData.selfVote == null) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                VotingButton(
+                    modifier = Modifier.weight(1f),
+                    voteType = VoteType.VOTE_AGAINST,
+                    votingData = proposal.votingData,
+                ) {
+                    onVote(it)
+                }
 
+                VotingButton(
+                    modifier = Modifier.weight(1f),
+                    voteType = VoteType.VOTE_FOR,
+                    votingData = proposal.votingData,
+                ) {
+                    onVote(it)
+                }
+            }
+        } else {
+            // TODO tx pending
+            VotingButton(
+                modifier = Modifier.fillMaxWidth(),
+                voteType = proposal.votingData.selfVote,
+                votingData = proposal.votingData,
+            ) {
+                onVote(it)
+            }
+        }
+    }
+}
+
+@Composable
+private fun VotingButton(
+    modifier: Modifier = Modifier,
+    voteType: VoteType,
+    votingData: VotingData,
+    onClick: (VoteType) -> Unit,
+) {
+    val displayedVotersCount: Int? = votingData.selfVote?.let {
+        val count = when (it) {
+            VoteType.VOTE_FOR -> votingData.votesAgainst
+            VoteType.VOTE_AGAINST -> votingData.votesFor
+        }
+
+        if (count > 1) count else null
+    }
+
+    val accentColor = remember (voteType) {
+        val alpha = 0.5f
+
+        if (votingData.selfVote == null) {
+            when (voteType) {
+                VoteType.VOTE_FOR -> getVoteColor(true)
+                VoteType.VOTE_AGAINST -> getVoteColor(false)
+            }
+        } else {
+            when (voteType) {
+                VoteType.VOTE_FOR -> getVoteColor(true).copy(alpha)
+                VoteType.VOTE_AGAINST -> getVoteColor(false).copy(alpha)
+            }
+        }
+    }
+
+    val textRes = remember(votingData, voteType) {
+        if (votingData.selfVote == null) {
+            when (voteType) {
+                VoteType.VOTE_FOR -> R.string.support
+                VoteType.VOTE_AGAINST -> R.string.reject
+            }
+        } else {
+            when (voteType) {
+                VoteType.VOTE_FOR -> R.string.supported
+                VoteType.VOTE_AGAINST -> R.string.not_supported
+            }
+        }
+    }
+    
+    Button(
+        modifier = modifier,
+        onClick = { onClick(voteType) },
+        shape = RoundedCornerShape(16.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = accentColor,
+            contentColor = MaterialTheme.colorScheme.onPrimary,
+            disabledContainerColor = accentColor,
+            disabledContentColor = MaterialTheme.colorScheme.onPrimary
+        ),
+        elevation = ButtonDefaults.elevatedButtonElevation(4.dp),
+        enabled = votingData.selfVote == null
+    ) {
+        Image(
+            modifier = Modifier.size(16.dp),
+            colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onPrimary),
+            painter = painterResource(
+                id = when (voteType) {
+                    VoteType.VOTE_AGAINST -> R.drawable.thumb_down
+                    VoteType.VOTE_FOR -> R.drawable.thumb_up
+                },
+            ),
+            contentDescription = null,
+        )
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Text(
+            text = stringResource(id = textRes)
+        )
+
+        displayedVotersCount?.let { votesCount ->
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = stringResource(id = R.string.proposal_self_votes_count, votesCount))
+        }
+    }
 }
 
 @Preview(widthDp = 360, heightDp = 720)

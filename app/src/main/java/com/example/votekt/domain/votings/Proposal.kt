@@ -2,7 +2,6 @@ package com.example.votekt.domain.votings
 
 import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionHash
 
 sealed class Proposal(
     open val uuid: String,
@@ -34,8 +33,10 @@ sealed class Proposal(
         val proposalNumber: Int,
         val expirationTime: Long,
         val votingData: VotingData,
-        val selfVote: VoteType? = null,
-        val selfVoteTransaction: TransactionHash? = null,
+        val voteTransaction: TransactionDomain?,
+        val canVote: Boolean,
+        val isVotePending: Boolean,
+        val isVoteFailed: Boolean,
     ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
         val isFinished
             get() = this.expirationTime < System.currentTimeMillis()

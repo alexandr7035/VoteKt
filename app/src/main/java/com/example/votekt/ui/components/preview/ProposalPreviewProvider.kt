@@ -20,6 +20,14 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
         gasFee = Wei(BigInteger("0"))
     )
 
+    private val mockVoteTransaction = TransactionDomain(
+        type = TransactionType.VOTE,
+        hash = "0x12334",
+        dateSent = 0,
+        status = TransactionStatus.MINED,
+        gasFee = Wei(BigInteger("0"))
+    )
+
     override val values: Sequence<Proposal> = sequenceOf(
         Proposal.Draft(
             uuid = "123",
@@ -55,7 +63,11 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
                 selfVote = VoteType.VOTE_FOR
             ),
             creatorAddress = Address("0x12345678abcd"),
-            isSelfCreated = true
+            isSelfCreated = true,
+            voteTransaction = mockVoteTransaction,
+            isVotePending = false,
+            canVote = false,
+            isVoteFailed = false,
         ),
         Proposal.Deployed(
             uuid = "123",
@@ -69,7 +81,11 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
                 selfVote = null,
             ),
             creatorAddress = Address("0x12345678abcd"),
-            isSelfCreated = false
+            isSelfCreated = false,
+            voteTransaction = mockVoteTransaction,
+            canVote = false,
+            isVoteFailed = false,
+            isVotePending = false,
         )
     )
 }

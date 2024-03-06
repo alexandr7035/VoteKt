@@ -12,6 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.votekt.ui.theme.VoteKtTheme
 
+// FIXME update this component
 @Composable
 fun PrimaryButton(
     text: String,
@@ -19,7 +20,8 @@ fun PrimaryButton(
     enabled: Boolean = true,
     modifier: Modifier = Modifier,
     buttonColor: Color? = null,
-    textColor: Color? = null
+    textColor: Color? = null,
+    leadingIcon: @Composable () -> Unit = {}
 ) {
     Button(
         onClick = { onClick.invoke() },
@@ -32,8 +34,9 @@ fun PrimaryButton(
             Modifier
                 .defaultMinSize(minHeight = 48.dp)
         ),
-        enabled = enabled
+        enabled = enabled,
     ) {
+        leadingIcon()
         Text(text = text)
     }
 }

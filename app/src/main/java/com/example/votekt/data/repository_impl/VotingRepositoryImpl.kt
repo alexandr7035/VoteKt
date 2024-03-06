@@ -5,10 +5,13 @@ import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.BuildConfig
 import by.alexandr7035.web3j_contracts.VotingContract
 import com.example.votekt.data.cache.ProposalEntity
-import com.example.votekt.data.cache.ProposalWithTransaction
+import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
+import com.example.votekt.data.cache.canVote
 import com.example.votekt.data.cache.isDeployFailed
 import com.example.votekt.data.cache.isDeployPending
+import com.example.votekt.data.cache.isVoteFailed
+import com.example.votekt.data.cache.isVotePending
 import com.example.votekt.data.cache.shouldBeDeployed
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
@@ -117,18 +120,26 @@ class VotingRepositoryImpl(
         }
     }
 
-    override suspend fun voteOnProposal(proposalId: Long, vote: VoteType): OperationResult<TransactionHash> = withContext(dispatcher) {
+    override suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<TransactionHash> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val isFor = when (vote) {
                 VoteType.VOTE_FOR -> true
                 VoteType.VOTE_AGAINST -> false
             }
 
-            val tx = votingContract.vote(proposalId.toBigInteger(), isFor).send()
+            val tx = votingContract.vote(proposalNumber.toBigInteger(), isFor).send()
 
             transactionRepository.addNewTransaction(
                 transactionType = TransactionType.VOTE,
                 transactionHash = TransactionHash(tx.transactionHash)
+            )
+
+            proposalsDao.updateProposalVote(
+                proposalNumber = proposalNumber,
+                supported = when (vote) {
+                    VoteType.VOTE_FOR -> true
+                    VoteType.VOTE_AGAINST -> false
+                }
             )
 
             TransactionHash(tx.transactionHash)
@@ -154,6 +165,7 @@ class VotingRepositoryImpl(
                         expiresAt = raw.expirationTime.toLong() * 1000L,
                         creatorAddress = contractOwner,
                         createdAt = raw.creationTime.toLong() * 1000L,
+                        // TODO update contract with self vote
                     )
                 )
             } ?: run {
@@ -169,7 +181,8 @@ class VotingRepositoryImpl(
                         deployTransactionHash = null,
                         creatorAddress = contractOwner,
                         title = raw.title,
-                        description = raw.description
+                        description = raw.description,
+                        // TODO update contract with self vote
                     )
                 )
             }
@@ -178,7 +191,7 @@ class VotingRepositoryImpl(
         proposalsDao.cleanUpProposals(remainingProposals = contractProposals.map { it.uuid })
     }
 
-    private suspend fun ProposalWithTransaction.mapToDomain(): Proposal = withContext(dispatcher) {
+    private suspend fun ProposalWithTransactions.mapToDomain(): Proposal = withContext(dispatcher) {
         return@withContext if (!proposal.isDraft) {
             Proposal.Deployed(
                 uuid = proposal.uuid,
@@ -186,22 +199,33 @@ class VotingRepositoryImpl(
                 description = proposal.description,
                 proposalNumber = proposal.number!!,
                 expirationTime = proposal.expiresAt!!,
+                creatorAddress = Address(proposal.creatorAddress),
+                isSelfCreated = proposal.isSelfCreated,
                 votingData = VotingData(
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
-                    selfVote = null
+                    // TODO mapper
+                    selfVote = when (proposal.selfVote) {
+                        true -> VoteType.VOTE_FOR
+                        false -> VoteType.VOTE_AGAINST
+                        null -> null
+                    }
                 ),
-                creatorAddress = Address(proposal.creatorAddress),
-                isSelfCreated = proposal.isSelfCreated,
+                // TODO refactoring
+                voteTransaction = voteTransaction?.mapToData(),
+                canVote = canVote(),
+                isVotePending = isVotePending(),
+                isVoteFailed = isVoteFailed(),
             )
         } else {
             Proposal.Draft(
                 uuid = proposal.uuid,
-                deploymentTransaction = deploymentTransaction?.mapToData(),
                 title = proposal.title,
                 description = proposal.description,
                 creatorAddress = Address(proposal.creatorAddress),
-                isSelfCreated = true,
+                isSelfCreated = proposal.isSelfCreated,
+                // TODO refactoring
+                deploymentTransaction = deploymentTransaction?.mapToData(),
                 shouldBeDeployed = shouldBeDeployed(),
                 isDeployFailed = isDeployFailed(),
                 isDeployPending = isDeployPending(),
