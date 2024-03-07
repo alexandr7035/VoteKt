@@ -36,8 +36,12 @@ interface ProposalsDao {
     @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE uuid = :proposalId")
     fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
 
-    @Query("UPDATE proposals SET selfVote = :supported WHERE number = :proposalNumber")
-    fun updateProposalVote(proposalNumber: Int, supported: Boolean)
+    @Query("UPDATE proposals SET selfVote = :supported, selfVoteTransactionHash = :voteTransactionHash WHERE number = :proposalNumber")
+    fun updateProposalVote(
+        proposalNumber: Int,
+        supported: Boolean,
+        voteTransactionHash: String,
+    )
 
     @Query("DELETE FROM proposals WHERE NOT isDraft AND uuid NOT IN (:remainingProposals)")
     suspend fun cleanUpProposals(remainingProposals: List<String>)

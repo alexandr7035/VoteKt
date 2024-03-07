@@ -29,6 +29,7 @@
     <string name="your_activity">Your activity</string>
     <string name="deploy">Deploy</string>
     <string name="deploy_failed">Deploy failed</string>
+    <string name="deploy_in_progress">Deploy in progress</string>
     <string name="proposal_is_not_deployed">Proposal is not deployed</string>
     <string name="proposal_is_failed_to_deploy">Proposal is failed to deploy</string>
     <string name="make_your_vote">Make your vote!</string>

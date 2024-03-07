@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
@@ -150,7 +151,8 @@ private fun VotingDetailsScreen_Ui(
             // Consider adding activity history later
             when (proposal) {
                 is Proposal.Draft -> {
-                    if (proposal.shouldBeDeployed || proposal.isDeployPending) {
+                    if (proposal.deployStatus is BlockchainActionStatus.NotCompleted ||
+                            proposal.deployStatus is BlockchainActionStatus.Pending) {
                         DeployStatusPanel(proposal)
                     }
                 }
@@ -198,21 +200,21 @@ private fun ProposalActionCard(
 @Composable
 fun DeployStatusPanel(proposal: Proposal.Draft) {
     ProposalActionCard(
-        title = if (proposal.isDeployPending) {
-            stringResource(R.string.deploy_failed)
-        } else {
-            stringResource(R.string.proposal_is_not_deployed)
+        title = when (proposal.deployStatus) {
+            is BlockchainActionStatus.NotCompleted -> stringResource(R.string.proposal_is_not_deployed)
+            is BlockchainActionStatus.Pending ->  stringResource(R.string.deploy_in_progress)
+            else -> error("unexpected deploy status ${proposal.deployStatus} in this component")
         }
     ) {
-        when {
-            proposal.isDeployPending -> {
+        when (proposal.deployStatus)  {
+            is BlockchainActionStatus.Pending -> {
                 proposal.deploymentTransaction?.let {
                     TransactionStatusCard(transactionStatus = it.status)
                 }
             }
 
-            else -> {
-                if (proposal.isDeployFailed) {
+            is BlockchainActionStatus.NotCompleted -> {
+                if (proposal.deployStatus is BlockchainActionStatus.NotCompleted.Failed) {
                     proposal.deploymentTransaction?.let {
                         TransactionStatusCard(transactionStatus = it.status)
                     }
@@ -220,14 +222,15 @@ fun DeployStatusPanel(proposal: Proposal.Draft) {
 
                 PrimaryButton(
                     modifier = Modifier.fillMaxWidth(),
-                    text = if (proposal.isDeployFailed) {
-                        stringResource(id = R.string.try_again)
-                    } else {
-                        stringResource(R.string.deploy)
+                    text = when (proposal.deployStatus) {
+                        is BlockchainActionStatus.NotCompleted.Failed -> stringResource(id = R.string.try_again)
+                        else ->  stringResource(R.string.deploy)
                     },
                     onClick = { /*TODO*/ }
                 )
             }
+
+            else -> error("unexpected deploy status ${proposal.deployStatus} in this component")
         }
     }
 }
@@ -238,41 +241,61 @@ fun VoteStatusPanel(
     onVote: (VoteType) -> Unit,
 ) {
     ProposalActionCard(
-        title = if (proposal.votingData.selfVote == null) {
-            stringResource(R.string.make_your_vote)
-        } else {
-            stringResource(R.string.your_vote)
+        title = when (proposal.selfVoteStatus) {
+            is BlockchainActionStatus.NotCompleted -> stringResource(R.string.make_your_vote)
+            else -> stringResource(R.string.your_vote)
         }
     ) {
-        if (proposal.votingData.selfVote == null) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                VotingButton(
-                    modifier = Modifier.weight(1f),
-                    voteType = VoteType.VOTE_AGAINST,
-                    votingData = proposal.votingData,
-                ) {
-                    onVote(it)
+
+        when (proposal.selfVoteStatus) {
+            is BlockchainActionStatus.NotCompleted -> {
+                if (proposal.selfVoteStatus is BlockchainActionStatus.NotCompleted.Failed) {
+                    proposal.voteTransaction?.let {
+                        TransactionStatusCard(transactionStatus = it.status)
+                    }
                 }
 
-                VotingButton(
-                    modifier = Modifier.weight(1f),
-                    voteType = VoteType.VOTE_FOR,
-                    votingData = proposal.votingData,
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    onVote(it)
+                    VotingButton(
+                        modifier = Modifier.weight(1f),
+                        voteType = VoteType.VOTE_AGAINST,
+                        votingData = proposal.votingData,
+                        selfVoteStatus = proposal.selfVoteStatus,
+                    ) {
+                        onVote(it)
+                    }
+
+                    VotingButton(
+                        modifier = Modifier.weight(1f),
+                        voteType = VoteType.VOTE_FOR,
+                        votingData = proposal.votingData,
+                        selfVoteStatus = proposal.selfVoteStatus,
+                    ) { vote ->
+                        onVote(vote)
+                    }
                 }
             }
-        } else {
-            // TODO tx pending
-            VotingButton(
-                modifier = Modifier.fillMaxWidth(),
-                voteType = proposal.votingData.selfVote,
-                votingData = proposal.votingData,
-            ) {
-                onVote(it)
+
+            BlockchainActionStatus.Completed -> {
+                proposal.votingData.selfVote?.let { it ->
+                    VotingButton(
+                        modifier = Modifier.fillMaxWidth(),
+                        voteType = it,
+                        votingData = proposal.votingData,
+                        selfVoteStatus = proposal.selfVoteStatus,
+                    ) { vote ->
+                        onVote(vote)
+                    }
+                }
+            }
+
+            BlockchainActionStatus.Pending -> {
+                proposal.voteTransaction?.let {
+                    TransactionStatusCard(transactionStatus = it.status)
+                }
             }
         }
     }
@@ -283,47 +306,57 @@ private fun VotingButton(
     modifier: Modifier = Modifier,
     voteType: VoteType,
     votingData: VotingData,
+    selfVoteStatus: BlockchainActionStatus,
     onClick: (VoteType) -> Unit,
 ) {
-    val displayedVotersCount: Int? = votingData.selfVote?.let {
-        val count = when (it) {
-            VoteType.VOTE_FOR -> votingData.votesAgainst
-            VoteType.VOTE_AGAINST -> votingData.votesFor
+    val displayedVotersCount: Int? = when (selfVoteStatus) {
+        is BlockchainActionStatus.Completed -> {
+                val count = when (voteType) {
+                    VoteType.VOTE_FOR -> votingData.votesFor
+                    VoteType.VOTE_AGAINST -> votingData.votesAgainst
+                }
+
+                if (count > 1) count else null
         }
 
-        if (count > 1) count else null
+        else -> null
     }
 
     val accentColor = remember (voteType) {
         val alpha = 0.5f
 
-        if (votingData.selfVote == null) {
-            when (voteType) {
-                VoteType.VOTE_FOR -> getVoteColor(true)
-                VoteType.VOTE_AGAINST -> getVoteColor(false)
+        when (selfVoteStatus) {
+            is BlockchainActionStatus.Completed -> {
+                when (voteType) {
+                    VoteType.VOTE_FOR -> getVoteColor(true).copy(alpha)
+                    VoteType.VOTE_AGAINST -> getVoteColor(false).copy(alpha)
+
+                }
             }
-        } else {
-            when (voteType) {
-                VoteType.VOTE_FOR -> getVoteColor(true).copy(alpha)
-                VoteType.VOTE_AGAINST -> getVoteColor(false).copy(alpha)
+            else -> {
+                when (voteType) {
+                    VoteType.VOTE_FOR -> getVoteColor(true)
+                    VoteType.VOTE_AGAINST -> getVoteColor(false)
+                }
             }
         }
     }
 
-    val textRes = remember(votingData, voteType) {
-        if (votingData.selfVote == null) {
-            when (voteType) {
-                VoteType.VOTE_FOR -> R.string.support
-                VoteType.VOTE_AGAINST -> R.string.reject
-            }
-        } else {
+    val textRes = when (selfVoteStatus) {
+        is BlockchainActionStatus.Completed -> {
             when (voteType) {
                 VoteType.VOTE_FOR -> R.string.supported
                 VoteType.VOTE_AGAINST -> R.string.not_supported
             }
         }
+        else -> {
+            when (voteType) {
+                VoteType.VOTE_FOR -> R.string.support
+                VoteType.VOTE_AGAINST -> R.string.reject
+            }
+        }
     }
-    
+
     Button(
         modifier = modifier,
         onClick = { onClick(voteType) },
@@ -335,7 +368,7 @@ private fun VotingButton(
             disabledContentColor = MaterialTheme.colorScheme.onPrimary
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(4.dp),
-        enabled = votingData.selfVote == null
+        enabled = selfVoteStatus is BlockchainActionStatus.NotCompleted
     ) {
         Image(
             modifier = Modifier.size(16.dp),

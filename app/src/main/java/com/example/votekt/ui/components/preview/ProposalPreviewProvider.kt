@@ -3,6 +3,7 @@ package com.example.votekt.ui.components.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.transactions.TransactionType
@@ -36,9 +37,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            shouldBeDeployed = true,
-            isDeployFailed = true,
-            isDeployPending = false,
+            deployStatus = BlockchainActionStatus.NotCompleted.Failed
         ),
         Proposal.Draft(
             uuid = "123",
@@ -47,9 +46,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            shouldBeDeployed = false,
-            isDeployFailed = false,
-            isDeployPending = true,
+            deployStatus = BlockchainActionStatus.Pending
         ),
         Proposal.Deployed(
             uuid = "123",
@@ -65,9 +62,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
             voteTransaction = mockVoteTransaction,
-            isVotePending = false,
-            canVote = false,
-            isVoteFailed = false,
+            selfVoteStatus = BlockchainActionStatus.Completed
         ),
         Proposal.Deployed(
             uuid = "123",
@@ -83,9 +78,7 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = false,
             voteTransaction = mockVoteTransaction,
-            canVote = false,
-            isVoteFailed = false,
-            isVotePending = false,
+            selfVoteStatus = BlockchainActionStatus.NotCompleted.Todo,
         )
     )
 }

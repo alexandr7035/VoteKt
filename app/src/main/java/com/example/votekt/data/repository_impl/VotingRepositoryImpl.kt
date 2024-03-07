@@ -2,17 +2,14 @@ package com.example.votekt.data.repository_impl
 
 import android.util.Log
 import by.alexandr7035.ethereum.model.Address
-import com.example.votekt.BuildConfig
 import by.alexandr7035.web3j_contracts.VotingContract
+import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
-import com.example.votekt.data.cache.canVote
-import com.example.votekt.data.cache.isDeployFailed
-import com.example.votekt.data.cache.isDeployPending
-import com.example.votekt.data.cache.isVoteFailed
-import com.example.votekt.data.cache.isVotePending
-import com.example.votekt.data.cache.shouldBeDeployed
+import com.example.votekt.data.cache.mapDeployStatus
+import com.example.votekt.data.cache.mapSelfVote
+import com.example.votekt.data.cache.mapVoteStatus
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.TransactionHash
@@ -139,7 +136,8 @@ class VotingRepositoryImpl(
                 supported = when (vote) {
                     VoteType.VOTE_FOR -> true
                     VoteType.VOTE_AGAINST -> false
-                }
+                },
+                voteTransactionHash = tx.transactionHash,
             )
 
             TransactionHash(tx.transactionHash)
@@ -159,12 +157,12 @@ class VotingRepositoryImpl(
                 proposalsDao.updateProposal(
                     cached.copy(
                         number = raw.number.toInt(),
+                        creatorAddress = contractOwner,
                         votesFor = raw.votesFor.toInt(),
                         isDraft = false,
                         votesAgainst = raw.votesAgainst.toInt(),
-                        expiresAt = raw.expirationTime.toLong() * 1000L,
-                        creatorAddress = contractOwner,
                         createdAt = raw.creationTime.toLong() * 1000L,
+                        expiresAt = raw.expirationTime.toLong() * 1000L,
                         // TODO update contract with self vote
                     )
                 )
@@ -173,16 +171,18 @@ class VotingRepositoryImpl(
                     ProposalEntity(
                         uuid = raw.uuid,
                         number = raw.number.toInt(),
+                        creatorAddress = contractOwner,
+                        title = raw.title,
+                        description = raw.description,
                         isDraft = false,
                         votesFor = raw.votesFor.toInt(),
                         votesAgainst = raw.votesAgainst.toInt(),
                         expiresAt = raw.expirationTime.toLong() * 1000L,
                         createdAt = raw.creationTime.toLong() * 1000L,
                         deployTransactionHash = null,
-                        creatorAddress = contractOwner,
-                        title = raw.title,
-                        description = raw.description,
                         // TODO update contract with self vote
+                        selfVote = null,
+                        selfVoteTransactionHash = null,
                     )
                 )
             }
@@ -204,18 +204,10 @@ class VotingRepositoryImpl(
                 votingData = VotingData(
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
-                    // TODO mapper
-                    selfVote = when (proposal.selfVote) {
-                        true -> VoteType.VOTE_FOR
-                        false -> VoteType.VOTE_AGAINST
-                        null -> null
-                    }
+                    selfVote = mapSelfVote()
                 ),
-                // TODO refactoring
                 voteTransaction = voteTransaction?.mapToData(),
-                canVote = canVote(),
-                isVotePending = isVotePending(),
-                isVoteFailed = isVoteFailed(),
+                selfVoteStatus = mapVoteStatus(),
             )
         } else {
             Proposal.Draft(
@@ -224,11 +216,8 @@ class VotingRepositoryImpl(
                 description = proposal.description,
                 creatorAddress = Address(proposal.creatorAddress),
                 isSelfCreated = proposal.isSelfCreated,
-                // TODO refactoring
                 deploymentTransaction = deploymentTransaction?.mapToData(),
-                shouldBeDeployed = shouldBeDeployed(),
-                isDeployFailed = isDeployFailed(),
-                isDeployPending = isDeployPending(),
+                deployStatus = mapDeployStatus(),
             )
         }
     }

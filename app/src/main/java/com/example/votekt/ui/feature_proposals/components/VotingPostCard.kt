@@ -43,6 +43,7 @@ import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.votekt.R
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.utils.AvatarHelper
@@ -105,6 +106,7 @@ fun VotingPostCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             if (proposal is Proposal.Deployed && !proposal.isFinished) {
+                // TODO accent color for expiring soon
                 RemainingTimeText(
                     time = proposal.expirationTime,
                 )
@@ -112,7 +114,9 @@ fun VotingPostCard(
 
             Spacer(modifier = Modifier.weight(1f))
 
-            if (proposal is Proposal.Draft && proposal.isDeployFailed && !isExpanded) {
+            if (proposal is Proposal.Draft
+                && proposal.deployStatus is BlockchainActionStatus.NotCompleted.Failed
+                && !isExpanded) {
                 Image(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_status_rejected),

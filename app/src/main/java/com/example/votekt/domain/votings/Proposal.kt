@@ -1,6 +1,7 @@
 package com.example.votekt.domain.votings
 
 import by.alexandr7035.ethereum.model.Address
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.transactions.TransactionDomain
 
 sealed class Proposal(
@@ -19,9 +20,7 @@ sealed class Proposal(
        override val creatorAddress: Address,
        override val isSelfCreated: Boolean,
        val deploymentTransaction: TransactionDomain?,
-       val shouldBeDeployed: Boolean,
-       val isDeployFailed: Boolean,
-       val isDeployPending: Boolean,
+       val deployStatus: BlockchainActionStatus,
    ): Proposal(uuid, title, description, creatorAddress, isSelfCreated)
 
     data class Deployed(
@@ -34,9 +33,7 @@ sealed class Proposal(
         val expirationTime: Long,
         val votingData: VotingData,
         val voteTransaction: TransactionDomain?,
-        val canVote: Boolean,
-        val isVotePending: Boolean,
-        val isVoteFailed: Boolean,
+        val selfVoteStatus: BlockchainActionStatus,
     ): Proposal(uuid, title, description, creatorAddress, isSelfCreated) {
         val isFinished
             get() = this.expirationTime < System.currentTimeMillis()

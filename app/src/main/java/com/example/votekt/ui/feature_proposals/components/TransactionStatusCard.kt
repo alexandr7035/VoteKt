@@ -29,7 +29,7 @@ fun TransactionStatusCard(
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         val statusUi = remember (transactionStatus) {
             transactionStatus.getTransactionStatusUi()

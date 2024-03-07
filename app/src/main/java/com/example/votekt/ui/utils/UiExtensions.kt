@@ -19,12 +19,12 @@ fun TransactionStatus.getTransactionStatusUi(): TransactionStatusUi {
         )
         TransactionStatus.MINED -> TransactionStatusUi(
             status  = "Mined",
-            statusExplained = "Transaction is confirmed",
+            statusExplained = "Transaction is confirmed. You can view it in explorer",
             iconRes = R.drawable.ic_status_accepted
         )
         TransactionStatus.REVERTED -> TransactionStatusUi(
             status  = "Failed",
-            statusExplained = "Transaction is failed",
+            statusExplained = "Transaction is failed. Check balance and try again",
             iconRes = R.drawable.ic_status_rejected
         )
     }
