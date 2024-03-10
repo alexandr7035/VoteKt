@@ -30,7 +30,11 @@ npx hardhat run --network localhost scripts/deploy.js
 npx hardhat run --network localhost scripts/mocks/mock_local_votings.js
 
 # (Optional) Interact from console
-npx hardhat console --network localhost 
+npx hardhat console --network localhost  
+
+# (Opional) Subscribe to contract events with WSS (replace address with actual)
+npx wscat -c http://127.0.0.1:8545/  
+>  {"jsonrpc":"2.0","id":1,"method":"eth_subscribe","params":["logs",{"address":"0x5FbDB2315678afecb367f032d93F642f64180aa3","topics":[]}]}
 ```
 
 ### Compile contract to use via web3j
