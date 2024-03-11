@@ -61,6 +61,7 @@ For localhost Gradle build variant, add following to `gradle.properties`:
 ```
 # Address of localhost for Android emulator
 LOCAL_NODE_URL="http://10.0.2.2:8545"
+LOCAL_WSS_NODE_URL="10.0.2.2:8545"
 
 LOCAL_CONTRACT_ADDRESS="...HERE ADDRESS OF DEPLOYED CONTRACT ON LOCAL NODE..."
 

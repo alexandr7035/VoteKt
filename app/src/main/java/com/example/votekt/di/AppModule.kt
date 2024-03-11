@@ -18,10 +18,12 @@ import com.example.votekt.data.helpers.MnemonicHelperImpl
 import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.cache.TransactionsDatabase
+import com.example.votekt.data.repository_impl.ContractEventRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
+import com.example.votekt.domain.account.ContractEventRepository
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
@@ -44,7 +46,8 @@ val appModule = module {
     includes(ethereumModule)
 
     viewModel { AppViewModel(
-        accountRepository = get()
+        accountRepository = get(),
+        contractEventRepository = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -147,6 +150,12 @@ val appModule = module {
             transactionDao = get(),
             dispatcher = Dispatchers.IO,
             workManager = get(),
+        )
+    }
+
+    single<ContractEventRepository> {
+        ContractEventRepositoryImpl(
+            wssUrl = BuildConfig.ETH_WSS_NODE_URL,
         )
     }
 }

@@ -3,13 +3,15 @@ package com.example.votekt.ui.core
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.account.ContractEventRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class AppViewModel(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val contractEventRepository: ContractEventRepository,
 ): ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(AppState.Loading)
     val appState = _appState.asStateFlow()
@@ -21,7 +23,13 @@ class AppViewModel(
 
     private fun emitIntent(intent: AppIntent) {
         when (intent) {
-            AppIntent.EnterApp -> reduceCheckAccount()
+            AppIntent.EnterApp -> {
+                reduceCheckAccount()
+
+                viewModelScope.launch {
+                    contractEventRepository.subscribe()
+                }
+            }
         }
     }
 
