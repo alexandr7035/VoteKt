@@ -86,3 +86,6 @@ Choose localDebug build variant and build
 [Subscribing to smart contract events with web3.js](https://support.chainstack.com/hc/en-us/articles/4403518123161-Subscribing-to-smart-contract-events-with-web3-js)
 
 [Understanding event logs on the Ethereum blockchain](https://medium.com/mycrypto/understanding-event-logs-on-the-ethereum-blockchain-f4ae7ba50378)
+
+## Tools
+[Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)
