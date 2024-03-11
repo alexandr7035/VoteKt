@@ -23,4 +23,9 @@ dependencies {
     implementation "com.squareup.moshi:moshi-kotlin:1.15.0"
     implementation "com.squareup.moshi:moshi-adapters:1.15.0"
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.15.0"
+
+    // Websockets
+    def ktor_version = "2.3.9"
+    implementation "io.ktor:ktor-client-websockets:$ktor_version"
+    implementation "io.ktor:ktor-client-okhttp:$ktor_version"
 }
