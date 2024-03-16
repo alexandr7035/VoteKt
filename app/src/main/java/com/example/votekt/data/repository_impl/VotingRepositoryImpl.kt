@@ -1,6 +1,7 @@
 package com.example.votekt.data.repository_impl
 
 import android.util.Log
+import by.alexandr7035.abi.VotingContractHelper
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.web3j_contracts.VotingContract
 import com.example.votekt.BuildConfig
@@ -39,6 +40,7 @@ class VotingRepositoryImpl(
     private val accountRepository: AccountRepository,
     private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
+    private val votingContractHelper: VotingContractHelper,
 ) : VotingRepository {
     private val votingContract: VotingContract
 
@@ -95,6 +97,15 @@ class VotingRepositoryImpl(
                 req.duration.getDurationInDays().toBigInteger()
             ).send()
 
+            val input = votingContractHelper.getCreateProposalTransactionInput(
+                uuid = uuid,
+                title = req.title,
+                description = req.desc,
+                durationInDays = req.duration.getDurationInDays().toBigInteger()
+            )
+
+            println("${TAG} encoded input ${input}")
+
             transactionRepository.addNewTransaction(
                 transactionType = TransactionType.CREATE_PROPOSAL,
                 transactionHash = TransactionHash(tx.transactionHash)
@@ -125,6 +136,13 @@ class VotingRepositoryImpl(
             }
 
             val tx = votingContract.vote(proposalNumber.toBigInteger(), isFor).send()
+
+            val input = votingContractHelper.getVotingTransactionInput(
+                proposalNumber = proposalNumber.toBigInteger(),
+                vote = isFor
+            )
+
+            println("${TAG} encoded input ${input}")
 
             transactionRepository.addNewTransaction(
                 transactionType = TransactionType.VOTE,
@@ -220,5 +238,9 @@ class VotingRepositoryImpl(
                 deployStatus = mapDeployStatus(),
             )
         }
+    }
+
+    companion object {
+        private const val TAG = "CONTRACT_TAG"
     }
 }
