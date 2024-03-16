@@ -27,11 +27,19 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
+import org.kethereum.eip1559.signer.signViaEIP1559
+import org.kethereum.extensions.transactions.encodeAsEIP1559Tx
+import org.kethereum.model.ECKeyPair
+import org.kethereum.model.PrivateKey
+import org.kethereum.model.PublicKey
+import org.kethereum.model.Transaction
+import org.komputing.khex.extensions.toHexString
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.response.NoOpProcessor
+import java.math.BigInteger
 import java.util.UUID
 
 class VotingRepositoryImpl(
@@ -104,7 +112,29 @@ class VotingRepositoryImpl(
                 durationInDays = req.duration.getDurationInDays().toBigInteger()
             )
 
+            val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
+
             println("${TAG} encoded input ${input}")
+
+            val transaction = Transaction().apply {
+                this.chain = BigInteger.ZERO
+                this.input = input.data
+                this.nonce = 0.toBigInteger()
+                this.gasPrice = null
+                this.maxFeePerGas = 1000_000_000.toBigInteger()
+                this.maxPriorityFeePerGas = 1000_000_000.toBigInteger()
+                this.gasLimit = 10_000.toBigInteger()
+                this.to = org.kethereum.model.Address(votingContract.contractAddress)
+            }
+
+            val signature = transaction.signViaEIP1559(ECKeyPair(
+                privateKey = PrivateKey(credentials.ecKeyPair.privateKey),
+                publicKey = PublicKey(credentials.ecKeyPair.publicKey)
+            ))
+
+            val raw = transaction.encodeAsEIP1559Tx(signature)
+
+            println("${TAG} signed tx ${raw.toHexString()}")
 
             transactionRepository.addNewTransaction(
                 transactionType = TransactionType.CREATE_PROPOSAL,
