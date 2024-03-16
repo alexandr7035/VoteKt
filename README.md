@@ -87,5 +87,7 @@ Choose localDebug build variant and build
 
 [Understanding event logs on the Ethereum blockchain](https://medium.com/mycrypto/understanding-event-logs-on-the-ethereum-blockchain-f4ae7ba50378)
 
+[The Magic of Digital Signatures on Ethereum](https://medium.com/mycrypto/the-magic-of-digital-signatures-on-ethereum-98fe184dc9c7)
+
 ## Tools
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)
