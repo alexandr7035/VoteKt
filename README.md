@@ -89,6 +89,8 @@ Choose localDebug build variant and build
 
 [The Magic of Digital Signatures on Ethereum](https://medium.com/mycrypto/the-magic-of-digital-signatures-on-ethereum-98fe184dc9c7)
 
+[Intro to Encoding & Decoding Ethereum Contract Functions](https://joshua-data.medium.com/intro-to-encoding-and-decoding-ethereum-contract-functions-0e12583916aa)
+
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)
