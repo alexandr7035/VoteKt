@@ -92,5 +92,8 @@ Choose localDebug build variant and build
 [Intro to Encoding & Decoding Ethereum Contract Functions](https://joshua-data.medium.com/intro-to-encoding-and-decoding-ethereum-contract-functions-0e12583916aa)
 
 ## Tools
-[Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)
-[Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)
+[Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
+[Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)  
+
+[Online ABI Encoder](https://abi.hashex.org/)  
+[Ethereum input data decoder](https://lab.miguelmota.com/ethereum-input-data-decoder/example/)  
