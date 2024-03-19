@@ -10,9 +10,12 @@ import by.alexandr7035.ethereum.model.TransactionData
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
+import by.alexandr7035.ethereum.model.eth_requests.EthGetTransactionCount
+import by.alexandr7035.ethereum.model.eth_requests.EthSendRawTransaction
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
 import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.ethereum_impl.model.toRpcRequest
+import java.math.BigInteger
 
 class EthereumClientImpl(
     private val api: RetrofitEthereumRpcApi
@@ -32,7 +35,8 @@ class EthereumClientImpl(
     }
 
     override suspend fun sendRawTransaction(signedTransactionData: String): String {
-        TODO("Not yet implemented")
+        return request(EthSendRawTransaction(signedTransactionData))
+            .checkedResult("Could not send raw transaction")
     }
 
     override suspend fun getTransactionReceipt(transactionHash: String): EthTransactionReceipt {
@@ -64,5 +68,10 @@ class EthereumClientImpl(
 
     override suspend fun getBlockByHash(blockHash: String): EthereumBlock {
         TODO("Not yet implemented")
+    }
+
+    override suspend fun getTransactionCount(address: Address): BigInteger {
+        return request(EthGetTransactionCount(address))
+            .checkedResult("Could not get tx count")
     }
 }

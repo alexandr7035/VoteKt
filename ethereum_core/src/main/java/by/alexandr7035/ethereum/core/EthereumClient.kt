@@ -1,11 +1,12 @@
 package by.alexandr7035.ethereum.core
 
-import by.alexandr7035.ethereum.model.TransactionData
 import by.alexandr7035.ethereum.model.Address
-import by.alexandr7035.ethereum.model.eth_requests.EthRequest
-import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
+import by.alexandr7035.ethereum.model.EthereumBlock
+import by.alexandr7035.ethereum.model.TransactionData
 import by.alexandr7035.ethereum.model.Wei
+import by.alexandr7035.ethereum.model.eth_requests.EthRequest
+import java.math.BigInteger
 
 interface EthereumClient {
     suspend fun <R : EthRequest<*>> request(request: R): R
@@ -19,4 +20,6 @@ interface EthereumClient {
     suspend fun getTransactionByHash(transactionHash: String): TransactionData
 
     suspend fun getBlockByHash(blockHash: String): EthereumBlock
+
+    suspend fun getTransactionCount(address: Address): BigInteger
 }
