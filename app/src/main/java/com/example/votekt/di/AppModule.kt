@@ -16,12 +16,14 @@ import com.example.votekt.data.helpers.MnemonicHelperDebugImpl
 import com.example.votekt.data.helpers.MnemonicHelperImpl
 import com.example.votekt.data.repository_impl.AccountRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
+import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.VotingRepository
 import com.example.votekt.ui.core.AppViewModel
@@ -47,7 +49,8 @@ val appModule = module {
     includes(ethereumModule)
 
     viewModel { AppViewModel(
-        accountRepository = get()
+        accountRepository = get(),
+        sendTransactionRepository = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -154,4 +157,6 @@ val appModule = module {
     }
 
     single { VotingContractHelperImpl() } bind VotingContractHelper::class
+
+    single { SendTransactionRepositoryImpl(get(), get(),get()) } bind SendTransactionRepository::class
 }
