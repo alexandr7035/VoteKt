@@ -3,20 +3,19 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.ethereum.core.EthereumClient
-import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import cash.z.ecc.android.bip39.Mnemonics
 import com.cioccarellia.ksprefs.KsPrefs
-import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.account.MnemonicWord
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.isActive
-import java.math.BigInteger
+import org.kethereum.model.Address
 import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 
@@ -35,8 +34,7 @@ class AccountRepositoryImpl(
     override fun getAccountBalance(): Flow<Wei> = flow {
         val recentBalance = ksPrefs.pull(PrefKeys.RECENT_BALANCE, "")
         if (recentBalance.isNotBlank()) {
-            // TODO extensions
-            emit(Wei(BigInteger(recentBalance)))
+            emit(Wei(recentBalance))
         }
 
         while (coroutineContext.isActive) {

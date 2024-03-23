@@ -118,7 +118,7 @@ class VotingRepositoryImpl(
 
             val transaction = Transaction().apply {
                 this.chain = BigInteger.ZERO
-                this.input = input.data
+                this.input = input.value
                 this.nonce = 0.toBigInteger()
                 this.gasPrice = null
                 this.maxFeePerGas = 1000_000_000.toBigInteger()
@@ -150,7 +150,7 @@ class VotingRepositoryImpl(
                     description = req.desc,
                     deployTransactionHash = tx.transactionHash,
                     createdAt = System.currentTimeMillis(),
-                    creatorAddress = accountRepository.getSelfAddress().value,
+                    creatorAddress = accountRepository.getSelfAddress().hex,
                 )
             )
 

@@ -3,6 +3,7 @@ package com.example.votekt.ui.feature_wallet
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.domain.account.AccountRepository
@@ -41,7 +42,7 @@ class WalletViewModel(
         viewModelScope.launch {
             val address = accountRepository.getSelfAddress()
             _state.update {
-                it.copy(address = address)
+                it.copy(address = Address(address.hex))
             }
         }
 
