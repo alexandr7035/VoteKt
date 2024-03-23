@@ -16,3 +16,5 @@ fun String.addHexPrefix() = if (!this.startsWith(HEX_PREFIX)) "$HEX_PREFIX$this"
 fun ByteArray.asBigInteger() = BigInteger(1, this)
 
 fun String.hexAsBigIntegerOrNull() = this.hexAsBigInteger()
+
+fun Byte.toHexString() = this.toString(16).addHexPrefix()
