@@ -23,6 +23,7 @@ import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import com.example.votekt.ui.create_proposal.CreateProposalScreen
+import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDialog
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_wallet.WalletScreen
@@ -81,7 +82,6 @@ fun AppNavHost(
                     startDestination = NavDestinations.Primary.Wallet.route,
                     modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
                 ) {
-
                     composable(NavDestinations.GeneratePhrase.route) {
                         GeneratePhraseScreen(
                             onConfirm = { words ->
@@ -160,6 +160,13 @@ fun AppNavHost(
                                 }
                             })
                     }
+                }
+
+                if (state.requiresTxConfirmation()) {
+                    ReviewTransactionDialog(
+                        onIntent = viewModel::onTransactionIntent,
+                        state = state.txConfirmationState.data!!,
+                    )
                 }
             }
         }
