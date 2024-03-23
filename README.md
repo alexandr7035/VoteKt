@@ -97,3 +97,4 @@ Choose localDebug build variant and build
 
 [Online ABI Encoder](https://abi.hashex.org/)  
 [Ethereum input data decoder](https://lab.miguelmota.com/ethereum-input-data-decoder/example/)  
+[How to Set EIP-1559 Gas Fees?](https://medium.com/imtoken/how-to-set-eip-1559-gas-fees-3ea9b9f16242)  
