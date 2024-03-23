@@ -10,4 +10,5 @@ java {
 
 dependencies {
     implementation project(":utils")
+    implementation 'com.github.komputing.kethereum:model:0.86.0'
 }
