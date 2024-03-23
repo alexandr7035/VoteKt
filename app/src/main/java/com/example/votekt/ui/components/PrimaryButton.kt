@@ -1,6 +1,10 @@
 package com.example.votekt.ui.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -9,7 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
 
 // FIXME update this component
@@ -29,10 +33,14 @@ fun PrimaryButton(
             contentColor = textColor ?: MaterialTheme.colorScheme.onPrimary,
             containerColor = buttonColor ?: MaterialTheme.colorScheme.primary
         ),
-        contentPadding = PaddingValues(horizontal = 36.dp),
+        shape = RoundedCornerShape(Dimensions.buttonCorners),
+        contentPadding = PaddingValues(
+            horizontal = Dimensions.buttonContentPaddingHorizontal
+        ),
         modifier = modifier.then(
-            Modifier
-                .defaultMinSize(minHeight = 48.dp)
+            Modifier.defaultMinSize(
+                minHeight = Dimensions.buttonMinHeight
+            )
         ),
         enabled = enabled,
     ) {

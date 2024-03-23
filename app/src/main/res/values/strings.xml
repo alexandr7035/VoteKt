@@ -50,4 +50,6 @@
     <string name="vote">Vote</string>
     <string name="unknown_interaction">Unknown interaction</string>
     <string name="insufficient_balance">Insufficient balance</string>
+    <string name="to">To</string>
+    <string name="next">Next</string>
 </resources>
