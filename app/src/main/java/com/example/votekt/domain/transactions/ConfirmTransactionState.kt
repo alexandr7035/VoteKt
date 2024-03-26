@@ -7,6 +7,7 @@ sealed class ConfirmTransactionState {
     object Idle: ConfirmTransactionState()
 
     data class TxReview(
+        val data: PrepareTransactionData,
         val transactionType: TransactionType,
         val to: Address,
         val value: Wei?,

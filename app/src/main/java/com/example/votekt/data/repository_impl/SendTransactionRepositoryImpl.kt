@@ -1,11 +1,12 @@
 package com.example.votekt.data.repository_impl
 
+import android.util.Log
 import by.alexandr7035.ethereum.core.EthereumClient
-import by.alexandr7035.ethereum.model.ETHER
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
 import by.alexandr7035.ethereum.model.GWEI
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.BuildConfig
+import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.transactions.ConfirmTransactionState
 import com.example.votekt.domain.transactions.PrepareTransactionData
@@ -13,12 +14,10 @@ import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.transactions.TransactionType
-import kotlinx.coroutines.CoroutineExceptionHandler
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.kethereum.eip1559.signer.signViaEIP1559
 import org.kethereum.extensions.transactions.encodeAsEIP1559Tx
 import org.kethereum.model.ECKeyPair
@@ -29,11 +28,13 @@ import org.kethereum.model.createEmptyTransaction
 import org.komputing.khex.extensions.toHexString
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.crypto.Credentials
+import java.math.BigInteger
 
 class SendTransactionRepositoryImpl(
     private val ethereumClient: EthereumClient,
     private val accountRepository: AccountRepository,
     private val transactionRepository: TransactionRepository,
+    private val proposalsDao: ProposalsDao,
 ) : SendTransactionRepository {
 
     private var transaction: Transaction = createEmptyTransaction()
@@ -43,24 +44,7 @@ class SendTransactionRepositoryImpl(
     )
     override val state = _state
 
-    // TODO viewmodel handling
-    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
-        println("error repo ${throwable.localizedMessage}")
-        throw throwable
-    }
-
-    init {
-        CoroutineScope(Dispatchers.IO + exceptionHandler).launch {
-            requirePrepareTransaction(
-                data = PrepareTransactionData.SendValue(
-                    amount = 0.25.ETHER,
-                    receiver = org.kethereum.model.Address("0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC")
-                )
-            )
-        }
-    }
-
-    override suspend fun requirePrepareTransaction(data: PrepareTransactionData) {
+    override suspend fun requirePrepareTransaction(data: PrepareTransactionData) = withContext(Dispatchers.IO) {
         val selfAddress = accountRepository.getSelfAddress()
 
         val recipientAddress = when (data) {
@@ -77,8 +61,17 @@ class SendTransactionRepositoryImpl(
         // Initial state
         _state.emit(
             ConfirmTransactionState.TxReview(
+                data = data,
                 transactionType = when (data) {
-                    is PrepareTransactionData.ContractInteraction -> data.operation
+                    is PrepareTransactionData.ContractInteraction -> {
+                        when (data) {
+                            is PrepareTransactionData.ContractInteraction.CreateProposal
+                                -> TransactionType.CREATE_PROPOSAL
+                            is PrepareTransactionData.ContractInteraction.VoteOnProposal
+                                -> TransactionType.VOTE
+                        }
+                    }
+
                     is PrepareTransactionData.SendValue -> TransactionType.PAYMENT
                 },
                 to = recipientAddress,
@@ -93,7 +86,9 @@ class SendTransactionRepositoryImpl(
         when (data) {
             is PrepareTransactionData.ContractInteraction -> {
                 transaction.input = data.contractInput.value
+                transaction.value = BigInteger.ZERO
             }
+
             is PrepareTransactionData.SendValue -> {
                 transaction.value = data.amount.value
             }
@@ -103,19 +98,17 @@ class SendTransactionRepositoryImpl(
         transaction.applyGasEstimation(transactionEstimation)
     }
 
-    override suspend fun confirmTransaction() {
+    override suspend fun confirmTransaction() = withContext(Dispatchers.IO) {
         val currentState = _state.value
-        if (currentState !is ConfirmTransactionState.TxReview) return
+        if (currentState !is ConfirmTransactionState.TxReview) return@withContext
 
         // TODO working with credentials
         val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
 
         val signedTxData = transaction.signAndEncode(credentials)
         val hash = ethereumClient.sendRawTransaction(signedTxData)
-        transactionRepository.addNewTransaction(
-            transactionHash = TransactionHash(hash),
-            transactionType = currentState.transactionType
-        )
+
+        cacheLocalTransactionData(currentState.data, hash)
 
         _state.update { ConfirmTransactionState.Idle }
     }
@@ -135,11 +128,14 @@ class SendTransactionRepositoryImpl(
         val maxFeePerGas = baseFee + maxPriorityFeePerGas
 
         this.apply {
-            gasLimit = estimation.estimatedGas
+            this.gasLimit = estimation.estimatedGas
             this.maxPriorityFeePerGas = maxPriorityFeePerGas.value
             this.maxFeePerGas = maxFeePerGas.value
             this.nonce = estimation.nonce
         }
+
+        Log.d(LOG_TAG, "estimated tx $this")
+        Log.d(LOG_TAG, "contract input: ${this.input.toHexString()}")
 
         val totalFee = Wei(estimation.estimatedGas * maxFeePerGas.value)
 
@@ -160,10 +156,41 @@ class SendTransactionRepositoryImpl(
             )
         )
 
+        Log.d(LOG_TAG, "sign tx $this")
         return this.encodeAsEIP1559Tx(signature).toHexString()
+    }
+
+    private suspend fun cacheLocalTransactionData(
+        prepareTransactionData: PrepareTransactionData,
+        transactionHash: String
+    )  = withContext(Dispatchers.IO) {
+        transactionRepository.addNewTransaction(
+            transactionHash = TransactionHash(transactionHash),
+            transactionType = prepareTransactionData.transactionType
+        )
+
+        when (prepareTransactionData) {
+            is PrepareTransactionData.ContractInteraction.CreateProposal -> {
+                proposalsDao.updateDeployTransactionHash(
+                    proposalId = prepareTransactionData.proposalUuid,
+                    newDeployTransactionHash = transactionHash
+                )
+            }
+
+            is PrepareTransactionData.ContractInteraction.VoteOnProposal -> {
+                proposalsDao.updateProposalVote(
+                    proposalNumber = prepareTransactionData.proposalNumber,
+                    supported = prepareTransactionData.vote,
+                    voteTransactionHash = transactionHash,
+                )
+            }
+
+            else -> {}
+        }
     }
 
     companion object {
         val DEFAULT_MINER_TIP = 1.5.GWEI
+        const val LOG_TAG = "SEND_TX_TAG"
     }
 }

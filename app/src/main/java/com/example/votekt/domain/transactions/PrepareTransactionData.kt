@@ -10,9 +10,34 @@ sealed class PrepareTransactionData {
         val receiver: Address,
     ): PrepareTransactionData()
 
-    data class ContractInteraction(
-        val operation: TransactionType,
-        val contractAddress: Address,
-        val contractInput: EthTransactionInput,
-    ): PrepareTransactionData()
+    sealed class ContractInteraction(
+        open val contractAddress: Address,
+        open val contractInput: EthTransactionInput,
+    ): PrepareTransactionData() {
+        data class CreateProposal(
+            override val contractAddress: Address,
+            override val contractInput: EthTransactionInput,
+            val proposalUuid: String,
+        ): ContractInteraction(contractAddress, contractInput)
+
+        data class VoteOnProposal(
+            override val contractAddress: Address,
+            override val contractInput: EthTransactionInput,
+            val proposalNumber: Int,
+            val vote: Boolean,
+        ): ContractInteraction(contractAddress, contractInput)
+    }
+
+    val to: Address
+        get() = when (this) {
+            is ContractInteraction -> this.contractAddress
+            is SendValue -> this.receiver
+        }
+
+    val transactionType
+        get() = when (this) {
+            is ContractInteraction.CreateProposal -> TransactionType.CREATE_PROPOSAL
+            is SendValue -> TransactionType.PAYMENT
+            is ContractInteraction.VoteOnProposal -> TransactionType.VOTE
+        }
 }
