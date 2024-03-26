@@ -2,8 +2,6 @@ package com.example.votekt.di
 
 import androidx.room.Room
 import androidx.work.WorkManager
-import by.alexandr7035.abi.VotingContractHelper
-import by.alexandr7035.abi.VotingContractHelperImpl
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
 import com.cioccarellia.ksprefs.KsPrefs
@@ -145,7 +143,14 @@ val appModule = module {
 
     // TODO dispatcher annotation
     single<VotingRepository> {
-        VotingRepositoryImpl(get(), get(), get(), get(), Dispatchers.IO, get())
+        VotingRepositoryImpl(
+            web3j = get(),
+            transactionRepository = get(),
+            accountRepository = get(),
+            proposalsDao = get(),
+            dispatcher = Dispatchers.IO,
+            sendTransactionRepository = get()
+        )
     }
 
     single<TransactionRepository> {
@@ -156,7 +161,10 @@ val appModule = module {
         )
     }
 
-    single { VotingContractHelperImpl() } bind VotingContractHelper::class
-
-    single { SendTransactionRepositoryImpl(get(), get(),get()) } bind SendTransactionRepository::class
+    single { SendTransactionRepositoryImpl(
+        ethereumClient = get(),
+        accountRepository = get(),
+        transactionRepository = get(),
+        proposalsDao = get()
+    ) } bind SendTransactionRepository::class
 }

@@ -1,8 +1,9 @@
 package com.example.votekt.data.repository_impl
 
 import android.util.Log
-import by.alexandr7035.abi.VotingContractHelper
+import by.alexandr7035.contracts.VoteKtContractV1
 import by.alexandr7035.ethereum.model.Address
+import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.web3j_contracts.VotingContract
 import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.ProposalEntity
@@ -13,9 +14,9 @@ import com.example.votekt.data.cache.mapSelfVote
 import com.example.votekt.data.cache.mapVoteStatus
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.domain.transactions.TransactionHash
+import com.example.votekt.domain.transactions.PrepareTransactionData
+import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
-import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
@@ -27,19 +28,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
-import org.kethereum.eip1559.signer.signViaEIP1559
-import org.kethereum.extensions.transactions.encodeAsEIP1559Tx
-import org.kethereum.model.ECKeyPair
-import org.kethereum.model.PrivateKey
-import org.kethereum.model.PublicKey
-import org.kethereum.model.Transaction
-import org.komputing.khex.extensions.toHexString
 import org.web3j.crypto.Bip44WalletUtils
 import org.web3j.protocol.Web3j
 import org.web3j.tx.RawTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.tx.response.NoOpProcessor
-import java.math.BigInteger
+import pm.gnosis.model.Solidity
+import pm.gnosis.utils.hexToByteArray
 import java.util.UUID
 
 class VotingRepositoryImpl(
@@ -48,7 +43,7 @@ class VotingRepositoryImpl(
     private val accountRepository: AccountRepository,
     private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
-    private val votingContractHelper: VotingContractHelper,
+    private val sendTransactionRepository: SendTransactionRepository
 ) : VotingRepository {
     private val votingContract: VotingContract
 
@@ -93,52 +88,15 @@ class VotingRepositoryImpl(
             }
     }
 
-    override suspend fun createProposal(req: CreateProposal): OperationResult<String> = withContext(dispatcher) {
+    override suspend fun createProposal(req: CreateProposal): OperationResult<Unit> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val uuid = UUID.randomUUID().toString()
-            Log.d("DEBUG_TAG", "Create proposal with ${uuid}")
 
-            val tx = votingContract.createProposal(
-                uuid,
-                req.title,
-                req.desc,
-                req.duration.getDurationInDays().toBigInteger()
-            ).send()
-
-            val input = votingContractHelper.getCreateProposalTransactionInput(
-                uuid = uuid,
-                title = req.title,
-                description = req.desc,
-                durationInDays = req.duration.getDurationInDays().toBigInteger()
-            )
-
-            val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
-
-            println("${TAG} encoded input ${input}")
-
-            val transaction = Transaction().apply {
-                this.chain = BigInteger.ZERO
-                this.input = input.value
-                this.nonce = 0.toBigInteger()
-                this.gasPrice = null
-                this.maxFeePerGas = 1000_000_000.toBigInteger()
-                this.maxPriorityFeePerGas = 1000_000_000.toBigInteger()
-                this.gasLimit = 10_000.toBigInteger()
-                this.to = org.kethereum.model.Address(votingContract.contractAddress)
-            }
-
-            val signature = transaction.signViaEIP1559(ECKeyPair(
-                privateKey = PrivateKey(credentials.ecKeyPair.privateKey),
-                publicKey = PublicKey(credentials.ecKeyPair.publicKey)
-            ))
-
-            val raw = transaction.encodeAsEIP1559Tx(signature)
-
-            println("${TAG} signed tx ${raw.toHexString()}")
-
-            transactionRepository.addNewTransaction(
-                transactionType = TransactionType.CREATE_PROPOSAL,
-                transactionHash = TransactionHash(tx.transactionHash)
+            val solidityInput = VoteKtContractV1.CreateProposal.encode(
+                uuid = Solidity.String(uuid),
+                title = Solidity.String(req.title),
+                description = Solidity.String(req.desc),
+                durationInDays = Solidity.UInt256(req.duration.getDurationInDays().toBigInteger())
             )
 
             proposalsDao.cacheProposal(
@@ -148,47 +106,45 @@ class VotingRepositoryImpl(
                     isSelfCreated = true,
                     title = req.title,
                     description = req.desc,
-                    deployTransactionHash = tx.transactionHash,
+                    deployTransactionHash = null,
                     createdAt = System.currentTimeMillis(),
                     creatorAddress = accountRepository.getSelfAddress().hex,
                 )
             )
 
-            tx.transactionHash
+            sendTransactionRepository.requirePrepareTransaction(
+                data = PrepareTransactionData.ContractInteraction.CreateProposal(
+                    contractAddress = org.kethereum.model.Address(votingContract.contractAddress),
+                    contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
+                    proposalUuid = uuid
+                )
+            )
         }
     }
 
-    override suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<TransactionHash> = withContext(dispatcher) {
+    override suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val isFor = when (vote) {
                 VoteType.VOTE_FOR -> true
                 VoteType.VOTE_AGAINST -> false
             }
 
-            val tx = votingContract.vote(proposalNumber.toBigInteger(), isFor).send()
-
-            val input = votingContractHelper.getVotingTransactionInput(
-                proposalNumber = proposalNumber.toBigInteger(),
-                vote = isFor
+            val solidityInput = VoteKtContractV1.Vote.encode(
+                proposalNumber = Solidity.UInt256(proposalNumber.toBigInteger()),
+                inFavor = Solidity.Bool(isFor)
             )
 
-            println("${TAG} encoded input ${input}")
-
-            transactionRepository.addNewTransaction(
-                transactionType = TransactionType.VOTE,
-                transactionHash = TransactionHash(tx.transactionHash)
+            sendTransactionRepository.requirePrepareTransaction(
+                data = PrepareTransactionData.ContractInteraction.VoteOnProposal(
+                    contractAddress = org.kethereum.model.Address(votingContract.contractAddress),
+                    contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
+                    proposalNumber = proposalNumber,
+                    vote = when (vote) {
+                        VoteType.VOTE_FOR -> true
+                        VoteType.VOTE_AGAINST -> false
+                    },
+                )
             )
-
-            proposalsDao.updateProposalVote(
-                proposalNumber = proposalNumber,
-                supported = when (vote) {
-                    VoteType.VOTE_FOR -> true
-                    VoteType.VOTE_AGAINST -> false
-                },
-                voteTransactionHash = tx.transactionHash,
-            )
-
-            TransactionHash(tx.transactionHash)
         }
     }
 

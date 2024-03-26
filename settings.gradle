@@ -23,4 +23,5 @@ include ':libs'
 include ':libs:gnosis_crypto'
 include ':utils'
 include ':web3j_contracts'
-include ':abi'
+include ':contracts'
+
