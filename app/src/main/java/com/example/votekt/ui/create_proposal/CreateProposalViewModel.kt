@@ -32,13 +32,7 @@ class CreateProposalViewModel(private val votingRepository: VotingRepository) : 
                 is OperationResult.Success -> {
                     _uiState.update { prev ->
                         prev.copy(
-                            submitProposalEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = true,
-                                    transactionHash = res.data,
-                                    error = null
-                                )
-                            ),
+                            submitProposalEvent = triggered(CreateProposalResult(error = null)),
                             isLoading = false,
                         )
                     }
@@ -48,11 +42,7 @@ class CreateProposalViewModel(private val votingRepository: VotingRepository) : 
                     _uiState.update { prev ->
                         prev.copy(
                             submitProposalEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = false,
-                                    transactionHash = null,
-                                    error = res.error
-                                )
+                                CreateProposalResult(error = res.error)
                             ),
                             isLoading = false,
                         )

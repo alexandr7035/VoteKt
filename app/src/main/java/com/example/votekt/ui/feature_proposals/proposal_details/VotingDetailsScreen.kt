@@ -100,8 +100,9 @@ fun VotingDetailsScreen(
         event = screenState.selfVoteSubmittedEvent, onConsumed = viewModel::onVoteSubmittedEvent
     ) { transactionHash ->
         // TODO composition local
+        // TODO remove this due to transaction dialog
         onShowSnackBar.invoke(
-            "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}", SnackBarMode.Neutral
+            "Vote created!", SnackBarMode.Neutral
         )
     }
 }

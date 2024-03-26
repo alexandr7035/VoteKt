@@ -63,13 +63,13 @@ fun CreateProposalScreen(
     EventEffect(
         event = state.submitProposalEvent, onConsumed = viewModel::onProposalCreatedEvent
     ) { eventData ->
-        if (eventData.isTransactionSubmitted) {
-            context.showToast("Transaction submitted!")
+        if (eventData.error == null) {
+            context.showToast(context.getString(R.string.proposal_created))
             onBack.invoke()
         } else {
             onShowSnackBar.invoke(
                 // TODO ui error model
-                "Failed to submit Proposal\n\n${eventData.error?.errorType?.uiError?.title}. ${eventData.error?.errorType?.uiError?.message}",
+                "Failed to create Proposal\n\n${eventData.error.errorType.uiError.title}. ${eventData.error.errorType.uiError.message}",
                 SnackBarMode.Negative
             )
         }

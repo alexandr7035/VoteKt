@@ -8,5 +8,5 @@ data class CreateProposalScreenState(
     val titleMaxLength: Int = ProposalConfig.titleMaxLength,
     val descMaxLength: Int = ProposalConfig.descMaxLength,
     val isLoading: Boolean = false,
-    val submitProposalEvent: StateEventWithContent<SubmitTransactionResult> = consumed()
+    val submitProposalEvent: StateEventWithContent<CreateProposalResult> = consumed()
 )

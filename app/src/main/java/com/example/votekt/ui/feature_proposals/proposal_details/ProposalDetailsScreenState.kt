@@ -1,6 +1,5 @@
 package com.example.votekt.ui.feature_proposals.proposal_details
 
-import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
@@ -11,5 +10,5 @@ data class ProposalDetailsScreenState(
     val proposal: Proposal? = null,
     val error: UiErrorMessage? = null,
     val isSelfVoteProcessing: Boolean = false,
-    val selfVoteSubmittedEvent: StateEventWithContent<TransactionHash> = consumed()
+    val selfVoteSubmittedEvent: StateEventWithContent<Unit> = consumed()
 )
