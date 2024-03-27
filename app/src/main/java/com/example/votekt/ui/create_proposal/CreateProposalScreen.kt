@@ -1,7 +1,6 @@
 package com.example.votekt.ui.create_proposal
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -42,10 +41,8 @@ import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
-import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
-import com.example.votekt.ui.uiError
 import com.example.votekt.ui.utils.showToast
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
@@ -54,24 +51,19 @@ import org.koin.androidx.compose.koinViewModel
 fun CreateProposalScreen(
     viewModel: CreateProposalViewModel = koinViewModel(),
     onBack: () -> Unit = {},
-    onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
     val state = viewModel.uiState.collectAsStateWithLifecycle().value
 
     EventEffect(
-        event = state.submitProposalEvent, onConsumed = viewModel::onProposalCreatedEvent
+        event = state.submitProposalEvent,
+        onConsumed = viewModel::onProposalCreatedEvent
     ) { eventData ->
         if (eventData.error == null) {
-            context.showToast(context.getString(R.string.proposal_created))
             onBack.invoke()
         } else {
-            onShowSnackBar.invoke(
-                // TODO ui error model
-                "Failed to create Proposal\n\n${eventData.error.errorType.uiError.title}. ${eventData.error.errorType.uiError.message}",
-                SnackBarMode.Negative
-            )
+            context.showToast(R.string.failed_to_create_proposal)
         }
     }
 
@@ -89,7 +81,7 @@ fun CreateProposalScreen(
     )
 }
 
-
+// TODO error
 @SuppressLint("RememberReturnType")
 @Composable
 private fun CreateProposalScreen_Ui(
@@ -98,7 +90,7 @@ private fun CreateProposalScreen_Ui(
     onBack: () -> Unit = {},
     onSubmit: (title: String, description: String, duration: ProposalDuration) -> Unit = { _, _, _ -> },
     snackarHostState: SnackbarHostState = SnackbarHostState(),
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
 ) {
 
     // To hide keyboard
@@ -154,7 +146,8 @@ private fun CreateProposalScreen_Ui(
             ) {
 
                 Text(
-                    text = "Choose proposal title", style = MaterialTheme.typography.headlineSmall
+                    text = stringResource(R.string.choose_proposal_title),
+                    style = MaterialTheme.typography.headlineSmall
                 )
 
                 OutlinedTextField(modifier = Modifier.fillMaxWidth(),
@@ -179,7 +172,8 @@ private fun CreateProposalScreen_Ui(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Choose proposal description", style = MaterialTheme.typography.headlineSmall
+                    text = stringResource(R.string.choose_proposal_description),
+                    style = MaterialTheme.typography.headlineSmall
                 )
 
                 OutlinedTextField(
@@ -207,7 +201,8 @@ private fun CreateProposalScreen_Ui(
                 Spacer(Modifier.height(16.dp))
 
                 Text(
-                    text = "Choose proposal duration", style = MaterialTheme.typography.headlineSmall
+                    text = stringResource(R.string.choose_proposal_duration),
+                    style = MaterialTheme.typography.headlineSmall
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -231,7 +226,6 @@ private fun CreateProposalScreen_Ui(
                     text = stringResource(R.string.create_proposal),
                     onClick = {
                         onSubmit.invoke(titleText.value, descText.value, selectedDuration.value)
-                        Log.d("TEST", "DURATON ${selectedDuration.value}")
                     },
                     enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
                 )
@@ -242,8 +236,6 @@ private fun CreateProposalScreen_Ui(
             FullscreenProgressBar()
         }
     }
-
-
 }
 
 @Preview

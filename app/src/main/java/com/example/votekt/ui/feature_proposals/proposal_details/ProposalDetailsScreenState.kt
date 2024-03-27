@@ -10,5 +10,4 @@ data class ProposalDetailsScreenState(
     val proposal: Proposal? = null,
     val error: UiErrorMessage? = null,
     val isSelfVoteProcessing: Boolean = false,
-    val selfVoteSubmittedEvent: StateEventWithContent<Unit> = consumed()
 )

@@ -91,7 +91,7 @@ class VotingContractRepositoryImpl(
         }
     }
 
-    override suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit> = withContext(dispatcher) {
+    override suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType) = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val isFor = when (vote) {
                 VoteType.VOTE_FOR -> true

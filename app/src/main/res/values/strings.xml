@@ -53,4 +53,8 @@
     <string name="to">To</string>
     <string name="next">Next</string>
     <string name="proposal_created">Proposal created!</string>
+    <string name="choose_proposal_description">Choose proposal description</string>
+    <string name="choose_proposal_duration">Choose proposal duration</string>
+    <string name="choose_proposal_title">Choose proposal title</string>
+    <string name="failed_to_create_proposal">Failed to create proposal</string>
 </resources>

@@ -63,29 +63,16 @@ class VotingDetailsViewModel(
             when (val res = votingContractRepository.voteOnProposal(proposalNumber, voteType)) {
                 is OperationResult.Success -> {
                     _state.update {
-                        it.copy(
-                            isSelfVoteProcessing = false,
-                            selfVoteSubmittedEvent = triggered(res.data)
-                        )
+                        it.copy(isSelfVoteProcessing = false,)
                     }
                 }
 
                 is OperationResult.Failure -> {
                     _state.update {
-                        it.copy(
-                            error = res.error.errorType.uiError
-                        )
+                        it.copy(error = res.error.errorType.uiError)
                     }
                 }
             }
-        }
-    }
-
-    fun onVoteSubmittedEvent() {
-        _state.update {
-            it.copy(
-                selfVoteSubmittedEvent = consumed()
-            )
         }
     }
 }

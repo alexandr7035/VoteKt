@@ -1,6 +1,7 @@
 package com.example.votekt.ui.create_proposal
 
 import com.example.votekt.core.config.ProposalConfig
+import com.example.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 
