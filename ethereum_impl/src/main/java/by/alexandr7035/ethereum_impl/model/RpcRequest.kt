@@ -1,6 +1,7 @@
 package by.alexandr7035.ethereum_impl.model
 
 import by.alexandr7035.ethereum.model.EthNodeMethods
+import by.alexandr7035.ethereum.model.EthNodeMethods.FUNCTION_CALL
 import by.alexandr7035.ethereum.model.EthNodeMethods.FUNCTION_ESTIMATE_GAS
 import by.alexandr7035.ethereum.model.EthNodeMethods.FUNCTION_GAS_PRICE
 import by.alexandr7035.ethereum.model.EthNodeMethods.FUNCTION_GET_TRANSACTION_COUNT
@@ -8,6 +9,7 @@ import by.alexandr7035.ethereum.model.EthNodeMethods.FUNCTION_SEND_RAW_TRANSACTI
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.asString
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
+import by.alexandr7035.ethereum.model.eth_requests.EthCall
 import by.alexandr7035.ethereum.model.eth_requests.EthEstimateGas
 import by.alexandr7035.ethereum.model.eth_requests.EthGasPrice
 import by.alexandr7035.ethereum.model.eth_requests.EthGetTransactionCount
@@ -101,6 +103,26 @@ class RpcGasPriceRequest(raw: EthGasPrice) : RpcRequest<EthGasPrice>(raw) {
         raw.response = response.error?.let { EthRequest.Response.Failure<BigInteger>(it.message) }
             ?: response.result?.hexAsBigIntegerOrNull()?.let { EthRequest.Response.Success(it) }
                     ?: EthRequest.Response.Failure("Invalid gas price!")
+    }
+}
+
+class RpcCallRequest(raw: EthCall) : RpcRequest<EthCall>(raw) {
+    override fun request() =
+        JsonRpcRequest(
+            method = FUNCTION_CALL,
+            params = listOf(
+                ContractCallParams(
+                    to = raw.to.hex,
+                    data = raw.data
+                )
+            ),
+            id = raw.id
+        )
+
+    override fun parse(response: JsonRpcResult) {
+        raw.response = response.error?.let { EthRequest.Response.Failure<String>(it.message) }
+            ?: response.result?.let { EthRequest.Response.Success(response.result) }
+                    ?: EthRequest.Response.Failure("Missing result")
     }
 }
 

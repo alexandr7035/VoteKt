@@ -16,14 +16,14 @@ import com.example.votekt.data.repository_impl.AccountRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
-import com.example.votekt.data.repository_impl.VotingRepositoryImpl
+import com.example.votekt.data.repository_impl.VotingContractRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
-import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
@@ -42,7 +42,6 @@ import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
 
 val appModule = module {
-    includes(web3Module)
     includes(netModule)
     includes(ethereumModule)
 
@@ -121,7 +120,7 @@ val appModule = module {
         SyncProposalsWorker(
             appContext = get(),
             params = get(),
-            votingRepository = get(),
+            votingContractRepository = get(),
         )
     }
 
@@ -142,14 +141,14 @@ val appModule = module {
     }
 
     // TODO dispatcher annotation
-    single<VotingRepository> {
-        VotingRepositoryImpl(
-            web3j = get(),
-            transactionRepository = get(),
+    single<VotingContractRepository> {
+        VotingContractRepositoryImpl(
+            contractAddress = BuildConfig.CONTRACT_ADDRESS,
             accountRepository = get(),
             proposalsDao = get(),
             dispatcher = Dispatchers.IO,
-            sendTransactionRepository = get()
+            sendTransactionRepository = get(),
+            web3 = get()
         )
     }
 

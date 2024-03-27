@@ -1,12 +1,11 @@
 package com.example.votekt.domain.votings
 
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.domain.transactions.TransactionHash
 import kotlinx.coroutines.flow.Flow
 
 // TODO redeploy proposal
 // TODO delete draft proposal
-interface VotingRepository {
+interface VotingContractRepository {
     fun getProposals(): Flow<List<Proposal>>
     fun getProposalById(id: String): Flow<Proposal>
 

@@ -5,11 +5,13 @@ import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
 import by.alexandr7035.ethereum.model.eth_requests.EthBulkRequest
 import by.alexandr7035.ethereum.model.EthNodeMethods
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
+import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.eth_requests.EthRequest
 import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
+import by.alexandr7035.ethereum.model.eth_requests.EthCall
 import by.alexandr7035.ethereum.model.eth_requests.EthEstimateGas
 import by.alexandr7035.ethereum.model.eth_requests.EthGasPrice
 import by.alexandr7035.ethereum.model.eth_requests.EthGetTransactionCount
@@ -50,6 +52,10 @@ class EthereumClientImpl(
     override suspend fun sendRawTransaction(signedTransactionData: String): String {
         return request(EthSendRawTransaction(signedTransactionData))
             .checkedResult("Could not send raw transaction")
+    }
+
+    override suspend fun sendEthCall(to: Address, input: String): String {
+        return request(EthCall(to, input)).checkedResult("Could not execute call")
     }
 
     override suspend fun getTransactionReceipt(transactionHash: String): EthTransactionReceipt {

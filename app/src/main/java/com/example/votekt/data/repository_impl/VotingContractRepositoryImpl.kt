@@ -1,11 +1,10 @@
 package com.example.votekt.data.repository_impl
 
-import android.util.Log
 import by.alexandr7035.contracts.VoteKtContractV1
+import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
-import by.alexandr7035.web3j_contracts.VotingContract
-import com.example.votekt.BuildConfig
+import by.alexandr7035.utils.asEthereumAddressString
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
@@ -16,59 +15,29 @@ import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
-import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
-import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
-import org.web3j.crypto.Bip44WalletUtils
-import org.web3j.protocol.Web3j
-import org.web3j.tx.RawTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
-import org.web3j.tx.response.NoOpProcessor
 import pm.gnosis.model.Solidity
 import pm.gnosis.utils.hexToByteArray
 import java.util.UUID
 
-class VotingRepositoryImpl(
-    web3j: Web3j,
-    private val transactionRepository: TransactionRepository,
+class VotingContractRepositoryImpl(
+    private val web3: EthereumClient,
+    private val contractAddress: String,
     private val accountRepository: AccountRepository,
     private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
-    private val sendTransactionRepository: SendTransactionRepository
-) : VotingRepository {
-    private val votingContract: VotingContract
-
-    init {
-        val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
-        Log.d("DEBUG_TAG", "KEY PAIR for ${credentials.address} created")
-
-        // NoOpProcessor provides an EmptyTransactionReceipt to clients which only contains the transaction hash.
-        // This is for clients who do not want web3j to perform any polling for a transaction receipt.
-        val receiptProcessor = NoOpProcessor(web3j)
-
-        // val txManager = RawTransactionManager(web3j, credentials)
-        val txManager = RawTransactionManager(
-            web3j,
-            credentials,
-            BuildConfig.CHAIN_ID.toLong(),
-            receiptProcessor
-        )
-
-        // TODO gas estimation
-        votingContract = VotingContract.load(
-            BuildConfig.CONTRACT_ADDRESS, web3j, txManager, DefaultGasProvider()
-        )
-    }
-
+    private val sendTransactionRepository: SendTransactionRepository,
+) : VotingContractRepository {
     override fun getProposalById(id: String): Flow<Proposal> {
         return proposalsDao.observeProposalByUuid(id).flowOn(dispatcher).map {
             it.mapToDomain()
@@ -114,7 +83,7 @@ class VotingRepositoryImpl(
 
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.CreateProposal(
-                    contractAddress = org.kethereum.model.Address(votingContract.contractAddress),
+                    contractAddress = org.kethereum.model.Address(contractAddress),
                     contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
                     proposalUuid = uuid
                 )
@@ -136,7 +105,7 @@ class VotingRepositoryImpl(
 
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.VoteOnProposal(
-                    contractAddress = org.kethereum.model.Address(votingContract.contractAddress),
+                    contractAddress = org.kethereum.model.Address(contractAddress),
                     contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
                     proposalNumber = proposalNumber,
                     vote = when (vote) {
@@ -149,40 +118,48 @@ class VotingRepositoryImpl(
     }
 
     override suspend fun syncProposalsWithContract(): Unit = withContext(dispatcher) {
-        val contractOwner = votingContract.owner().send()
+        val ownerInput = VoteKtContractV1.Owner.encode()
+        val ownerRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = ownerInput
+        )
+        val decodedOwner = VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
 
-        val contractProposals = votingContract.proposalsList
-            .send()
-            .map { it as VotingContract.ProposalRaw }
+        val contractCallRes = VoteKtContractV1.GetProposalsList.encode()
+        val callRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = contractCallRes,
+        )
+        val decoded = VoteKtContractV1.GetProposalsList.decode(callRes).param0.items
 
-        contractProposals.forEach { raw ->
-            val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid)
+        decoded.forEach { raw ->
+            val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid.value)
             cached?.let {
                 proposalsDao.updateProposal(
                     cached.copy(
-                        number = raw.number.toInt(),
-                        creatorAddress = contractOwner,
-                        votesFor = raw.votesFor.toInt(),
+                        number = raw.number.value.toInt(),
+                        creatorAddress = decodedOwner,
+                        votesFor = raw.votesfor.value.toInt(),
                         isDraft = false,
-                        votesAgainst = raw.votesAgainst.toInt(),
-                        createdAt = raw.creationTime.toLong() * 1000L,
-                        expiresAt = raw.expirationTime.toLong() * 1000L,
+                        votesAgainst = raw.votesagainst.value.toInt(),
+                        createdAt = raw.creationtime.value.toLong() * 1000L,
+                        expiresAt = raw.expirationtime.value.toLong() * 1000L,
                         // TODO update contract with self vote
                     )
                 )
             } ?: run {
                 proposalsDao.cacheProposal(
                     ProposalEntity(
-                        uuid = raw.uuid,
-                        number = raw.number.toInt(),
-                        creatorAddress = contractOwner,
-                        title = raw.title,
-                        description = raw.description,
+                        uuid = raw.uuid.value,
+                        number = raw.number.value.toInt(),
+                        creatorAddress = decodedOwner,
+                        title = raw.title.value,
+                        description = raw.description.value,
                         isDraft = false,
-                        votesFor = raw.votesFor.toInt(),
-                        votesAgainst = raw.votesAgainst.toInt(),
-                        expiresAt = raw.expirationTime.toLong() * 1000L,
-                        createdAt = raw.creationTime.toLong() * 1000L,
+                        votesFor = raw.votesfor.value.toInt(),
+                        votesAgainst = raw.votesagainst.value.toInt(),
+                        expiresAt = raw.expirationtime.value.toLong() * 1000L,
+                        createdAt = raw.creationtime.value.toLong() * 1000L,
                         deployTransactionHash = null,
                         // TODO update contract with self vote
                         selfVote = null,
@@ -192,7 +169,7 @@ class VotingRepositoryImpl(
             }
         }
 
-        proposalsDao.cleanUpProposals(remainingProposals = contractProposals.map { it.uuid })
+        proposalsDao.cleanUpProposals(remainingProposals = decoded.map { it.uuid.value })
     }
 
     private suspend fun ProposalWithTransactions.mapToDomain(): Proposal = withContext(dispatcher) {
