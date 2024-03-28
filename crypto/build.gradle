@@ -10,8 +10,12 @@ java {
 
 dependencies {
     implementation project(":utils")
-    implementation project(":libs:gnosis_crypto")
+//    implementation project(":libs:gnosis_crypto")
 
     // Crypto specific module for key generation, signing and hashing
     implementation "cash.z.ecc.android:kotlin-bip39:1.0.7"
+    implementation 'com.github.komputing.kethereum:model:0.86.0'
+    implementation 'com.github.komputing.kethereum:crypto:0.86.0'
+    implementation 'com.github.komputing.kethereum:bip39:0.86.0'
+    implementation 'com.github.komputing.kethereum:bip32:0.86.0'
 }

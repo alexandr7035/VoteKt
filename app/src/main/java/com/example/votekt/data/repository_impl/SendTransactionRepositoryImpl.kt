@@ -1,11 +1,15 @@
 package com.example.votekt.data.repository_impl
 
 import android.util.Log
+import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
 import by.alexandr7035.ethereum.model.GWEI
 import by.alexandr7035.ethereum.model.Wei
+import cash.z.ecc.android.bip39.Mnemonics
+import com.cioccarellia.ksprefs.KsPrefs
 import com.example.votekt.BuildConfig
+import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.transactions.ConfirmTransactionState
@@ -26,15 +30,15 @@ import org.kethereum.model.PublicKey
 import org.kethereum.model.Transaction
 import org.kethereum.model.createEmptyTransaction
 import org.komputing.khex.extensions.toHexString
-import org.web3j.crypto.Bip44WalletUtils
-import org.web3j.crypto.Credentials
 import java.math.BigInteger
 
 class SendTransactionRepositoryImpl(
     private val ethereumClient: EthereumClient,
+    private val cryptoHelper: CryptoHelper,
     private val accountRepository: AccountRepository,
     private val transactionRepository: TransactionRepository,
     private val proposalsDao: ProposalsDao,
+    private val ksPrefs: KsPrefs,
 ) : SendTransactionRepository {
 
     private var transaction: Transaction = createEmptyTransaction()
@@ -102,9 +106,7 @@ class SendTransactionRepositoryImpl(
         val currentState = _state.value
         if (currentState !is ConfirmTransactionState.TxReview) return@withContext
 
-        // TODO working with credentials
-        val credentials = Bip44WalletUtils.loadBip44Credentials("", BuildConfig.TEST_MNEMONIC)
-
+        val credentials = loadCredentials()
         val signedTxData = transaction.signAndEncode(credentials)
         val hash = ethereumClient.sendRawTransaction(signedTxData)
 
@@ -148,14 +150,8 @@ class SendTransactionRepositoryImpl(
         }
     }
 
-    private fun Transaction.signAndEncode(credentials: Credentials): String {
-        val signature = this.signViaEIP1559(
-            ECKeyPair(
-                privateKey = PrivateKey(credentials.ecKeyPair.privateKey),
-                publicKey = PublicKey(credentials.ecKeyPair.publicKey)
-            )
-        )
-
+    private fun Transaction.signAndEncode(credentials: ECKeyPair): String {
+        val signature = this.signViaEIP1559(credentials)
         Log.d(LOG_TAG, "sign tx $this")
         return this.encodeAsEIP1559Tx(signature).toHexString()
     }
@@ -187,6 +183,14 @@ class SendTransactionRepositoryImpl(
 
             else -> {}
         }
+    }
+
+    private suspend fun loadCredentials(): ECKeyPair = withContext(Dispatchers.IO) {
+        // TODO proper account storing
+        Log.d(LOG_TAG, "load credentials for seed: ${ ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)}")
+        val phrase = ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)
+        val mnemonic = Mnemonics.MnemonicCode(phrase)
+        return@withContext cryptoHelper.generateCredentialsFromMnemonic(phrase).ecKeyPair!!
     }
 
     companion object {

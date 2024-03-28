@@ -164,6 +164,8 @@ val appModule = module {
         ethereumClient = get(),
         accountRepository = get(),
         transactionRepository = get(),
-        proposalsDao = get()
+        proposalsDao = get(),
+        ksPrefs = get(),
+        cryptoHelper = get(),
     ) } bind SendTransactionRepository::class
 }

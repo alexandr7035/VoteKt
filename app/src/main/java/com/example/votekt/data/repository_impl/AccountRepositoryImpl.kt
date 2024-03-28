@@ -54,13 +54,15 @@ class AccountRepositoryImpl(
     override suspend fun createAndSaveAccount(seedPhrase: List<MnemonicWord>) {
         val rawPhrase = seedPhrase.joinToString(" ") { it.value }
         val mnemonicCode = Mnemonics.MnemonicCode(rawPhrase)
-        val credentials = cryptoHelper.generateCredentialsFromMnemonic(mnemonicCode)
+        mnemonicCode.validate()
+
+        val credentials = cryptoHelper.generateCredentialsFromMnemonic(rawPhrase)
 
         with(ksPrefs) {
             push(PrefKeys.ACCOUNT_ADDRESS_KEY, credentials.address)
-            push(PrefKeys.PRIVATE_KEY, credentials.privateKey)
+            push(PrefKeys.ACCOUNT_MNEMONIC_PHRASE, rawPhrase)
         }
 
-        Log.d("WEB3_TAG", "created account ${credentials.address} ${credentials.privateKey}")
+        Log.d("WEB3_TAG", "created account ${credentials.address}")
     }
 }
