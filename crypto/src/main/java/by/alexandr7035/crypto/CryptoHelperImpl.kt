@@ -1,26 +1,16 @@
 package by.alexandr7035.crypto
 
-import by.alexandr7035.utils.asBigInteger
-import by.alexandr7035.utils.asEthereumAddressString
-import cash.z.ecc.android.bip39.Mnemonics
-import cash.z.ecc.android.bip39.toSeed
-import pm.gnosis.crypto.KeyGenerator
+import org.kethereum.bip39.model.MnemonicWords
+import org.kethereum.bip39.toKey
+import org.kethereum.crypto.toCredentials
+import org.kethereum.model.Credentials
 
 class CryptoHelperImpl : CryptoHelper {
-    override suspend fun generateCredentialsFromMnemonic(mnemonic: Mnemonics.MnemonicCode): Credentials {
-        val mnemonicSeed = mnemonic.toSeed()
-        val hdNode = KeyGenerator.masterNode(mnemonicSeed)
-        val masterKey = hdNode.derive(BIP44_PATH_ETHEREUM)
-        // a hard-coded first address here
-        val firstChild = masterKey.deriveChild(0).keyPair
-
-        return Credentials(
-            address = firstChild.address.asEthereumAddressString(),
-            privateKey = firstChild.privKey,
-        )
+    override suspend fun generateCredentialsFromMnemonic(mnemonic: String): Credentials {
+       return MnemonicWords(mnemonic).toKey(BIP44_PATH_ETHEREUM).keyPair.toCredentials()
     }
 
     private companion object {
-        const val BIP44_PATH_ETHEREUM = "m/44'/60'/0'/0"
+        const val BIP44_PATH_ETHEREUM = "m/44'/60'/0'/0/0"
     }
 }

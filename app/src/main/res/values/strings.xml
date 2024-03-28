@@ -38,4 +38,23 @@
     <string name="support">Support</string>
     <string name="supported">Supported</string>
     <string name="not_supported">Not supported</string>
+    <string name="estimated_gas">Estimated gas</string>
+    <string name="confirm_transaction">Confirm transaction</string>
+    <string name="actual_gas">Actual gas</string>
+    <string name="amount">Amount</string>
+    <string name="send_to">Send to</string>
+    <string name="eth">ETH</string>
+    <string name="gwei">GWEI</string>
+    <string name="including_miner_tip">Including miner TIP</string>
+    <string name="minus_prefix">-</string>
+    <string name="vote">Vote</string>
+    <string name="unknown_interaction">Unknown interaction</string>
+    <string name="insufficient_balance">Insufficient balance</string>
+    <string name="to">To</string>
+    <string name="next">Next</string>
+    <string name="proposal_created">Proposal created!</string>
+    <string name="choose_proposal_description">Choose proposal description</string>
+    <string name="choose_proposal_duration">Choose proposal duration</string>
+    <string name="choose_proposal_title">Choose proposal title</string>
+    <string name="failed_to_create_proposal">Failed to create proposal</string>
 </resources>

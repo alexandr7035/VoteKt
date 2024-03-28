@@ -4,16 +4,16 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 
 class SyncProposalsWorker(
     appContext: Context,
     params: WorkerParameters,
-    private val votingRepository: VotingRepository,
+    private val votingContractRepository: VotingContractRepository,
 ): CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         return try {
-            votingRepository.syncProposalsWithContract()
+            votingContractRepository.syncProposalsWithContract()
             Result.success()
         } catch (e: Exception) {
             Log.d(TAG, "failed to sync proposals: ${e.localizedMessage}")

@@ -3,7 +3,7 @@ package com.example.votekt.ui.feature_proposals.proposal_details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.ErrorType
-import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.ui.uiError
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class VotingDetailsViewModel(
-    private val votingRepository: VotingRepository
+    private val votingContractRepository: VotingContractRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -30,7 +30,7 @@ class VotingDetailsViewModel(
     val state = _state.asStateFlow()
 
     fun loadProposalById(id: String) {
-        votingRepository
+        votingContractRepository
             .getProposalById(id)
             .catch { error ->
                 _state.update { curr ->
@@ -52,7 +52,6 @@ class VotingDetailsViewModel(
             .launchIn(viewModelScope)
     }
 
-    // TODO FIX ID
     fun makeVote(proposalNumber: Int, voteType: VoteType) {
         _state.update {
             it.copy(
@@ -61,32 +60,19 @@ class VotingDetailsViewModel(
         }
 
         viewModelScope.launch {
-            when (val res = votingRepository.voteOnProposal(proposalNumber, voteType)) {
+            when (val res = votingContractRepository.voteOnProposal(proposalNumber, voteType)) {
                 is OperationResult.Success -> {
                     _state.update {
-                        it.copy(
-                            isSelfVoteProcessing = false,
-                            selfVoteSubmittedEvent = triggered(res.data)
-                        )
+                        it.copy(isSelfVoteProcessing = false,)
                     }
                 }
 
                 is OperationResult.Failure -> {
                     _state.update {
-                        it.copy(
-                            error = res.error.errorType.uiError
-                        )
+                        it.copy(error = res.error.errorType.uiError)
                     }
                 }
             }
-        }
-    }
-
-    fun onVoteSubmittedEvent() {
-        _state.update {
-            it.copy(
-                selfVoteSubmittedEvent = consumed()
-            )
         }
     }
 }

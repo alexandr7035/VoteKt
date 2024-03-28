@@ -1,8 +1,9 @@
 package by.alexandr7035.crypto
 
-import java.math.BigInteger
+import org.kethereum.model.Address
+import org.kethereum.model.ECKeyPair
 
 data class Credentials(
-    val address: String,
-    val privateKey: BigInteger,
+    val address: Address,
+    val keyPair: ECKeyPair
 )

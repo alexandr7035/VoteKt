@@ -47,14 +47,11 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
-import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getVoteColor
-import com.example.votekt.ui.utils.prettifyAddress
-import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -62,7 +59,6 @@ import org.koin.androidx.compose.koinViewModel
 fun VotingDetailsScreen(
     proposalId: String,
     onBack: () -> Unit = {},
-    onShowSnackBar: (message: String, snackBarMode: SnackBarMode) -> Unit = { _, _ -> },
     viewModel: VotingDetailsViewModel = koinViewModel(),
 ) {
 
@@ -94,15 +90,6 @@ fun VotingDetailsScreen(
                 viewModel.loadProposalById(proposalId)
             })
         }
-    }
-
-    EventEffect(
-        event = screenState.selfVoteSubmittedEvent, onConsumed = viewModel::onVoteSubmittedEvent
-    ) { transactionHash ->
-        // TODO composition local
-        onShowSnackBar.invoke(
-            "Vote submitted! Wait for the transaction result\nHash: ${transactionHash.value.prettifyAddress()}", SnackBarMode.Neutral
-        )
     }
 }
 

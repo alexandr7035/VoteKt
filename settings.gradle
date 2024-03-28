@@ -3,10 +3,11 @@ pluginManagement {
         google()
         mavenCentral()
         gradlePluginPortal()
+        maven { url "https://jitpack.io" }
     }
 }
 dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+//    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
         google()
         mavenCentral()
@@ -19,6 +20,8 @@ include ':ethereum_core'
 include ':ethereum_impl'
 include ':crypto'
 include ':libs'
-include ':libs:gnosis_crypto'
+//include ':libs:gnosis_crypto'
 include ':utils'
 include ':web3j_contracts'
+include ':contracts'
+

@@ -3,8 +3,9 @@ package com.example.votekt.ui.create_proposal
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.domain.votings.VotingRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.domain.votings.CreateProposal
+import com.example.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class CreateProposalViewModel(private val votingRepository: VotingRepository) : ViewModel() {
+class CreateProposalViewModel(private val votingContractRepository: VotingContractRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(
         CreateProposalScreenState()
     )
@@ -26,19 +27,13 @@ class CreateProposalViewModel(private val votingRepository: VotingRepository) : 
                 prev.copy(isLoading = true)
             }
 
-            val res = votingRepository.createProposal(data)
+            val res = votingContractRepository.createProposal(data)
 
             when (res) {
                 is OperationResult.Success -> {
                     _uiState.update { prev ->
                         prev.copy(
-                            submitProposalEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = true,
-                                    transactionHash = res.data,
-                                    error = null
-                                )
-                            ),
+                            submitProposalEvent = triggered(CreateProposalResult(error = null)),
                             isLoading = false,
                         )
                     }
@@ -48,11 +43,7 @@ class CreateProposalViewModel(private val votingRepository: VotingRepository) : 
                     _uiState.update { prev ->
                         prev.copy(
                             submitProposalEvent = triggered(
-                                SubmitTransactionResult(
-                                    isTransactionSubmitted = false,
-                                    transactionHash = null,
-                                    error = res.error
-                                )
+                                CreateProposalResult(error = res.error)
                             ),
                             isLoading = false,
                         )

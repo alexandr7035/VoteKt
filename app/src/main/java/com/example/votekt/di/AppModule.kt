@@ -9,42 +9,45 @@ import com.cioccarellia.ksprefs.config.EncryptionType
 import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
 import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import com.example.votekt.BuildConfig
-import com.example.votekt.domain.transactions.TransactionRepository
-import com.example.votekt.domain.votings.VotingRepository
-import com.example.votekt.domain.account.AccountRepository
-import com.example.votekt.data.repository_impl.AccountRepositoryImpl
+import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.helpers.MnemonicHelperDebugImpl
 import com.example.votekt.data.helpers.MnemonicHelperImpl
-import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.data.repository_impl.AccountRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
-import com.example.votekt.data.cache.TransactionsDatabase
+import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
-import com.example.votekt.data.repository_impl.VotingRepositoryImpl
+import com.example.votekt.data.repository_impl.VotingContractRepositoryImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
+import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.transactions.SendTransactionRepository
+import com.example.votekt.domain.transactions.TransactionRepository
+import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
-import com.example.votekt.ui.feature_wallet.WalletViewModel
-import com.example.votekt.ui.tx_history.TransactionsViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
+import com.example.votekt.ui.feature_wallet.WalletViewModel
+import com.example.votekt.ui.tx_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.workmanager.dsl.worker
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import kotlin.time.Duration.Companion.seconds
 
 val appModule = module {
-    includes(web3Module)
     includes(netModule)
     includes(ethereumModule)
 
     viewModel { AppViewModel(
-        accountRepository = get()
+        accountRepository = get(),
+        sendTransactionRepository = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -117,7 +120,7 @@ val appModule = module {
         SyncProposalsWorker(
             appContext = get(),
             params = get(),
-            votingRepository = get()
+            votingContractRepository = get(),
         )
     }
 
@@ -138,8 +141,15 @@ val appModule = module {
     }
 
     // TODO dispatcher annotation
-    single<VotingRepository> {
-        VotingRepositoryImpl(get(), get(), get(), get(), Dispatchers.IO)
+    single<VotingContractRepository> {
+        VotingContractRepositoryImpl(
+            contractAddress = BuildConfig.CONTRACT_ADDRESS,
+            accountRepository = get(),
+            proposalsDao = get(),
+            dispatcher = Dispatchers.IO,
+            sendTransactionRepository = get(),
+            web3 = get()
+        )
     }
 
     single<TransactionRepository> {
@@ -149,4 +159,13 @@ val appModule = module {
             workManager = get(),
         )
     }
+
+    single { SendTransactionRepositoryImpl(
+        ethereumClient = get(),
+        accountRepository = get(),
+        transactionRepository = get(),
+        proposalsDao = get(),
+        ksPrefs = get(),
+        cryptoHelper = get(),
+    ) } bind SendTransactionRepository::class
 }

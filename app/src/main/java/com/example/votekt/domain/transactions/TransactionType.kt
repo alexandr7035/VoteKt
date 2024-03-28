@@ -1,6 +1,7 @@
 package com.example.votekt.domain.transactions
 
 enum class TransactionType {
+    PAYMENT,
     CREATE_PROPOSAL,
     VOTE;
 
@@ -9,6 +10,7 @@ enum class TransactionType {
             return when (this) {
                 CREATE_PROPOSAL -> "Create proposal"
                 VOTE -> "Vote on proposal"
+                PAYMENT -> "Send ETH"
             }
         }
 }
