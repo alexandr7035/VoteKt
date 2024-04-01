@@ -1,6 +1,6 @@
 plugins {
-    id 'java-library'
-    id 'org.jetbrains.kotlin.jvm'
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
 }
 
@@ -9,9 +9,34 @@ java {
     targetCompatibility = JavaVersion.VERSION_17
 }
 
+android {
+    namespace 'by.alexandr7035.ethereum_impl'
+    compileSdk 34
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 34
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+}
+
 dependencies {
     implementation project(":ethereum_core")
     implementation project(":utils")
+    implementation project(":contracts")
 
     // Retrofit
     implementation "com.squareup.retrofit2:retrofit:2.9.0"
@@ -22,6 +47,7 @@ dependencies {
     // Moshi
     implementation "com.squareup.moshi:moshi-kotlin:1.15.0"
     implementation "com.squareup.moshi:moshi-adapters:1.15.0"
+    implementation project(path: ':contracts')
     kapt "com.squareup.moshi:moshi-kotlin-codegen:1.15.0"
 
     implementation 'com.github.komputing.kethereum:model:0.86.0'
@@ -29,4 +55,13 @@ dependencies {
     // For tx serialization
     implementation 'com.github.komputing.khex:extensions:1.1.2'
     implementation("com.github.komputing:khex:1.1.2")
+
+    // Coroutines
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
+
+    // Ktor
+    def ktor_version = "2.3.9"
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+    implementation("io.ktor:ktor-server-websockets:$ktor_version")
 }

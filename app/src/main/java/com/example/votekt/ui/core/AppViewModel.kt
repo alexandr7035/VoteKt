@@ -2,6 +2,7 @@ package com.example.votekt.ui.core
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import by.alexandr7035.ethereum.core.EthereumEventListener
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.transactions.ConfirmTransactionState
 import com.example.votekt.domain.transactions.SendTransactionRepository
@@ -19,6 +20,7 @@ import kotlinx.coroutines.launch
 class AppViewModel(
     private val accountRepository: AccountRepository,
     private val sendTransactionRepository: SendTransactionRepository,
+    private val web3EventsRepository: EthereumEventListener
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(AppState.Loading)
     val appState = _appState.asStateFlow()
@@ -30,7 +32,9 @@ class AppViewModel(
 
     private fun emitIntent(intent: AppIntent) {
         when (intent) {
-            AppIntent.EnterApp -> reduceCheckAccount()
+            AppIntent.EnterApp -> {
+                reduceCheckAccount()
+            }
         }
     }
 
@@ -72,6 +76,12 @@ class AppViewModel(
                     reduceConfirmTransactionState(it)
                 }
                 .launchIn(viewModelScope)
+
+            if (shouldCreateAccount.not()) {
+                web3EventsRepository
+                    .subscribe()
+                    .launchIn(viewModelScope)
+            }
         }
     }
 

@@ -27,6 +27,8 @@ android {
         goerli {
             dimension "environment"
             buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
+            // TODO infura url
+            buildConfigField("String", "ETH_WSS_NODE_URL", LOCAL_WSS_NODE_URL)
             buildConfigField("String", "CONTRACT_ADDRESS", GOERLI_CONTRACT_ADDRESS)
             buildConfigField("String", "TEST_MNEMONIC", GOERLI_TEST_MNEMONIC)
             buildConfigField("String", "TEST_ADDRESS", GOERLI_TEST_ADDRESS)
@@ -36,6 +38,7 @@ android {
         local {
             dimension "environment"
             buildConfigField("String", "ETH_NODE_URL", LOCAL_NODE_URL)
+            buildConfigField("String", "ETH_WSS_NODE_URL", LOCAL_WSS_NODE_URL)
             buildConfigField("String", "CONTRACT_ADDRESS", LOCAL_CONTRACT_ADDRESS)
             buildConfigField("String", "TEST_MNEMONIC", LOCAL_TEST_MNEMONIC)
             buildConfigField("String", "TEST_ADDRESS", LOCAL_TEST_ADDRESS)
