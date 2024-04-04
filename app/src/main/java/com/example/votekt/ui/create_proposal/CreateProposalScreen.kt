@@ -34,6 +34,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.BuildConfig
 import com.example.votekt.R
 import com.example.votekt.core.config.ProposalConfig
+import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.ProposalDuration
 import com.example.votekt.ui.components.PrimaryButton
@@ -50,7 +51,8 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CreateProposalScreen(
     viewModel: CreateProposalViewModel = koinViewModel(),
-    onBack: () -> Unit = {},
+    onBack: () -> Unit,
+    onProposalCreated: (proposalUuid: Uuid) -> Unit = {},
 ) {
     val context = LocalContext.current
     val snackBarHostState = remember { SnackbarHostState() }
@@ -61,7 +63,9 @@ fun CreateProposalScreen(
         onConsumed = viewModel::onProposalCreatedEvent
     ) { eventData ->
         if (eventData.error == null) {
-            onBack.invoke()
+            eventData.proposalUuid?.let {
+                onProposalCreated(it)
+            }
         } else {
             context.showToast(R.string.failed_to_create_proposal)
         }

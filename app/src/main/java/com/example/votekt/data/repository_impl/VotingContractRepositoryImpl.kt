@@ -15,6 +15,7 @@ import com.example.votekt.data.cache.mapSelfVote
 import com.example.votekt.data.cache.mapVoteStatus
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
+import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
@@ -59,7 +60,7 @@ class VotingContractRepositoryImpl(
             }
     }
 
-    override suspend fun createProposal(req: CreateProposal): OperationResult<Unit> = withContext(dispatcher) {
+    override suspend fun createProposal(req: CreateProposal): OperationResult<Uuid> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val uuid = UUID.randomUUID().toString()
 
@@ -90,6 +91,8 @@ class VotingContractRepositoryImpl(
                     proposalUuid = uuid
                 )
             )
+
+            Uuid(uuid)
         }
     }
 

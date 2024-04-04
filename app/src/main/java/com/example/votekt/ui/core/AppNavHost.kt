@@ -122,9 +122,14 @@ fun AppNavHost(
                     }
 
                     composable(NavDestinations.NewProposal.route) {
-                        CreateProposalScreen {
-                            navController.popBackStack()
-                        }
+                        CreateProposalScreen(
+                            onProposalCreated = { proposalId ->
+                                navController.navigate("${NavDestinations.VotingDetails.route}/${proposalId.value}")
+                            },
+                            onBack = {
+                                navController.popBackStack()
+                            }
+                        )
                     }
 
                     composable(NavDestinations.Primary.Transactions.route) {
@@ -135,7 +140,13 @@ fun AppNavHost(
                         route = "${NavDestinations.VotingDetails.route}/{proposalId}",
                         arguments = listOf(navArgument("proposalId") { type = NavType.StringType })
                     ) {
-                        VotingDetailsScreen(proposalId = it.arguments?.getString("proposalId")!!, onBack = { navController.popBackStack() })
+                        VotingDetailsScreen(
+                            proposalId = it.arguments?.getString("proposalId")!!,
+                            onBack = { navController.popBackStack(
+                                route = NavDestinations.Primary.Proposals.route,
+                                inclusive = false
+                            ) }
+                        )
                     }
                 }
 

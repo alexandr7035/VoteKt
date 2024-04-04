@@ -1,6 +1,7 @@
 package com.example.votekt.ui.feature_proposals.proposal_details
 
 import android.annotation.SuppressLint
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -61,6 +62,10 @@ fun VotingDetailsScreen(
     onBack: () -> Unit = {},
     viewModel: VotingDetailsViewModel = koinViewModel(),
 ) {
+
+    BackHandler() {
+        onBack()
+    }
 
     LaunchedEffect(proposalId) {
         viewModel.loadProposalById(proposalId)
