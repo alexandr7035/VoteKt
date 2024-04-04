@@ -23,6 +23,10 @@ interface ProposalsDao {
     fun getProposalByUuid(uuid: String): ProposalEntity?
 
     @Transaction
+    @Query("SELECT * FROM proposals WHERE uuid = :uuid")
+    fun getProposalWithTransactionsByUuid(uuid: String): ProposalWithTransactions?
+
+    @Transaction
     @Query("SELECT * FROM proposals WHERE deployTransactionHash = :transactionHash")
     fun getProposalByDeployHash(transactionHash: String): ProposalEntity
 
@@ -43,8 +47,10 @@ interface ProposalsDao {
     )
 
     @Query("UPDATE proposals SET votesFor = votesFor + CASE WHEN :inFavor THEN 1 ELSE 0 END, votesAgainst = votesAgainst + CASE WHEN :inFavor THEN 0 ELSE 1 END WHERE number = :proposalNumber")
-//    @Query("UPDATE proposals SET votesFor = votesFor + 40 WHERE number = :proposalNumber")
     suspend fun addVoteToProposal(proposalNumber: Int, inFavor: Boolean)
+
+    @Query("DELETE FROM proposals WHERE isDraft AND uuid = (:proposalUuid)")
+    suspend fun deleteProposal(proposalUuid: String)
 
     @Query("DELETE FROM proposals WHERE NOT isDraft AND uuid NOT IN (:remainingProposals)")
     suspend fun cleanUpProposals(remainingProposals: List<String>)

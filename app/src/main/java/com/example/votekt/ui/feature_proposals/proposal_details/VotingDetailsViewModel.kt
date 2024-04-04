@@ -8,6 +8,8 @@ import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.uiError
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -74,6 +76,34 @@ class VotingDetailsViewModel(
                     }
                 }
             }
+        }
+    }
+
+    fun deleteDraft(proposalUuid: Uuid) {
+        println("call delete draft ${proposalUuid}")
+        viewModelScope.launch {
+            when (val res = votingContractRepository.deleteDraftProposal(proposalUuid)) {
+                is OperationResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            draftDeletedEvent = triggered
+                        )
+                    }
+                }
+                is OperationResult.Failure -> {
+                    _state.update {
+                        it.copy(error = res.error.errorType.uiError)
+                    }
+                }
+            }
+        }
+    }
+
+    fun consumeDraftDeletedEvent() {
+        _state.update {
+            it.copy(
+                draftDeletedEvent = consumed
+            )
         }
     }
 }

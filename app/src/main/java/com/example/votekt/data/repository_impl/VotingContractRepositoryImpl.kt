@@ -7,6 +7,7 @@ import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.utils.asEthereumAddressString
+import com.example.votekt.core.extensions.orFalse
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
@@ -14,10 +15,13 @@ import com.example.votekt.data.cache.mapDeployStatus
 import com.example.votekt.data.cache.mapSelfVote
 import com.example.votekt.data.cache.mapVoteStatus
 import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
+import com.example.votekt.domain.transactions.TransactionStatus
+import com.example.votekt.domain.transactions.isNotPendingOrCompleted
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.ProposalDuration
@@ -100,7 +104,7 @@ class VotingContractRepositoryImpl(
     override suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val cachedProposal = proposalsDao.getProposalByUuid(proposalUuid.value)
-                ?: throw IllegalStateException("Proposal draft not found")
+            require(cachedProposal != null) { "Proposal draft not found" }
 
             val solidityInput = VoteKtContractV1.CreateProposal.encode(
                 uuid = Solidity.String(proposalUuid.value),
@@ -116,6 +120,21 @@ class VotingContractRepositoryImpl(
                     proposalUuid = proposalUuid.value
                 )
             )
+        }
+    }
+
+    override suspend fun deleteDraftProposal(proposalUuid: Uuid): OperationResult<Unit> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
+            val cachedProposalData = proposalsDao
+                .getProposalWithTransactionsByUuid(proposalUuid.value)
+                ?.mapToDomain()
+            println("delete cached proposal ${cachedProposalData}")
+            require(cachedProposalData != null) { "Proposal draft not found" }
+            require(cachedProposalData is Proposal.Draft) { "Proposal is not draft" }
+            require(cachedProposalData.deployStatus is BlockchainActionStatus.NotCompleted) { "Proposal deploy must be not completed" }
+
+            println("delete proposal ${proposalUuid}")
+            proposalsDao.deleteProposal(proposalUuid.value)
         }
     }
 

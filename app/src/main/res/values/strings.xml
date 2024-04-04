@@ -4,6 +4,7 @@
     <string name="proposal_title">Proposal title</string>
     <string name="proposal_desc">Proposal description</string>
     <string name="create_proposal">Create proposal</string>
+    <string name="delete_draft">Delete draft</string>
 
     <string name="mock_proposal_title_1">Education for All - Empowering Minds, Transforming Lives!</string>
     <string name="mock_proposal_desc_1">Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities. Together, we can create a brighter future and empower young minds to shape their destinies. Vote now and be a part of this transformative journey!</string>

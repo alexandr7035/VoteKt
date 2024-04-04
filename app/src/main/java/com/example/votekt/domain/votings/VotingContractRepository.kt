@@ -15,6 +15,8 @@ interface VotingContractRepository {
     suspend fun createProposal(req: CreateProposal): OperationResult<Uuid>
 
     suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit>
+    // TODO move to local datasource as not a contract feature
+    suspend fun deleteDraftProposal(proposalUuid: Uuid): OperationResult<Unit>
     suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit>
     suspend fun syncProposalsWithContract()
     suspend fun handleContractEvent(event: EthereumEvent.ContractEvent)

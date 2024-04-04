@@ -11,3 +11,7 @@ data class TransactionDomain(
 ) {
     companion object
 }
+
+fun TransactionDomain.isNotPendingOrCompleted(): Boolean {
+    return this.status != TransactionStatus.MINED && this.status != TransactionStatus.PENDING
+}

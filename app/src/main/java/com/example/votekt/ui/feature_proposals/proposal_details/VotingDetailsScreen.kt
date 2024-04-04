@@ -16,10 +16,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -42,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.Uuid
+import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
@@ -54,6 +59,7 @@ import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getVoteColor
+import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
 
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
@@ -94,6 +100,9 @@ fun VotingDetailsScreen(
                         )
                     }
                 },
+                onDeleteDraft = {
+                    viewModel.deleteDraft(Uuid(screenState.proposal.uuid))
+                }
             )
         }
 
@@ -103,6 +112,13 @@ fun VotingDetailsScreen(
             })
         }
     }
+
+    NavigationEventEffect(
+        event = screenState.draftDeletedEvent,
+        onConsumed = viewModel::consumeDraftDeletedEvent,
+    ) {
+        onBack()
+    }
 }
 
 
@@ -111,20 +127,35 @@ private fun VotingDetailsScreen_Ui(
     proposal: Proposal,
     onDeployClick: () -> Unit,
     onVote: (VoteType) -> Unit,
-    onBack: () -> Unit = {}
+    onBack: () -> Unit = {},
+    onDeleteDraft: () -> Unit = {},
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
-        AppBar(title = when (proposal) {
-            is Proposal.Draft -> {
-                stringResource(R.string.draft_proposal)
-            }
+        AppBar(
+            title = when (proposal) {
+                is Proposal.Draft -> {
+                    stringResource(R.string.draft_proposal)
+                }
 
-            is Proposal.Deployed -> {
-                stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
+                is Proposal.Deployed -> {
+                    stringResource(id = R.string.proposal_title_template, proposal.proposalNumber)
+                }
+            },
+            onBack = {
+                onBack()
+            },
+            actions = {
+                if (proposal is Proposal.Draft && proposal.deployStatus is BlockchainActionStatus.NotCompleted) {
+                    IconButton(onClick = onDeleteDraft) {
+                        Icon(
+                            imageVector = Icons.Outlined.Delete,
+                            contentDescription = stringResource(R.string.delete_draft),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                }
             }
-        }, onBack = {
-            onBack()
-        })
+        )
     }) { pv ->
         Column(
             modifier = Modifier
