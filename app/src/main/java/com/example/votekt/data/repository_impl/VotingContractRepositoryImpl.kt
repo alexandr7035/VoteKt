@@ -186,6 +186,14 @@ class VotingContractRepositoryImpl(
                 processVoteCastedEvent(eventData)
             }
 
+            VoteKtContractV1.Events.ProposalCreated.EVENT_ID -> {
+                val eventData = VoteKtContractV1.Events.ProposalCreated.decode(
+                    topics = listOf(event.eventTopic),
+                    data = event.encodedData
+                )
+                processProposalCreatedEvent(eventData)
+            }
+
             else -> {
                 println("${TAG} unknown contract event")
             }
@@ -229,6 +237,12 @@ class VotingContractRepositoryImpl(
             inFavor = eventData.infavor.value,
             proposalNumber = eventData.proposalnumber.value.toInt()
         )
+    }
+
+    // TODO more optimal updating
+    private suspend fun processProposalCreatedEvent(eventData: VoteKtContractV1.Events.ProposalCreated.Arguments) {
+        Log.d(TAG, "Proposal created ${eventData}")
+        syncProposalsWithContract()
     }
 
     companion object {
