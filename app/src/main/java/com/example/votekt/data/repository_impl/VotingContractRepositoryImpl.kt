@@ -20,6 +20,7 @@ import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.domain.votings.ProposalDuration
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.domain.votings.VotingData
@@ -93,6 +94,28 @@ class VotingContractRepositoryImpl(
             )
 
             Uuid(uuid)
+        }
+    }
+
+    override suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
+            val cachedProposal = proposalsDao.getProposalByUuid(proposalUuid.value)
+                ?: throw IllegalStateException("Proposal draft not found")
+
+            val solidityInput = VoteKtContractV1.CreateProposal.encode(
+                uuid = Solidity.String(proposalUuid.value),
+                title = Solidity.String(cachedProposal.title),
+                description = Solidity.String(cachedProposal.description),
+                durationInDays = Solidity.UInt256(ProposalDuration.DURATION_24_HOURS.getDurationInDays().toBigInteger())
+            )
+
+            sendTransactionRepository.requirePrepareTransaction(
+                data = PrepareTransactionData.ContractInteraction.CreateProposal(
+                    contractAddress = org.kethereum.model.Address(contractAddress),
+                    contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
+                    proposalUuid = proposalUuid.value
+                )
+            )
         }
     }
 

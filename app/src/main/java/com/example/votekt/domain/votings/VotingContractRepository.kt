@@ -13,6 +13,8 @@ interface VotingContractRepository {
 
     // TODO refactoring of OperationResult class
     suspend fun createProposal(req: CreateProposal): OperationResult<Uuid>
+
+    suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit>
     suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit>
     suspend fun syncProposalsWithContract()
     suspend fun handleContractEvent(event: EthereumEvent.ContractEvent)

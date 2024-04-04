@@ -10,6 +10,9 @@ object Dimensions {
     val buttonMinHeight = 48.dp
     val buttonContentPaddingHorizontal = 36.dp
 
+    val roundedButtonCorners = 16.dp
+    val roundedButtonHeight = 44.dp
+
     val chipCorners = 12.dp
     val chipSpaceInGroup = 8.dp
 }

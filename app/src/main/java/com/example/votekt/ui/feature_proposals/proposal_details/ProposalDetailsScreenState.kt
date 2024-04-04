@@ -9,5 +9,5 @@ data class ProposalDetailsScreenState(
     val isProposalLoading: Boolean = false,
     val proposal: Proposal? = null,
     val error: UiErrorMessage? = null,
-    val isSelfVoteProcessing: Boolean = false,
+//    val isSelfVoteProcessing: Boolean = false,
 )
