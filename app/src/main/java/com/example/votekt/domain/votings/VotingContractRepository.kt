@@ -1,5 +1,6 @@
 package com.example.votekt.domain.votings
 
+import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import com.example.votekt.domain.core.OperationResult
 import kotlinx.coroutines.flow.Flow
 
@@ -13,5 +14,6 @@ interface VotingContractRepository {
     suspend fun createProposal(req: CreateProposal): OperationResult<Unit>
     suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit>
     suspend fun syncProposalsWithContract()
+    suspend fun handleContractEvent(event: EthereumEvent.ContractEvent)
 }
 

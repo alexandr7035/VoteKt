@@ -1,9 +1,11 @@
 package com.example.votekt.data.repository_impl
 
+import android.util.Log
 import by.alexandr7035.contracts.VoteKtContractV1
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
+import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.utils.asEthereumAddressString
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
@@ -18,8 +20,8 @@ import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
-import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.domain.votings.VotingContractRepository
+import com.example.votekt.domain.votings.VotingData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -172,6 +174,24 @@ class VotingContractRepositoryImpl(
         proposalsDao.cleanUpProposals(remainingProposals = decoded.map { it.uuid.value })
     }
 
+    override suspend fun handleContractEvent(event: EthereumEvent.ContractEvent) {
+        println("${TAG} wss topic ${event.eventTopic}")
+        println("${TAG} contact topic ${VoteKtContractV1.Events.VoteCasted.EVENT_ID}")
+        when (event.eventTopic) {
+            VoteKtContractV1.Events.VoteCasted.EVENT_ID -> {
+                val eventData = VoteKtContractV1.Events.VoteCasted.decode(
+                    topics = listOf(event.eventTopic),
+                    data = event.encodedData
+                )
+                processVoteCastedEvent(eventData)
+            }
+
+            else -> {
+                println("${TAG} unknown contract event")
+            }
+        }
+    }
+
     private suspend fun ProposalWithTransactions.mapToDomain(): Proposal = withContext(dispatcher) {
         return@withContext if (!proposal.isDraft) {
             Proposal.Deployed(
@@ -201,6 +221,14 @@ class VotingContractRepositoryImpl(
                 deployStatus = mapDeployStatus(),
             )
         }
+    }
+
+    private suspend fun processVoteCastedEvent(eventData: VoteKtContractV1.Events.VoteCasted.Arguments) {
+        Log.d(TAG, "Vote casted ${eventData}")
+        proposalsDao.addVoteToProposal(
+            inFavor = eventData.infavor.value,
+            proposalNumber = eventData.proposalnumber.value.toInt()
+        )
     }
 
     companion object {

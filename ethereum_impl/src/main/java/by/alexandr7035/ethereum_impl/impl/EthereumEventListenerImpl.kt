@@ -1,9 +1,10 @@
 package by.alexandr7035.ethereum_impl.impl
 
-import by.alexandr7035.contracts.VoteKtContractV1
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
+import by.alexandr7035.utils.addHexPrefix
+import by.alexandr7035.utils.removeHexPrefix
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -64,9 +65,7 @@ class EthereumEventListenerImpl(
                 while(coroutineScope.isActive) {
                     val othersMessage = incoming.receive() as? Frame.Text
                     othersMessage?.let {
-                        reduceWssEvent(it.readText())
-                        println("WSS event ${it.readText()}")
-//                        VoteKtContractV1.Events.VoteCasted.decode()
+                        emit(parseWssEvent(it.readText()))
                     }
                 }
             }
@@ -88,22 +87,23 @@ class EthereumEventListenerImpl(
     }
 
 
-    private fun reduceWssEvent(rawEvent: String) {
+    private fun parseWssEvent(rawEvent: String): EthereumEvent {
         try {
             val res = responseAdapter.fromJson(rawEvent)
             println("Contract event?: ${res?.params?.result}")
 
             res?.params?.result?.let {
-                val event = VoteKtContractV1.Events.VoteCasted.decode(
-                    topics = it.topics,
-                    data = it.data
+                return EthereumEvent.ContractEvent(
+                    eventTopic = it.topics.first().removeHexPrefix(),
+                    encodedData = it.data,
                 )
-                println("Decoded event: ${event}")
             }
         }
         catch (e: Exception) {
             println("failed to handle raw event ${rawEvent}")
         }
+
+        return EthereumEvent.UnknownEvent
     }
 
     private companion object {

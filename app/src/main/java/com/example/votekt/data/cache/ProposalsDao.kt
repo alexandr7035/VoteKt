@@ -6,7 +6,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import com.example.votekt.domain.votings.VoteType
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -37,11 +36,15 @@ interface ProposalsDao {
     fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
 
     @Query("UPDATE proposals SET selfVote = :supported, selfVoteTransactionHash = :voteTransactionHash WHERE number = :proposalNumber")
-    fun updateProposalVote(
+    fun updateSelfVote(
         proposalNumber: Int,
         supported: Boolean,
         voteTransactionHash: String,
     )
+
+    @Query("UPDATE proposals SET votesFor = votesFor + CASE WHEN :inFavor THEN 1 ELSE 0 END, votesAgainst = votesAgainst + CASE WHEN :inFavor THEN 0 ELSE 1 END WHERE number = :proposalNumber")
+//    @Query("UPDATE proposals SET votesFor = votesFor + 40 WHERE number = :proposalNumber")
+    suspend fun addVoteToProposal(proposalNumber: Int, inFavor: Boolean)
 
     @Query("DELETE FROM proposals WHERE NOT isDraft AND uuid NOT IN (:remainingProposals)")
     suspend fun cleanUpProposals(remainingProposals: List<String>)

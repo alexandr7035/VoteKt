@@ -41,6 +41,7 @@ class VotingDetailsViewModel(
                 }
             }
             .onEach { proposal ->
+                println("UI proposal ${proposal}")
                 _state.update {
                     it.copy(
                         proposal = proposal,

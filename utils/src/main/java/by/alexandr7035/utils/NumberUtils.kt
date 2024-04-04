@@ -13,6 +13,8 @@ fun String.decimalAsBigInteger() = BigInteger(this, 10)
 private const val HEX_PREFIX = "0x"
 fun String.addHexPrefix() = if (!this.startsWith(HEX_PREFIX)) "$HEX_PREFIX$this" else this
 
+fun String.removeHexPrefix() = if (this.startsWith(HEX_PREFIX)) this.removePrefix(HEX_PREFIX) else this
+
 fun ByteArray.asBigInteger() = BigInteger(1, this)
 
 fun String.hexAsBigIntegerOrNull() = this.hexAsBigInteger()

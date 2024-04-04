@@ -25,8 +25,6 @@ import kotlinx.coroutines.withContext
 import org.kethereum.eip1559.signer.signViaEIP1559
 import org.kethereum.extensions.transactions.encodeAsEIP1559Tx
 import org.kethereum.model.ECKeyPair
-import org.kethereum.model.PrivateKey
-import org.kethereum.model.PublicKey
 import org.kethereum.model.Transaction
 import org.kethereum.model.createEmptyTransaction
 import org.komputing.khex.extensions.toHexString
@@ -174,7 +172,7 @@ class SendTransactionRepositoryImpl(
             }
 
             is PrepareTransactionData.ContractInteraction.VoteOnProposal -> {
-                proposalsDao.updateProposalVote(
+                proposalsDao.updateSelfVote(
                     proposalNumber = prepareTransactionData.proposalNumber,
                     supported = prepareTransactionData.vote,
                     voteTransactionHash = transactionHash,

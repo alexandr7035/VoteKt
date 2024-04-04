@@ -51,7 +51,8 @@ val appModule = module {
     viewModel { AppViewModel(
         accountRepository = get(),
         sendTransactionRepository = get(),
-        web3EventsRepository = get()
+        web3EventsRepository = get(),
+        votingContractRepository = get()
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
