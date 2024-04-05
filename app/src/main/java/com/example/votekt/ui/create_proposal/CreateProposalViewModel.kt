@@ -5,7 +5,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.domain.votings.CreateProposal
-import com.example.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +26,7 @@ class CreateProposalViewModel(private val votingContractRepository: VotingContra
                 prev.copy(isLoading = true)
             }
 
-            val res = votingContractRepository.createProposal(data)
+            val res = votingContractRepository.createDraftProposal(data)
 
             when (res) {
                 is OperationResult.Success -> {

@@ -65,16 +65,9 @@ class VotingContractRepositoryImpl(
             }
     }
 
-    override suspend fun createProposal(req: CreateProposal): OperationResult<Uuid> = withContext(dispatcher) {
+    override suspend fun createDraftProposal(req: CreateProposal): OperationResult<Uuid> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val uuid = UUID.randomUUID().toString()
-
-            val solidityInput = VoteKtContractV1.CreateProposal.encode(
-                uuid = Solidity.String(uuid),
-                title = Solidity.String(req.title),
-                description = Solidity.String(req.desc),
-                durationInDays = Solidity.UInt256(req.duration.getDurationInDays().toBigInteger())
-            )
 
             proposalsDao.cacheProposal(
                 ProposalEntity(
@@ -86,14 +79,7 @@ class VotingContractRepositoryImpl(
                     deployTransactionHash = null,
                     createdAt = System.currentTimeMillis(),
                     creatorAddress = accountRepository.getSelfAddress().hex,
-                )
-            )
-
-            sendTransactionRepository.requirePrepareTransaction(
-                data = PrepareTransactionData.ContractInteraction.CreateProposal(
-                    contractAddress = org.kethereum.model.Address(contractAddress),
-                    contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
-                    proposalUuid = uuid
+                    durationInDays = req.duration,
                 )
             )
 
@@ -110,7 +96,11 @@ class VotingContractRepositoryImpl(
                 uuid = Solidity.String(proposalUuid.value),
                 title = Solidity.String(cachedProposal.title),
                 description = Solidity.String(cachedProposal.description),
-                durationInDays = Solidity.UInt256(ProposalDuration.DURATION_24_HOURS.getDurationInDays().toBigInteger())
+                durationInDays = cachedProposal.durationInDays?.getDurationInDays()?.let {
+                    Solidity.UInt256(it.toBigInteger())
+                } ?: kotlin.run {
+                    Solidity.UInt256(ProposalDuration.default.getDurationInDays().toBigInteger())
+                }
             )
 
             sendTransactionRepository.requirePrepareTransaction(

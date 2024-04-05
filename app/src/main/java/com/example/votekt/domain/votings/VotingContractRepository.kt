@@ -12,7 +12,7 @@ interface VotingContractRepository {
     fun getProposalById(id: String): Flow<Proposal>
 
     // TODO refactoring of OperationResult class
-    suspend fun createProposal(req: CreateProposal): OperationResult<Uuid>
+    suspend fun createDraftProposal(req: CreateProposal): OperationResult<Uuid>
 
     suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit>
     // TODO move to local datasource as not a contract feature

@@ -20,4 +20,8 @@ enum class ProposalDuration {
             DURATION_30_DAYS -> "30 days"
         }
     }
+
+    companion object {
+        val default = DURATION_7_DAYS
+    }
 }
