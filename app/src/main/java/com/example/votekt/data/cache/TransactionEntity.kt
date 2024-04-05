@@ -15,6 +15,7 @@ data class TransactionEntity(
     val type: TransactionType,
     val status: TransactionStatus,
     val dateSent: Long,
+    val value: Wei?,
     val gasUsed: BigInteger?,
     val gasFee: Wei?,
 ) {
@@ -23,6 +24,7 @@ data class TransactionEntity(
         hash = hash,
         status = status,
         dateSent = dateSent,
-        gasFee = gasFee
+        gasFee = gasFee,
+        value = value,
     )
 }

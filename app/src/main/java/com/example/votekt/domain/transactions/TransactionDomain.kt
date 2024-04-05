@@ -6,6 +6,7 @@ data class TransactionDomain(
     val type: TransactionType,
     val hash: String,
     val status: TransactionStatus,
+    val value: Wei?,
     val dateSent: Long,
     val gasFee: Wei?,
 ) {

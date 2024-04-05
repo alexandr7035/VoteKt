@@ -7,7 +7,6 @@ import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.utils.asEthereumAddressString
-import com.example.votekt.core.extensions.orFalse
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
@@ -20,8 +19,6 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
-import com.example.votekt.domain.transactions.TransactionStatus
-import com.example.votekt.domain.transactions.isNotPendingOrCompleted
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.ProposalDuration

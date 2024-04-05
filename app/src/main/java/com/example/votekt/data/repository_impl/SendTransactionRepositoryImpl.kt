@@ -180,7 +180,11 @@ class SendTransactionRepositoryImpl(
     )  = withContext(Dispatchers.IO) {
         transactionRepository.addNewTransaction(
             transactionHash = TransactionHash(transactionHash),
-            transactionType = prepareTransactionData.transactionType
+            transactionType = prepareTransactionData.transactionType,
+            value = when (prepareTransactionData) {
+                is PrepareTransactionData.ContractInteraction -> null
+                is PrepareTransactionData.SendValue -> prepareTransactionData.amount
+            }
         )
 
         when (prepareTransactionData) {
@@ -207,7 +211,6 @@ class SendTransactionRepositoryImpl(
         // TODO proper account storing
         Log.d(LOG_TAG, "load credentials for seed: ${ ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)}")
         val phrase = ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)
-        val mnemonic = Mnemonics.MnemonicCode(phrase)
         return@withContext cryptoHelper.generateCredentialsFromMnemonic(phrase).ecKeyPair!!
     }
 

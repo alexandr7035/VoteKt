@@ -140,7 +140,7 @@ val appModule = module {
             dispatcher = Dispatchers.IO,
             ethereumClient = get(),
             cryptoHelper = get(),
-            balancePollingDelay = 5.seconds,
+            balancePollingDelay = 20.seconds,
             ksPrefs = get()
         )
     }

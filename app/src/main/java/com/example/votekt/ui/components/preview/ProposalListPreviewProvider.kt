@@ -18,7 +18,8 @@ class ProposalListPreviewProvider: PreviewParameterProvider<List<Proposal>> {
         hash = "0x12334",
         dateSent = 0,
         status = TransactionStatus.PENDING,
-        gasFee = Wei(BigInteger("0"))
+        gasFee = Wei(BigInteger("0")),
+        value = null,
     )
 
     private val mockVoteTransaction = TransactionDomain(
@@ -26,7 +27,8 @@ class ProposalListPreviewProvider: PreviewParameterProvider<List<Proposal>> {
         hash = "0x12334",
         dateSent = 0,
         status = TransactionStatus.MINED,
-        gasFee = Wei(BigInteger("0"))
+        gasFee = Wei(BigInteger("0")),
+        value = null,
     )
 
     override val values: Sequence<List<Proposal>>
