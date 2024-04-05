@@ -153,7 +153,7 @@ fun AppNavHost(
                 if (state.requiresTxConfirmation()) {
                     ReviewTransactionDialog(
                         onIntent = viewModel::onTransactionIntent,
-                        state = state.txConfirmationState.data!!,
+                        state = state.txConfirmationState!!,
                     )
                 }
             }

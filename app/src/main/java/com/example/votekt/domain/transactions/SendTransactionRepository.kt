@@ -3,7 +3,7 @@ package com.example.votekt.domain.transactions
 import kotlinx.coroutines.flow.StateFlow
 
 interface SendTransactionRepository {
-    val state: StateFlow<ConfirmTransactionState>
+    val state: StateFlow<ReviewTransactionData?>
 
     suspend fun requirePrepareTransaction(data: PrepareTransactionData)
 

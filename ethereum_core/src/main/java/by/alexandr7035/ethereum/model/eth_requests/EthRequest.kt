@@ -9,7 +9,7 @@ sealed class EthRequest<T>(open val id: Int) {
     fun result(): T? = (response as? Response.Success)?.data
 
     @Throws(RequestFailedException::class, RequestNotExecutedException::class)
-    fun checkedResult(errorMsg: String? = null): T =
+    fun checkedResult(errorMsg: String): T =
         response.let {
             when (it) {
                 is Response.Success ->

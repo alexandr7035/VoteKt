@@ -3,6 +3,8 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.ethereum.core.EthereumClient
+import by.alexandr7035.ethereum.errors.RequestFailedException
+import by.alexandr7035.ethereum.errors.RequestNotExecutedException
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
 import by.alexandr7035.ethereum.model.GWEI
 import by.alexandr7035.ethereum.model.Wei
@@ -12,12 +14,13 @@ import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.domain.account.AccountRepository
-import com.example.votekt.domain.transactions.ConfirmTransactionState
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.transactions.TransactionType
+import com.example.votekt.domain.transactions.ReviewTransactionData
+import com.example.votekt.domain.transactions.TransactionEstimationError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -41,9 +44,7 @@ class SendTransactionRepositoryImpl(
 
     private var transaction: Transaction = createEmptyTransaction()
 
-    private val _state: MutableStateFlow<ConfirmTransactionState> = MutableStateFlow(
-        ConfirmTransactionState.Idle
-    )
+    private val _state: MutableStateFlow<ReviewTransactionData?> = MutableStateFlow(null)
     override val state = _state
 
     override suspend fun requirePrepareTransaction(data: PrepareTransactionData) = withContext(Dispatchers.IO) {
@@ -61,16 +62,17 @@ class SendTransactionRepositoryImpl(
         }
 
         // Initial state
-        _state.emit(
-            ConfirmTransactionState.TxReview(
+        _state.update {
+            ReviewTransactionData(
                 data = data,
                 transactionType = when (data) {
                     is PrepareTransactionData.ContractInteraction -> {
                         when (data) {
                             is PrepareTransactionData.ContractInteraction.CreateProposal
-                                -> TransactionType.CREATE_PROPOSAL
+                            -> TransactionType.CREATE_PROPOSAL
+
                             is PrepareTransactionData.ContractInteraction.VoteOnProposal
-                                -> TransactionType.VOTE
+                            -> TransactionType.VOTE
                         }
                     }
 
@@ -81,9 +83,9 @@ class SendTransactionRepositoryImpl(
                 input = if (data is PrepareTransactionData.ContractInteraction) data.contractInput.value.toHexString() else null,
                 totalEstimatedFee = null,
                 minerTipFee = null,
-                isSufficientBalance = null,
+                estimationError = null,
             )
-        )
+        }
 
         when (data) {
             is PrepareTransactionData.ContractInteraction -> {
@@ -96,13 +98,28 @@ class SendTransactionRepositoryImpl(
             }
         }
 
-        val transactionEstimation = ethereumClient.estimateTransaction(transaction)
-        transaction.applyGasEstimation(transactionEstimation)
+        try {
+            val transactionEstimation = ethereumClient.estimateTransaction(transaction)
+            transaction.applyGasEstimation(transactionEstimation)
+        } catch (e: Exception) {
+            when (e) {
+                is RequestFailedException -> {
+                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
+                }
+
+                is RequestNotExecutedException -> {
+                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
+                }
+
+                else -> {
+                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(null)) }
+                }
+            }
+        }
     }
 
     override suspend fun confirmTransaction() = withContext(Dispatchers.IO) {
-        val currentState = _state.value
-        if (currentState !is ConfirmTransactionState.TxReview) return@withContext
+        val currentState = _state.value ?: return@withContext
 
         val credentials = loadCredentials()
         val signedTxData = transaction.signAndEncode(credentials)
@@ -110,17 +127,16 @@ class SendTransactionRepositoryImpl(
 
         cacheLocalTransactionData(currentState.data, hash)
 
-        _state.update { ConfirmTransactionState.Idle }
+        _state.update { null }
     }
 
     override suspend fun cancelTransaction() {
         transaction = createEmptyTransaction()
-        state.emit(ConfirmTransactionState.Idle)
+        state.update { null }
     }
 
     private fun Transaction.applyGasEstimation(estimation: EthTransactionEstimation) {
-        val currentState = _state.value
-        if (currentState !is ConfirmTransactionState.TxReview) return
+        val currentState = _state.value ?: return
 
         val baseFee = estimation.gasPrice
         val maxPriorityFeePerGas = DEFAULT_MINER_TIP
@@ -139,11 +155,15 @@ class SendTransactionRepositoryImpl(
 
         val totalFee = Wei(estimation.estimatedGas * maxFeePerGas.value)
 
+        val insufficientBalanceError = if (estimation.balance < totalFee) {
+            TransactionEstimationError.InsufficientBalance
+        } else null
+
         _state.update {
             currentState.copy(
                 totalEstimatedFee = totalFee,
                 minerTipFee = maxPriorityFeePerGas,
-                isSufficientBalance = estimation.balance > totalFee
+                estimationError = insufficientBalanceError
             )
         }
     }

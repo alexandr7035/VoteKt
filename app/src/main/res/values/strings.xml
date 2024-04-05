@@ -58,4 +58,6 @@
     <string name="choose_proposal_duration">Choose proposal duration</string>
     <string name="choose_proposal_title">Choose proposal title</string>
     <string name="failed_to_create_proposal">Failed to create proposal</string>
+    <string name="unknown_transaction_execution_error">Unknown transaction execution error. Please, try again later</string>
+    <string name="metric_na">---</string>
 </resources>
