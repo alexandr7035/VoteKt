@@ -9,4 +9,5 @@ object EthNodeMethods {
     const val FUNCTION_GET_STORAGE_AT = "eth_getStorageAt"
     const val FUNCTION_SEND_RAW_TRANSACTION = "eth_sendRawTransaction"
     const val FUNCTION_GET_TRANSACTION_RECEIPT = "eth_getTransactionReceipt"
+    const val FUNCTION_SUBSCRIBE = "eth_subscribe"
 }

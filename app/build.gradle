@@ -27,8 +27,7 @@ android {
         goerli {
             dimension "environment"
             buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
-            // TODO infura url
-            buildConfigField("String", "ETH_WSS_NODE_URL", LOCAL_WSS_NODE_URL)
+            buildConfigField("String", "ETH_WSS_NODE_URL", GOERLI_WSS_NODE_URL)
             buildConfigField("String", "CONTRACT_ADDRESS", GOERLI_CONTRACT_ADDRESS)
             buildConfigField("String", "TEST_MNEMONIC", GOERLI_TEST_MNEMONIC)
             buildConfigField("String", "TEST_ADDRESS", GOERLI_TEST_ADDRESS)
@@ -159,4 +158,10 @@ dependencies {
     // WorkManager
     def work_version = "2.9.0"
     implementation "androidx.work:work-runtime-ktx:$work_version"
+
+    // Ktor
+    def ktor_version = "2.3.9"
+    implementation("io.ktor:ktor-client-core:$ktor_version")
+    implementation("io.ktor:ktor-client-okhttp:$ktor_version")
+    implementation("io.ktor:ktor-server-websockets:$ktor_version")
 }
