@@ -5,7 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -135,6 +137,8 @@ private fun ProposalsList(
             }
         }
 
+        Spacer(Modifier.height(8.dp))
+
         PagerTabRow(
             tabs = pages,
             pagerState = pagerState
@@ -146,6 +150,7 @@ private fun ProposalsList(
                     start = Dimensions.screenPaddingHorizontal,
                     end = Dimensions.screenPaddingHorizontal,
                     bottom = Dimensions.screenPaddingVertical,
+                    top = 8.dp,
                 ),
                 verticalArrangement = Arrangement.spacedBy(Dimensions.cardListSpacing)
             ) {

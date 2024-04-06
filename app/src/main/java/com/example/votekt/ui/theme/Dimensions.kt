@@ -18,7 +18,7 @@ object Dimensions {
     val chipSpaceInGroup = 8.dp
 
     val tabCorners = 20.dp
-    val tabPaddingVertical = 12.dp
+    val tabPaddingVertical = 10.dp
     val tabTextSize = 14.sp
     val tabTextLineHeight= 20.sp
 

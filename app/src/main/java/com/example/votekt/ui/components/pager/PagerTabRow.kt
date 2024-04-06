@@ -82,7 +82,7 @@ fun PagerTab(
         selected = isSelected,
         onClick = onClick,
         modifier = Modifier
-            .padding(10.dp)
+            .padding(horizontal = 10.dp)
             .fillMaxWidth()
             .clip(RoundedCornerShape(Dimensions.tabCorners))
             .background(
