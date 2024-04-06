@@ -60,4 +60,5 @@
     <string name="failed_to_create_proposal">Failed to create proposal</string>
     <string name="unknown_transaction_execution_error">Unknown transaction execution error. Please, try again later</string>
     <string name="metric_na">---</string>
+    <string name="no_connection">No connection to Ethereum node</string>
 </resources>

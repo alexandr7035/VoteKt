@@ -18,10 +18,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.components.loading.LoadingScreen
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.create_proposal.CreateProposalScreen
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDialog
+import com.example.votekt.ui.feature_node_connection.NodeConnectionIntent
+import com.example.votekt.ui.feature_node_connection.NodeConnectionScreen
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
@@ -42,7 +45,7 @@ fun AppNavHost(
 
     when (state) {
         is AppState.Loading -> {
-            FullscreenProgressBar()
+            LoadingScreen(null)
         }
 
         is AppState.InitFailure -> {
@@ -142,10 +145,12 @@ fun AppNavHost(
                     ) {
                         VotingDetailsScreen(
                             proposalId = it.arguments?.getString("proposalId")!!,
-                            onBack = { navController.popBackStack(
-                                route = NavDestinations.Primary.Proposals.route,
-                                inclusive = false
-                            ) }
+                            onBack = {
+                                navController.popBackStack(
+                                    route = NavDestinations.Primary.Proposals.route,
+                                    inclusive = false
+                                )
+                            }
                         )
                     }
                 }
@@ -158,5 +163,13 @@ fun AppNavHost(
                 }
             }
         }
+
+        AppState.NodeConnectionError -> NodeConnectionScreen(
+            onIntent = {
+                when (it) {
+                    NodeConnectionIntent.TryAgain -> viewModel.onAppIntent(AppIntent.ReconnectToNode)
+                }
+            }
+        )
     }
 }

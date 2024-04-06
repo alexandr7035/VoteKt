@@ -14,6 +14,8 @@ sealed class AppState {
         val txConfirmationState: ReviewTransactionDataUi? = null,
     ) : AppState()
 
+    object NodeConnectionError: AppState()
+
     data class InitFailure(
         val error: UiErrorMessage
     ) : AppState()

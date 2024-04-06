@@ -6,6 +6,7 @@ import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum_impl.impl.EthereumEventListenerImpl
+import by.alexandr7035.ethereum_impl.impl.NodeWssConfiguration
 import com.cioccarellia.ksprefs.KsPrefs
 import com.cioccarellia.ksprefs.config.EncryptionType
 import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
@@ -176,6 +177,12 @@ val appModule = module {
 
     single { EthereumEventListenerImpl(
         wssUrl = BuildConfig.ETH_WSS_NODE_URL,
-        contractAddress = Address(BuildConfig.CONTRACT_ADDRESS)
+        contractAddress = Address(BuildConfig.CONTRACT_ADDRESS),
+        ktorClient = get(),
+        wssConfiguration = if (BuildConfig.FLAVOR == "local") {
+            NodeWssConfiguration.CLEARTEXT
+        } else {
+            NodeWssConfiguration.WSS
+        }
     ) } bind EthereumEventListener::class
 }
