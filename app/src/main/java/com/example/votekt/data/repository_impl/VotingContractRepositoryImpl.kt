@@ -207,8 +207,6 @@ class VotingContractRepositoryImpl(
     }
 
     override suspend fun handleContractEvent(event: EthereumEvent.ContractEvent) {
-        println("${TAG} wss topic ${event.eventTopic}")
-        println("${TAG} contact topic ${VoteKtContractV1.Events.VoteCasted.EVENT_ID}")
         when (event.eventTopic) {
             VoteKtContractV1.Events.VoteCasted.EVENT_ID -> {
                 val eventData = VoteKtContractV1.Events.VoteCasted.decode(
@@ -227,7 +225,7 @@ class VotingContractRepositoryImpl(
             }
 
             else -> {
-                println("${TAG} unknown contract event")
+                println("${TAG} unknown contract event, skip")
             }
         }
     }

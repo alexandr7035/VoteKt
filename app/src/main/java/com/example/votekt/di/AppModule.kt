@@ -48,12 +48,14 @@ import kotlin.time.Duration.Companion.seconds
 val appModule = module {
     includes(netModule)
     includes(ethereumModule)
+    includes(domainModule)
 
     viewModel { AppViewModel(
         accountRepository = get(),
         sendTransactionRepository = get(),
         web3EventsRepository = get(),
-        votingContractRepository = get()
+        votingContractRepository = get(),
+        syncWithContractUseCase = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
