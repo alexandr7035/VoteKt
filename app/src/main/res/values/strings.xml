@@ -4,6 +4,7 @@
     <string name="proposal_title">Proposal title</string>
     <string name="proposal_desc">Proposal description</string>
     <string name="create_proposal">Create proposal</string>
+    <string name="delete_draft">Delete draft</string>
 
     <string name="mock_proposal_title_1">Education for All - Empowering Minds, Transforming Lives!</string>
     <string name="mock_proposal_desc_1">Support our mission to make quality education accessible to all. This voting campaign aims to allocate resources to educational programs, scholarships, and technology for underserved communities. Together, we can create a brighter future and empower young minds to shape their destinies. Vote now and be a part of this transformative journey!</string>
@@ -27,7 +28,7 @@
     <string name="create">Create</string>
     <string name="no_proposals_yet">No Proposals yet</string>
     <string name="your_activity">Your activity</string>
-    <string name="deploy">Deploy</string>
+    <string name="deploy">Deploy 🚀</string>
     <string name="deploy_failed">Deploy failed</string>
     <string name="deploy_in_progress">Deploy in progress</string>
     <string name="proposal_is_not_deployed">Proposal is not deployed</string>
@@ -57,4 +58,7 @@
     <string name="choose_proposal_duration">Choose proposal duration</string>
     <string name="choose_proposal_title">Choose proposal title</string>
     <string name="failed_to_create_proposal">Failed to create proposal</string>
+    <string name="unknown_transaction_execution_error">Unknown transaction execution error. Please, try again later</string>
+    <string name="metric_na">---</string>
+    <string name="no_connection">No connection to Ethereum node</string>
 </resources>

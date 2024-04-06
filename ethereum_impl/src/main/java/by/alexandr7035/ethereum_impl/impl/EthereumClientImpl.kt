@@ -2,19 +2,18 @@ package by.alexandr7035.ethereum_impl.impl
 
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
-import by.alexandr7035.ethereum.model.eth_requests.EthBulkRequest
 import by.alexandr7035.ethereum.model.EthNodeMethods
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
-import by.alexandr7035.ethereum.model.EthTransactionInput
-import by.alexandr7035.ethereum.model.eth_requests.EthRequest
-import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
+import by.alexandr7035.ethereum.model.EthereumBlock
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_requests.EthBalance
+import by.alexandr7035.ethereum.model.eth_requests.EthBulkRequest
 import by.alexandr7035.ethereum.model.eth_requests.EthCall
 import by.alexandr7035.ethereum.model.eth_requests.EthEstimateGas
 import by.alexandr7035.ethereum.model.eth_requests.EthGasPrice
 import by.alexandr7035.ethereum.model.eth_requests.EthGetTransactionCount
+import by.alexandr7035.ethereum.model.eth_requests.EthRequest
 import by.alexandr7035.ethereum.model.eth_requests.EthSendRawTransaction
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
 import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
@@ -45,8 +44,8 @@ class EthereumClientImpl(
             }
     }
 
-    override suspend fun getBalance(address: org.kethereum.model.Address): Wei {
-        return request(EthBalance(address)).checkedResult()
+    override suspend fun getBalance(address: Address): Wei {
+        return request(EthBalance(address)).checkedResult("Could not get balance")
     }
 
     override suspend fun sendRawTransaction(signedTransactionData: String): String {

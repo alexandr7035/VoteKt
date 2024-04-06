@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,7 +46,7 @@ import org.kethereum.model.Address
 @Composable
 fun ReviewTransactionDialog(
     onIntent: (ReviewTransactionIntent) -> Unit,
-    state: ReviewTransactionData,
+    state: ReviewTransactionDataUi,
 ) {
     val dialogState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true
@@ -69,7 +70,7 @@ fun ReviewTransactionDialog(
 
 @Composable
 fun ConfirmTransactionDialog_Ui(
-    state: ReviewTransactionData,
+    state: ReviewTransactionDataUi,
     onConfirmTransaction: () -> Unit,
 ) {
     Column(
@@ -84,8 +85,8 @@ fun ConfirmTransactionDialog_Ui(
         )
 
         when (state) {
-            is ReviewTransactionData.ContractInteraction -> ContractInputComponent(state)
-            is ReviewTransactionData.SendAmount -> SendAmountComponent(state)
+            is ReviewTransactionDataUi.ContractInteraction -> ContractInputComponent(state)
+            is ReviewTransactionDataUi.SendAmount -> SendAmountComponent(state)
         }
 
         TransactionFeeComponent(txReview = state)
@@ -100,7 +101,7 @@ fun ConfirmTransactionDialog_Ui(
 }
 
 @Composable
-private fun TransactionFeeComponent(txReview: ReviewTransactionData) {
+private fun TransactionFeeComponent(txReview: ReviewTransactionDataUi) {
     Column() {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -129,9 +130,8 @@ private fun TransactionFeeComponent(txReview: ReviewTransactionData) {
                     )
                 }
             } ?: run {
-                DotsProgressIndicator()
+                EstimationProgressIndicator(txReview)
             }
-
         }
 
         Row(
@@ -152,26 +152,25 @@ private fun TransactionFeeComponent(txReview: ReviewTransactionData) {
                     style = MaterialTheme.typography.titleSmall
                 )
             } ?: run {
-                DotsProgressIndicator()
+                EstimationProgressIndicator(txReview)
             }
         }
 
-        if (txReview.isBalanceSufficient == false) {
+        txReview.estimationError?.let {
             Spacer(Modifier.height(12.dp))
             Text(
-                text = stringResource(R.string.insufficient_balance),
+                text = it.asString(),
                 style = TextStyle(
                     color = MaterialTheme.colorScheme.error,
-                    fontSize = 16.sp,
+                    fontSize = 14.sp,
                 )
             )
         }
     }
 }
 
-
 @Composable
-private fun ContractInputComponent(txReview: ReviewTransactionData.ContractInteraction) {
+private fun ContractInputComponent(txReview: ReviewTransactionDataUi.ContractInteraction) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +218,7 @@ private fun ContractInputComponent(txReview: ReviewTransactionData.ContractInter
 }
 
 @Composable
-private fun SendAmountComponent(txReview: ReviewTransactionData.SendAmount) {
+private fun SendAmountComponent(txReview: ReviewTransactionDataUi.SendAmount) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -270,11 +269,28 @@ private fun AddressComponent(recipient: Address) {
     )
 }
 
+@Composable
+private fun EstimationProgressIndicator(txReview: ReviewTransactionDataUi) {
+    if (txReview.estimationError == null) {
+        DotsProgressIndicator(
+            circleSize = 12.dp,
+            spaceBetween = 4.dp
+        )
+    } else {
+        Text(
+            text = stringResource(R.string.metric_na),
+            style = TextStyle(
+                fontSize = 16.sp,
+                fontWeight = FontWeight.SemiBold
+            ),
+        )
+    }
+}
 
 @Preview
 @Composable
 fun ConfirmTransactionDialog_Preview(
-    @PreviewParameter(TransactionReviewPreviewProvider::class) txReview: ReviewTransactionData
+    @PreviewParameter(TransactionReviewPreviewProvider::class) txReview: ReviewTransactionDataUi
 ) {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {

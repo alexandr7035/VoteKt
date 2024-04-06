@@ -7,6 +7,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
+import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.transactionFee
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.data.cache.TransactionDao
@@ -46,6 +47,7 @@ class TransactionRepositoryImpl(
     override suspend fun addNewTransaction(
         transactionHash: TransactionHash,
         transactionType: TransactionType,
+        value: Wei?,
     ) {
         transactionDao.cacheTransaction(
             TransactionEntity(
@@ -55,6 +57,7 @@ class TransactionRepositoryImpl(
                 dateSent = System.currentTimeMillis(),
                 gasUsed = null,
                 gasFee = null,
+                value = value,
             )
         )
 

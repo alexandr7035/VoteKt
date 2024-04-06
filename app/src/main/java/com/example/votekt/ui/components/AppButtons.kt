@@ -8,6 +8,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -49,13 +50,47 @@ fun PrimaryButton(
     }
 }
 
+@Composable
+fun RoundedButton(
+    text: String,
+    onClick: () -> Unit,
+    enabled: Boolean = true,
+    modifier: Modifier = Modifier,
+    buttonColor: Color? = null,
+    textColor: Color? = null,
+    leadingIcon: @Composable () -> Unit = {}
+) {
+    Button(
+        onClick = { onClick.invoke() },
+        colors = ButtonDefaults.buttonColors(
+            contentColor = textColor ?: MaterialTheme.colorScheme.onPrimary,
+            containerColor = buttonColor ?: MaterialTheme.colorScheme.primary
+        ),
+        shape = RoundedCornerShape(Dimensions.roundedButtonCorners),
+        contentPadding = PaddingValues(
+            horizontal = Dimensions.buttonContentPaddingHorizontal
+        ),
+        modifier = modifier.then(
+            Modifier.defaultMinSize(
+                minHeight = Dimensions.roundedButtonHeight
+            )
+        ),
+        enabled = enabled,
+    ) {
+        leadingIcon()
+        Text(text = text)
+    }
+}
 
 @Preview(widthDp = 360, heightDp = 560)
 @Composable
 fun PrimaryButton_Preview() {
-    VoteKtTheme(darkTheme = true) {
-        Column(Modifier.fillMaxSize()) {
-            PrimaryButton(text = "Click Me", onClick = {})
+    VoteKtTheme(darkTheme = false) {
+        Surface(color = MaterialTheme.colorScheme.background) {
+            Column(Modifier.fillMaxSize()) {
+                PrimaryButton(text = "Click Me", onClick = {})
+                RoundedButton(text = "Click Me", onClick = {})
+            }
         }
     }
 }

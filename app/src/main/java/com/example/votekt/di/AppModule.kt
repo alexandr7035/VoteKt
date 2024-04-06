@@ -4,6 +4,9 @@ import androidx.room.Room
 import androidx.work.WorkManager
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
+import by.alexandr7035.ethereum.core.EthereumEventListener
+import by.alexandr7035.ethereum_impl.impl.EthereumEventListenerImpl
+import by.alexandr7035.ethereum_impl.impl.NodeWssConfiguration
 import com.cioccarellia.ksprefs.KsPrefs
 import com.cioccarellia.ksprefs.config.EncryptionType
 import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
@@ -33,6 +36,7 @@ import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
+import org.kethereum.model.Address
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -48,6 +52,8 @@ val appModule = module {
     viewModel { AppViewModel(
         accountRepository = get(),
         sendTransactionRepository = get(),
+        web3EventsRepository = get(),
+        votingContractRepository = get()
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -135,7 +141,7 @@ val appModule = module {
             dispatcher = Dispatchers.IO,
             ethereumClient = get(),
             cryptoHelper = get(),
-            balancePollingDelay = 5.seconds,
+            balancePollingDelay = 20.seconds,
             ksPrefs = get()
         )
     }
@@ -168,4 +174,15 @@ val appModule = module {
         ksPrefs = get(),
         cryptoHelper = get(),
     ) } bind SendTransactionRepository::class
+
+    single { EthereumEventListenerImpl(
+        wssUrl = BuildConfig.ETH_WSS_NODE_URL,
+        contractAddress = Address(BuildConfig.CONTRACT_ADDRESS),
+        ktorClient = get(),
+        wssConfiguration = if (BuildConfig.FLAVOR == "local") {
+            NodeWssConfiguration.CLEARTEXT
+        } else {
+            NodeWssConfiguration.WSS
+        }
+    ) } bind EthereumEventListener::class
 }

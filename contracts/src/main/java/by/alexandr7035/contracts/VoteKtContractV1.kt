@@ -1,4 +1,4 @@
-package by.alexandr7035.contracts
+package `by`.alexandr7035.contracts
 
 import java.math.BigInteger
 import kotlin.Boolean
@@ -8,8 +8,6 @@ import pm.gnosis.model.Solidity
 import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
-// AUTO-GENERATED code!!!
-// TODO add gradle plugin
 public class VoteKtContractV1 {
     public object CreateProposal {
         public const val METHOD_ID: String = "4c15676b"
@@ -20,7 +18,7 @@ public class VoteKtContractV1 {
             description: Solidity.String,
             durationInDays: Solidity.UInt256
         ): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(uuid,
-                title, description, durationInDays)
+            title, description, durationInDays)
 
         public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
@@ -49,7 +47,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "8259d553"
 
         public fun encode(proposalNumber: Solidity.UInt256): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber)
 
         public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
@@ -69,7 +67,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "3b4d01a7"
 
         public fun encode(proposalNumber: Solidity.UInt256): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber)
 
         public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
@@ -123,7 +121,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "43859632"
 
         public fun encode(arg1: Solidity.UInt256, arg2: Solidity.Address): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1, arg2)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1, arg2)
 
         public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
@@ -196,7 +194,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "013cf08b"
 
         public fun encode(arg1: Solidity.UInt256): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1)
 
         public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
@@ -252,7 +250,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "f2fde38b"
 
         public fun encode(newOwner: Solidity.Address): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(newOwner)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(newOwner)
 
         public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
@@ -272,7 +270,7 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "c9d27afe"
 
         public fun encode(proposalNumber: Solidity.UInt256, inFavor: Solidity.Bool): String =
-                "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber,
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber,
                 inFavor)
 
         public fun decodeArguments(`data`: String): Arguments {
@@ -292,9 +290,70 @@ public class VoteKtContractV1 {
     }
 
     public object Events {
+        public object OwnershipTransferred {
+            public const val EVENT_ID: String =
+                "8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+
+            public fun decode(topics: List<String>): Arguments {
+                // Decode topics
+                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+                val source1 = SolidityBase.PartitionData.of(topics[1])
+                val t1 = Solidity.Address.DECODER.decode(source1)
+                val source2 = SolidityBase.PartitionData.of(topics[2])
+                val t2 = Solidity.Address.DECODER.decode(source2)
+                return Arguments(t1, t2)
+            }
+
+            public data class Arguments(
+                public val previousowner: Solidity.Address,
+                public val newowner: Solidity.Address
+            )
+        }
+
+        public object ProposalCreated {
+            public const val EVENT_ID: String =
+                "9c770c289ab5bf7e57cb1d23c8ceae993aea46eb64847072fd3d78ca60d3e432"
+
+            public fun decode(topics: List<String>, `data`: String): Arguments {
+                // Decode topics
+                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+
+                // Decode data
+                val source = SolidityBase.PartitionData.of(data)
+                val arg0 = Solidity.UInt256.DECODER.decode(source)
+                val arg1Offset = BigIntegerUtils.exact(BigInteger(source.consume(), 16))
+                val arg1 = Solidity.String.DECODER.decode(source.subData(arg1Offset))
+                return Arguments(arg0, arg1)
+            }
+
+            public data class Arguments(
+                public val proposalnumber: Solidity.UInt256,
+                public val title: Solidity.String
+            )
+        }
+
+        public object ProposalDeleted {
+            public const val EVENT_ID: String =
+                "61c0d93dc2b610877e420b107c8d12e9185e46e04a505da758cc7f7329ae545f"
+
+            public fun decode(topics: List<String>, `data`: String): Arguments {
+                // Decode topics
+                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+
+                // Decode data
+                val source = SolidityBase.PartitionData.of(data)
+                val arg0 = Solidity.UInt256.DECODER.decode(source)
+                return Arguments(arg0)
+            }
+
+            public data class Arguments(
+                public val proposalnumber: Solidity.UInt256
+            )
+        }
+
         public object VoteCasted {
             public const val EVENT_ID: String =
-                    "98b03f1463128a74cc9dd4acc43b54ef12ac07daacbcd621d2e4266091b7024a"
+                "98b03f1463128a74cc9dd4acc43b54ef12ac07daacbcd621d2e4266091b7024a"
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
@@ -325,7 +384,7 @@ public class VoteKtContractV1 {
         public val expirationtime: Solidity.UInt256
     ) : SolidityBase.DynamicType {
         public override fun encode(): String = SolidityBase.encodeFunctionArguments(number, uuid,
-                title, description, votesfor, votesagainst, creationtime, expirationtime)
+            title, description, votesfor, votesagainst, creationtime, expirationtime)
 
         public override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 

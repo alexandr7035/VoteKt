@@ -11,4 +11,6 @@ java {
 dependencies {
     implementation project(":utils")
     implementation 'com.github.komputing.kethereum:model:0.86.0'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3'
 }

@@ -9,10 +9,14 @@ import by.alexandr7035.ethereum_impl.adapters.WeiAdapter
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
 import com.example.votekt.BuildConfig
 import com.squareup.moshi.Moshi
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.websocket.WebSockets
 import okhttp3.OkHttpClient
 import org.koin.dsl.module
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
+import java.util.concurrent.TimeUnit
 
 
 val netModule = module {
@@ -20,6 +24,18 @@ val netModule = module {
         OkHttpClient()
         .newBuilder()
         .build()
+    }
+
+    // Ktor
+    single {
+        HttpClient(OkHttp) {
+            engine {
+                preconfigured = OkHttpClient.Builder()
+                    .pingInterval(30, TimeUnit.SECONDS)
+                    .build()
+            }
+            install(WebSockets)
+        }
     }
 
     single<Moshi> {

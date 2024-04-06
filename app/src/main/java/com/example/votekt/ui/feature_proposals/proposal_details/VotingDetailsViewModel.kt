@@ -3,9 +3,10 @@ package com.example.votekt.ui.feature_proposals.proposal_details
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.core.ErrorType
-import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.domain.core.OperationResult
+import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.votings.VoteType
+import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -53,26 +54,56 @@ class VotingDetailsViewModel(
     }
 
     fun makeVote(proposalNumber: Int, voteType: VoteType) {
-        _state.update {
-            it.copy(
-                isSelfVoteProcessing = true
-            )
-        }
-
         viewModelScope.launch {
             when (val res = votingContractRepository.voteOnProposal(proposalNumber, voteType)) {
-                is OperationResult.Success -> {
-                    _state.update {
-                        it.copy(isSelfVoteProcessing = false,)
-                    }
-                }
-
+                is OperationResult.Success -> {}
                 is OperationResult.Failure -> {
                     _state.update {
                         it.copy(error = res.error.errorType.uiError)
                     }
                 }
             }
+        }
+    }
+
+    fun deployProposal(proposalUuid: Uuid) {
+        viewModelScope.launch {
+            when (val res = votingContractRepository.deployDraftProposal(proposalUuid)) {
+                is OperationResult.Success -> {}
+                is OperationResult.Failure -> {
+                    _state.update {
+                        it.copy(error = res.error.errorType.uiError)
+                    }
+                }
+            }
+        }
+    }
+
+    fun deleteDraft(proposalUuid: Uuid) {
+        println("call delete draft ${proposalUuid}")
+        viewModelScope.launch {
+            when (val res = votingContractRepository.deleteDraftProposal(proposalUuid)) {
+                is OperationResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            draftDeletedEvent = triggered
+                        )
+                    }
+                }
+                is OperationResult.Failure -> {
+                    _state.update {
+                        it.copy(error = res.error.errorType.uiError)
+                    }
+                }
+            }
+        }
+    }
+
+    fun consumeDraftDeletedEvent() {
+        _state.update {
+            it.copy(
+                draftDeletedEvent = consumed
+            )
         }
     }
 }

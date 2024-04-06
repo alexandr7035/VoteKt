@@ -4,27 +4,28 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.ETHER
 import by.alexandr7035.ethereum.model.GWEI
 import com.example.votekt.domain.transactions.TransactionType
-import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionData
+import com.example.votekt.ui.core.resources.UiText
+import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDataUi
 import org.kethereum.model.Address
 
-class TransactionReviewPreviewProvider : PreviewParameterProvider<ReviewTransactionData> {
-    override val values: Sequence<ReviewTransactionData>
+class TransactionReviewPreviewProvider : PreviewParameterProvider<ReviewTransactionDataUi> {
+    override val values: Sequence<ReviewTransactionDataUi>
         get() = sequenceOf(
-            ReviewTransactionData.SendAmount(
+            ReviewTransactionDataUi.SendAmount(
                 transactionType = TransactionType.PAYMENT,
                 recipient = Address(SAMPLE_ADDRESS),
                 value = 0.24.ETHER,
                 minerTipFee = 1.GWEI,
                 totalEstimatedFee = 30.GWEI,
-                isBalanceSufficient = true,
+                estimationError = UiText.DynamicString("Insufficient balance"),
             ),
-            ReviewTransactionData.ContractInteraction(
+            ReviewTransactionDataUi.ContractInteraction(
                 transactionType = TransactionType.VOTE,
                 recipient = Address(SAMPLE_ADDRESS),
                 contractInput = SAMPLE_CONTRACT_INPUT,
                 minerTipFee = 1.GWEI,
                 totalEstimatedFee = 30.GWEI,
-                isBalanceSufficient = false
+                estimationError = null,
             )
         )
 

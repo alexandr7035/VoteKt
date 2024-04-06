@@ -1,9 +1,11 @@
 package com.example.votekt.data.repository_impl
 
+import android.util.Log
 import by.alexandr7035.contracts.VoteKtContractV1
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
+import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.utils.asEthereumAddressString
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
@@ -12,14 +14,17 @@ import com.example.votekt.data.cache.mapDeployStatus
 import com.example.votekt.data.cache.mapSelfVote
 import com.example.votekt.data.cache.mapVoteStatus
 import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.OperationResult
+import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.domain.votings.ProposalDuration
 import com.example.votekt.domain.votings.VoteType
-import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.domain.votings.VotingContractRepository
+import com.example.votekt.domain.votings.VotingData
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -57,16 +62,9 @@ class VotingContractRepositoryImpl(
             }
     }
 
-    override suspend fun createProposal(req: CreateProposal): OperationResult<Unit> = withContext(dispatcher) {
+    override suspend fun createDraftProposal(req: CreateProposal): OperationResult<Uuid> = withContext(dispatcher) {
         return@withContext OperationResult.runWrapped {
             val uuid = UUID.randomUUID().toString()
-
-            val solidityInput = VoteKtContractV1.CreateProposal.encode(
-                uuid = Solidity.String(uuid),
-                title = Solidity.String(req.title),
-                description = Solidity.String(req.desc),
-                durationInDays = Solidity.UInt256(req.duration.getDurationInDays().toBigInteger())
-            )
 
             proposalsDao.cacheProposal(
                 ProposalEntity(
@@ -78,16 +76,52 @@ class VotingContractRepositoryImpl(
                     deployTransactionHash = null,
                     createdAt = System.currentTimeMillis(),
                     creatorAddress = accountRepository.getSelfAddress().hex,
+                    durationInDays = req.duration,
                 )
+            )
+
+            Uuid(uuid)
+        }
+    }
+
+    override suspend fun deployDraftProposal(proposalUuid: Uuid): OperationResult<Unit> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
+            val cachedProposal = proposalsDao.getProposalByUuid(proposalUuid.value)
+            require(cachedProposal != null) { "Proposal draft not found" }
+
+            val solidityInput = VoteKtContractV1.CreateProposal.encode(
+                uuid = Solidity.String(proposalUuid.value),
+                title = Solidity.String(cachedProposal.title),
+                description = Solidity.String(cachedProposal.description),
+                durationInDays = cachedProposal.durationInDays?.getDurationInDays()?.let {
+                    Solidity.UInt256(it.toBigInteger())
+                } ?: kotlin.run {
+                    Solidity.UInt256(ProposalDuration.default.getDurationInDays().toBigInteger())
+                }
             )
 
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.CreateProposal(
                     contractAddress = org.kethereum.model.Address(contractAddress),
                     contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
-                    proposalUuid = uuid
+                    proposalUuid = proposalUuid.value
                 )
             )
+        }
+    }
+
+    override suspend fun deleteDraftProposal(proposalUuid: Uuid): OperationResult<Unit> = withContext(dispatcher) {
+        return@withContext OperationResult.runWrapped {
+            val cachedProposalData = proposalsDao
+                .getProposalWithTransactionsByUuid(proposalUuid.value)
+                ?.mapToDomain()
+            println("delete cached proposal ${cachedProposalData}")
+            require(cachedProposalData != null) { "Proposal draft not found" }
+            require(cachedProposalData is Proposal.Draft) { "Proposal is not draft" }
+            require(cachedProposalData.deployStatus is BlockchainActionStatus.NotCompleted) { "Proposal deploy must be not completed" }
+
+            println("delete proposal ${proposalUuid}")
+            proposalsDao.deleteProposal(proposalUuid.value)
         }
     }
 
@@ -172,6 +206,32 @@ class VotingContractRepositoryImpl(
         proposalsDao.cleanUpProposals(remainingProposals = decoded.map { it.uuid.value })
     }
 
+    override suspend fun handleContractEvent(event: EthereumEvent.ContractEvent) {
+        println("${TAG} wss topic ${event.eventTopic}")
+        println("${TAG} contact topic ${VoteKtContractV1.Events.VoteCasted.EVENT_ID}")
+        when (event.eventTopic) {
+            VoteKtContractV1.Events.VoteCasted.EVENT_ID -> {
+                val eventData = VoteKtContractV1.Events.VoteCasted.decode(
+                    topics = listOf(event.eventTopic),
+                    data = event.encodedData
+                )
+                processVoteCastedEvent(eventData)
+            }
+
+            VoteKtContractV1.Events.ProposalCreated.EVENT_ID -> {
+                val eventData = VoteKtContractV1.Events.ProposalCreated.decode(
+                    topics = listOf(event.eventTopic),
+                    data = event.encodedData
+                )
+                processProposalCreatedEvent(eventData)
+            }
+
+            else -> {
+                println("${TAG} unknown contract event")
+            }
+        }
+    }
+
     private suspend fun ProposalWithTransactions.mapToDomain(): Proposal = withContext(dispatcher) {
         return@withContext if (!proposal.isDraft) {
             Proposal.Deployed(
@@ -201,6 +261,20 @@ class VotingContractRepositoryImpl(
                 deployStatus = mapDeployStatus(),
             )
         }
+    }
+
+    private suspend fun processVoteCastedEvent(eventData: VoteKtContractV1.Events.VoteCasted.Arguments) {
+        Log.d(TAG, "Vote casted ${eventData}")
+        proposalsDao.addVoteToProposal(
+            inFavor = eventData.infavor.value,
+            proposalNumber = eventData.proposalnumber.value.toInt()
+        )
+    }
+
+    // TODO more optimal updating
+    private suspend fun processProposalCreatedEvent(eventData: VoteKtContractV1.Events.ProposalCreated.Arguments) {
+        Log.d(TAG, "Proposal created ${eventData}")
+        syncProposalsWithContract()
     }
 
     companion object {
