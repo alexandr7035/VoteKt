@@ -57,6 +57,7 @@ import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getVoteColor
 import de.palm.composestateevents.NavigationEventEffect
@@ -162,11 +163,10 @@ private fun VotingDetailsScreen_Ui(
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
                 .padding(
-                    // TODO dimens
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = pv.calculateTopPadding() + 16.dp,
-                    bottom = pv.calculateTopPadding() + 16.dp,
+                    start = Dimensions.screenPaddingHorizontal,
+                    end = Dimensions.screenPaddingHorizontal,
+                    top = pv.calculateTopPadding() + Dimensions.screenPaddingVertical,
+                    bottom = pv.calculateTopPadding() + Dimensions.screenPaddingVertical,
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {

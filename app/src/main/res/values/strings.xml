@@ -61,4 +61,6 @@
     <string name="unknown_transaction_execution_error">Unknown transaction execution error. Please, try again later</string>
     <string name="metric_na">---</string>
     <string name="no_connection">No connection to Ethereum node</string>
+    <string name="drafts">Drafts</string>
+    <string name="on_chain">On-Chain</string>
 </resources>

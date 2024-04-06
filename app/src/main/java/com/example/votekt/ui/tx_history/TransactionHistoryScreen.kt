@@ -5,9 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -22,13 +20,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.uiError
 import org.koin.androidx.compose.koinViewModel
 
@@ -59,8 +57,7 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
                 state.shouldShowData() -> {
                     if (state.data!!.isNotEmpty()) {
                         TransactionsList(
-                            transactions = state.data,
-                            viewModel = viewModel
+                            transactions = state.data
                         )
                     } else {
                         NoTransactionsStub()
@@ -87,14 +84,16 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
 
 @Composable
 private fun TransactionsList(
-    transactions: List<TransactionDomain>,
-    viewModel: TransactionsViewModel
+    transactions: List<TransactionDomain>
 ) {
     LazyColumn(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.background),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        contentPadding = PaddingValues(horizontal = 12.dp, vertical = 12.dp))
+        verticalArrangement = Arrangement.spacedBy(Dimensions.cardListSpacing),
+        contentPadding = PaddingValues(
+            horizontal = Dimensions.screenPaddingHorizontal,
+            vertical = Dimensions.screenPaddingVertical,
+        ))
     {
         items(transactions.size) {
             TransactionCard(
