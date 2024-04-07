@@ -7,4 +7,5 @@ data class ProposalsScreenState(
     val isLoading: Boolean = false,
     val proposals: List<Proposal> = emptyList(),
     val error: UiErrorMessage? = null,
+    val controlsAreVisible: Boolean = true
 )

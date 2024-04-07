@@ -1,13 +1,14 @@
 package com.example.votekt.ui.feature_proposals.proposals_list
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -23,10 +24,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.rememberNestedScrollInteropConnection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -40,9 +47,9 @@ import com.example.votekt.ui.components.pager.PagerTabRow
 import com.example.votekt.ui.components.preview.ProposalListPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
-import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.Dimensions
+import com.example.votekt.ui.theme.VoteKtTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
@@ -51,24 +58,46 @@ fun ProposalsScreen(
     onNewProposalClick: () -> Unit = {},
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                if (available.y < -1) {
+                    viewModel.onIntent(ProposalsScreenIntent.ChangeControlsVisibility(false))
+                }
+
+                if (available.y > 1) {
+                    viewModel.onIntent(ProposalsScreenIntent.ChangeControlsVisibility(true))
+                }
+
+                return Offset.Zero
+            }
+        }
+    }
+
     Scaffold(
         topBar = {
             AppBar(title = stringResource(R.string.proposals))
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = onNewProposalClick,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary,
+            AnimatedVisibility(
+                visible = state.controlsAreVisible,
+                enter = slideInVertically(initialOffsetY = { it * 2 }),
+                exit = slideOutVertically(targetOffsetY = { it * 2 }),
             ) {
-                Icon(
-                    imageVector = Icons.Outlined.Add,
-                    contentDescription = stringResource(id = R.string.create_proposal)
-                )
+                FloatingActionButton(
+                    onClick = onNewProposalClick,
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = MaterialTheme.colorScheme.onPrimary,
+                ) {
+                    Icon(
+                        imageVector = Icons.Outlined.Add,
+                        contentDescription = stringResource(id = R.string.create_proposal)
+                    )
+                }
             }
         }) { pv ->
-
-        val state = viewModel.state.collectAsStateWithLifecycle().value
 
         when {
             state.isLoading -> {
@@ -89,6 +118,11 @@ fun ProposalsScreen(
                     proposals = state.proposals,
                     pv = pv,
                     onProposalClick = onProposalClick,
+                    nestedScrollConnection = nestedScrollConnection,
+                    isTabBarVisible = state.controlsAreVisible,
+                    onIntent = {
+                        viewModel.onIntent(it)
+                    }
                 )
             }
         }
@@ -101,6 +135,9 @@ private fun ProposalsList(
     proposals: List<Proposal>,
     pv: PaddingValues,
     onProposalClick: (proposalId: String) -> Unit,
+    nestedScrollConnection: NestedScrollConnection = rememberNestedScrollInteropConnection(),
+    isTabBarVisible: Boolean = true,
+    onIntent: (ProposalsScreenIntent) -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -129,16 +166,23 @@ private fun ProposalsList(
             }
         }
 
-        Spacer(Modifier.height(8.dp))
+        AnimatedVisibility(
+            visible = isTabBarVisible,
+        ) {
+            Box(modifier = Modifier.padding(top = 8.dp)) {
+                PagerTabRow(
+                    tabs = pages,
+                    pagerState = pagerState
+                )
+            }
+        }
 
-        PagerTabRow(
-            tabs = pages,
-            pagerState = pagerState
-        )
+        HorizontalPager(state = pagerState) {pageIndex ->
+            LaunchedEffect(pageIndex) {
+                onIntent(ProposalsScreenIntent.ChangeControlsVisibility(true))
+            }
 
-        HorizontalPager(state = pagerState) {
             if (proposalsFiltered.isNotEmpty()) {
-
                 LazyColumn(
                     contentPadding = PaddingValues(
                         start = Dimensions.screenPaddingHorizontal,
@@ -147,7 +191,9 @@ private fun ProposalsList(
                         top = 8.dp,
                     ),
                     verticalArrangement = Arrangement.spacedBy(Dimensions.cardListSpacing),
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScrollConnection),
                 ) {
                     itemsIndexed(
                         items = proposalsFiltered,

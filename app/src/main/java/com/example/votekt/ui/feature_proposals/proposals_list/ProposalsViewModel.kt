@@ -20,6 +20,16 @@ class ProposalsViewModel(private val votingContractRepository: VotingContractRep
         subscribeToProposals()
     }
 
+    fun onIntent(intent: ProposalsScreenIntent) {
+        when (intent) {
+            is ProposalsScreenIntent.ChangeControlsVisibility -> {
+                _state.update {
+                    it.copy(controlsAreVisible = intent.isVisible)
+                }
+            }
+        }
+    }
+
     fun subscribeToProposals() {
         votingContractRepository
             .getProposals()
