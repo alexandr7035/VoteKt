@@ -17,24 +17,27 @@ Use Android Emulator with default network settings
 ### Deploy and test contract
 ```
 # Setup env
-MNEMONIC="fix tape two tooth country bottom siren decide east salad music warfare"
+MNEMONIC="test test test test test test test test test test test junk"
 INFURA_API_KEY="...."
 
 # Run a node
 mpx hardhat node
 
 # Deploy contract
-npx hardhat run --network localhost scripts/deploy.js
+npx hardhat --network localhost deploy
 
-# (Optional) When using local node, we can prepare mock proposals and votes
-npx hardhat run --network localhost scripts/mocks/mock_local_votings.js
+# Create random proposal
+npx hardhat --network localhost create_proposal
+
+# Spawn fake votes
+npx hardhat --network localhost spawn_votes
 
 # (Optional) Interact from console
-npx hardhat console --network localhost  
+npx hardhat --network localhost console
 
-# (Opional) Subscribe to contract events with WSS (replace address with actual)
+# (Opional) Subscribe to contract events via websockets (replace address with actual)
 npx wscat -c http://127.0.0.1:8545/  
->  {"jsonrpc":"2.0","id":1,"method":"eth_subscribe","params":["logs",{"address":"0x5FbDB2315678afecb367f032d93F642f64180aa3","topics":[]}]}
+>  {"jsonrpc":"2.0","id":1,"method":"eth_subscribe","params":["logs",{"address":"<CONTRACT_ADDRESS>","topics":[]}]}
 ```
 
 ### Compile contract to use via web3j

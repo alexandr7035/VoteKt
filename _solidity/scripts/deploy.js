@@ -1,4 +1,4 @@
-async function main () {
+async function deployContract() {
     // We get the contract to deploy
     const VotingContract = await ethers.getContractFactory('VotingContract');
     console.log('Deploying contract...');
@@ -6,10 +6,7 @@ async function main () {
     await contract.deployed();
     console.log('Contract deployed to:', contract.address);
   }
-  
-  main()
-    .then(() => process.exit(0))
-    .catch(error => {
-      console.error(error);
-      process.exit(1);
-    });
+
+module.exports = {
+  deployContract
+}
