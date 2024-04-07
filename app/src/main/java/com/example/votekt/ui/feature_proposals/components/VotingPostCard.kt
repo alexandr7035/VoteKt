@@ -46,6 +46,7 @@ import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
+import com.example.votekt.ui.components.web3.ExplorableText
 import com.example.votekt.ui.utils.AvatarHelper
 import com.example.votekt.ui.utils.DateFormatters
 import com.example.votekt.ui.utils.prettifyAddress
@@ -154,16 +155,19 @@ private fun ProposalStatusMark(
 
 @Composable
 private fun Creator(
-    address: String, imageSize: Dp = 24.dp, isSelf: Boolean = true
+    address: String, imageSize: Dp = 24.dp,
+    isSelf: Boolean = true
 ) {
     Row(
-        verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(12.dp)
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         val sample = AvatarHelper.getAvatarUrl(identifier = address)
         val imageReq = ImageRequest.Builder(LocalContext.current).data(sample).decoderFactory(SvgDecoder.Factory()).crossfade(true).build()
 
         Text(
-            text = stringResource(R.string.creator), style = TextStyle(
+            text = stringResource(R.string.creator),
+            style = TextStyle(
                 fontWeight = FontWeight.Bold,
             )
         )
@@ -177,12 +181,17 @@ private fun Creator(
             placeholder = debugPlaceholder(debugPreview = R.drawable.sample_avatar)
         )
 
-        Text(
+        ExplorableText(
             text = if (isSelf) {
                 "${address.prettifyAddress()} (You)"
             } else {
                 address.prettifyAddress()
-            }
+            },
+            explorerUrl = "todo",
+            onClick = {
+
+            },
+            fontSize = 14.sp,
         )
     }
 }

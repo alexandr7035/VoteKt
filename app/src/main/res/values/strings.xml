@@ -63,4 +63,8 @@
     <string name="no_connection">No connection to Ethereum node</string>
     <string name="drafts">Drafts</string>
     <string name="on_chain">On-Chain</string>
+    <string name="deploy_proposal">Deploy proposal</string>
+    <string name="send_eth">Send ETH</string>
+    <string name="ticker_eth">ETH</string>
+    <string name="make_vote">Make vote</string>
 </resources>

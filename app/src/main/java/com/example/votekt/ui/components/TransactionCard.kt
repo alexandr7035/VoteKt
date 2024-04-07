@@ -15,7 +15,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -23,13 +25,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.votekt.R
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.domain.transactions.TransactionDomain
+import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.preview.TransactionPreviewProvider
+import com.example.votekt.ui.components.web3.ExplorableText
+import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
+import com.example.votekt.ui.utils.showToast
 
 @Composable
 fun TransactionCard(
@@ -44,6 +51,8 @@ fun TransactionCard(
 private fun TransactionCardUi(
     transaction: TransactionDomain
 ) {
+    val context = LocalContext.current
+
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -63,17 +72,18 @@ private fun TransactionCardUi(
                 )
 
                 Text(
-                    text = transaction.type.uiMessage,
+                    text = transaction.type.getTransactionUiType().asString(),
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
                 )
 
-                Text(
+                ExplorableText(
                     text = transaction.hash.prettifyAddress(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Gray,
+                    explorerUrl = "todo",
+                    onClick = {
+                        context.showToast("click on transaction")
+                    }
                 )
             }
 
@@ -84,7 +94,7 @@ private fun TransactionCardUi(
                     text = "- ${
                         BalanceFormatter.formatAmountWithSymbol(
                             amount = it.toEther(),
-                            symbol = "ETH"
+                            symbol = stringResource(R.string.ticker_eth)
                         )
                     }",
                     style = TextStyle(
@@ -108,6 +118,14 @@ private fun TransactionCardUi(
                 ),
             )
         }
+    }
+}
+
+private fun TransactionType.getTransactionUiType(): UiText {
+    return when (this) {
+        TransactionType.CREATE_PROPOSAL -> UiText.StringResource(R.string.deploy_proposal)
+        TransactionType.VOTE -> UiText.StringResource(R.string.make_vote)
+        TransactionType.PAYMENT -> UiText.StringResource(R.string.send_eth)
     }
 }
 
