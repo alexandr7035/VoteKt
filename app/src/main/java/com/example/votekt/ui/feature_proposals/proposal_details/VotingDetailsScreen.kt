@@ -350,8 +350,8 @@ private fun VotingButton(
     val displayedVotersCount: Int? = when (selfVoteStatus) {
         is BlockchainActionStatus.Completed -> {
             val count = when (voteType) {
-                VoteType.VOTE_FOR -> votingData.votesFor
-                VoteType.VOTE_AGAINST -> votingData.votesAgainst
+                VoteType.VOTE_FOR -> votingData.votesFor - 1
+                VoteType.VOTE_AGAINST -> votingData.votesAgainst - 1
             }
 
             if (count > 1) count else null
