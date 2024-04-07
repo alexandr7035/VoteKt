@@ -152,12 +152,7 @@ class VotingContractRepositoryImpl(
     }
 
     override suspend fun syncProposalsWithContract(): Unit = withContext(dispatcher) {
-        val ownerInput = VoteKtContractV1.Owner.encode()
-        val ownerRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
-            input = ownerInput
-        )
-        val decodedOwner = VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
+        val proposalCreator = getContractOwner(contractAddress)
 
         val contractCallRes = VoteKtContractV1.GetProposalsList.encode()
         val callRes = web3.sendEthCall(
@@ -166,43 +161,7 @@ class VotingContractRepositoryImpl(
         )
         val decoded = VoteKtContractV1.GetProposalsList.decode(callRes).param0.items
 
-        decoded.forEach { raw ->
-            val cached = proposalsDao.getProposalByUuid(uuid = raw.uuid.value)
-            cached?.let {
-                proposalsDao.updateProposal(
-                    cached.copy(
-                        number = raw.number.value.toInt(),
-                        creatorAddress = decodedOwner,
-                        votesFor = raw.votesfor.value.toInt(),
-                        isDraft = false,
-                        votesAgainst = raw.votesagainst.value.toInt(),
-                        createdAt = raw.creationtime.value.toLong() * 1000L,
-                        expiresAt = raw.expirationtime.value.toLong() * 1000L,
-                        // TODO update contract with self vote
-                    )
-                )
-            } ?: run {
-                proposalsDao.cacheProposal(
-                    ProposalEntity(
-                        uuid = raw.uuid.value,
-                        number = raw.number.value.toInt(),
-                        creatorAddress = decodedOwner,
-                        title = raw.title.value,
-                        description = raw.description.value,
-                        isDraft = false,
-                        votesFor = raw.votesfor.value.toInt(),
-                        votesAgainst = raw.votesagainst.value.toInt(),
-                        expiresAt = raw.expirationtime.value.toLong() * 1000L,
-                        createdAt = raw.creationtime.value.toLong() * 1000L,
-                        deployTransactionHash = null,
-                        // TODO update contract with self vote
-                        selfVote = null,
-                        selfVoteTransactionHash = null,
-                    )
-                )
-            }
-        }
-
+        decoded.forEach { raw -> updateProposalInCache(proposalCreator, raw) }
         proposalsDao.cleanUpProposals(remainingProposals = decoded.map { it.uuid.value })
     }
 
@@ -269,10 +228,69 @@ class VotingContractRepositoryImpl(
         )
     }
 
-    // TODO more optimal updating
     private suspend fun processProposalCreatedEvent(eventData: VoteKtContractV1.Events.ProposalCreated.Arguments) {
-        Log.d(TAG, "Proposal created ${eventData}")
-        syncProposalsWithContract()
+        val proposalCreatorAddress = getContractOwner(contractAddress)
+
+        val input = VoteKtContractV1.GetProposalDetails.encode(eventData.proposalnumber)
+        val res = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = input
+        )
+
+        val raw = VoteKtContractV1.GetProposalDetails.decode(res).param0
+        updateProposalInCache(
+            contractProposal = raw,
+            proposalCreatorAddress = proposalCreatorAddress
+        )
+    }
+
+    private suspend fun getContractOwner(contractAddress: String): String {
+        val ownerInput = VoteKtContractV1.Owner.encode()
+        val ownerRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = ownerInput
+        )
+        return VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
+    }
+
+    private suspend fun updateProposalInCache(
+        proposalCreatorAddress: String,
+        contractProposal: VoteKtContractV1.TupleA
+    ) = withContext(dispatcher) {
+        val cached = proposalsDao.getProposalByUuid(uuid = contractProposal.uuid.value)
+        cached?.let {
+            proposalsDao.updateProposal(
+                cached.copy(
+                    number = contractProposal.number.value.toInt(),
+                    creatorAddress = proposalCreatorAddress,
+                    votesFor = contractProposal.votesfor.value.toInt(),
+                    isDraft = false,
+                    votesAgainst = contractProposal.votesagainst.value.toInt(),
+                    createdAt = contractProposal.creationtime.value.toLong() * 1000L,
+                    expiresAt = contractProposal.expirationtime.value.toLong() * 1000L,
+                    // TODO update contract with self vote
+                )
+            )
+        } ?: run {
+            proposalsDao.cacheProposal(
+                ProposalEntity(
+                    uuid = contractProposal.uuid.value,
+                    number = contractProposal.number.value.toInt(),
+                    creatorAddress = proposalCreatorAddress,
+                    title = contractProposal.title.value,
+                    description = contractProposal.description.value,
+                    isDraft = false,
+                    votesFor = contractProposal.votesfor.value.toInt(),
+                    votesAgainst = contractProposal.votesagainst.value.toInt(),
+                    expiresAt = contractProposal.expirationtime.value.toLong() * 1000L,
+                    createdAt = contractProposal.creationtime.value.toLong() * 1000L,
+                    deployTransactionHash = null,
+                    // TODO update contract with self vote
+                    selfVote = null,
+                    selfVoteTransactionHash = null,
+                )
+            )
+        }
     }
 
     companion object {
