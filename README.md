@@ -94,7 +94,8 @@ Choose localDebug build variant and build
 
 [Intro to Encoding & Decoding Ethereum Contract Functions](https://joshua-data.medium.com/intro-to-encoding-and-decoding-ethereum-contract-functions-0e12583916aa)  
 
-[Goerli’s Deprecation: Navigating the Transition to Sepolia](https://medium.com/buildbear/goerlis-deprecation-navigating-the-transition-to-sepolia-84ea374bed9a#:~:text=We're%20here%20to%20announce,by%20the%20Ethereum%20Foundation%20team.)
+[Goerli’s Deprecation: Navigating the Transition to Sepolia](https://medium.com/buildbear/goerlis-deprecation-navigating-the-transition-to-sepolia-84ea374bed9a#:~:text=We're%20here%20to%20announce,by%20the%20Ethereum%20Foundation%20team.)  
+[Deprecation Notice for all Infura-Supported Goerli Endpoints](https://www.infura.io/blog/post/deprecation-notice-for-all-infura-supported-goerli-endpoints)
 
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
