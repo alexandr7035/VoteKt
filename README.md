@@ -92,7 +92,9 @@ Choose localDebug build variant and build
 
 [The Magic of Digital Signatures on Ethereum](https://medium.com/mycrypto/the-magic-of-digital-signatures-on-ethereum-98fe184dc9c7)
 
-[Intro to Encoding & Decoding Ethereum Contract Functions](https://joshua-data.medium.com/intro-to-encoding-and-decoding-ethereum-contract-functions-0e12583916aa)
+[Intro to Encoding & Decoding Ethereum Contract Functions](https://joshua-data.medium.com/intro-to-encoding-and-decoding-ethereum-contract-functions-0e12583916aa)  
+
+[Goerli’s Deprecation: Navigating the Transition to Sepolia](https://medium.com/buildbear/goerlis-deprecation-navigating-the-transition-to-sepolia-84ea374bed9a#:~:text=We're%20here%20to%20announce,by%20the%20Ethereum%20Foundation%20team.)
 
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
