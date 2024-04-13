@@ -34,6 +34,7 @@ import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
+import com.example.votekt.ui.feature_welcome.WelcomeScreenViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.kethereum.model.Address
@@ -50,6 +51,7 @@ val appModule = module {
     includes(ethereumModule)
     includes(domainModule)
 
+    viewModel { WelcomeScreenViewModel() }
     viewModel { AppViewModel(
         accountRepository = get(),
         sendTransactionRepository = get(),

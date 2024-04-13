@@ -27,9 +27,11 @@ import com.example.votekt.ui.feature_node_connection.NodeConnectionIntent
 import com.example.votekt.ui.feature_node_connection.NodeConnectionScreen
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
+import com.example.votekt.ui.feature_create_account.welcome_screen.WelcomeScreen
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
 import com.example.votekt.ui.feature_wallet.WalletScreen
+import com.example.votekt.ui.feature_welcome.model.WelcomeScreenNavigationEvent
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -57,7 +59,7 @@ fun AppNavHost(
             // Conditional navigation
             LaunchedEffect(Unit) {
                 if (state.conditionalNavigation.requireCreateAccount) {
-                    navController.navigate(NavDestinations.GeneratePhrase.route) {
+                    navController.navigate(NavDestinations.Welcome.route) {
                         popUpTo(NavDestinations.Primary.Wallet.route) {
                             inclusive = true
                         }
@@ -83,6 +85,22 @@ fun AppNavHost(
                     startDestination = NavDestinations.Primary.Wallet.route,
                     modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
                 ) {
+
+                    composable(NavDestinations.Welcome.route) {
+                        WelcomeScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    WelcomeScreenNavigationEvent.ToCreateAccount -> {
+                                        navController.navigate(NavDestinations.GeneratePhrase.route)
+                                    }
+                                    WelcomeScreenNavigationEvent.ToRestoreAccount -> {
+
+                                    }
+                                }
+                            }
+                        )
+                    }
+
                     composable(NavDestinations.GeneratePhrase.route) {
                         GeneratePhraseScreen(onConfirm = { words ->
                             val phrase = words.map {

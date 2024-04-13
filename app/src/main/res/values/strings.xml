@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Vote Kt</string>
+    <string name="welcome_to_app">Welcome to VoteKt</string>
+
     <string name="clear_transactions">Clear transactions</string>
     <string name="proposal_title">Proposal title</string>
     <string name="proposal_desc">Proposal description</string>
@@ -67,4 +69,6 @@
     <string name="send_eth">Send ETH</string>
     <string name="ticker_eth">ETH</string>
     <string name="make_vote">Make vote</string>
+    <string name="create_account">Create account</string>
+    <string name="already_have_account">I already have account</string>
 </resources>

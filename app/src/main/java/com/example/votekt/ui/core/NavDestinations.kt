@@ -36,6 +36,10 @@ sealed class NavDestinations(
         }
     }
 
+    object Welcome: NavDestinations(
+        route = "welcome"
+    )
+
     object GeneratePhrase: NavDestinations(
         route = "generate_phrase"
     )
