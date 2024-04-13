@@ -33,7 +33,7 @@ android {
 }
 
 dependencies {
-    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:0.8.1"
+    implementation project(":libs:bivrost-solidity-types")
 
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'

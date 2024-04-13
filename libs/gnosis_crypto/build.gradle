@@ -9,11 +9,10 @@ java {
 }
 
 dependencies {
+    implementation project(":libs:bivrost-solidity-types")
+
     implementation("org.bouncycastle:bcprov-jdk15on:1.61", {
         exclude group: 'junit', module: 'junit'
     })
     implementation "com.squareup.okio:okio:2.4.1"
-
-    // Solidity types
-    implementation "com.github.gnosis.bivrost-kotlin:bivrost-solidity-types:0.8.0"
 }
