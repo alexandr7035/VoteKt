@@ -24,18 +24,19 @@ android {
     flavorDimensions "environment"
 
     productFlavors {
-        goerli {
+        infuraTestnet {
             dimension "environment"
-            buildConfigField("String", "ETH_NODE_URL", GOERLI_NODE_URL)
-            buildConfigField("String", "ETH_WSS_NODE_URL", GOERLI_WSS_NODE_URL)
-            buildConfigField("String", "CONTRACT_ADDRESS", GOERLI_CONTRACT_ADDRESS)
-            buildConfigField("String", "TEST_MNEMONIC", GOERLI_TEST_MNEMONIC)
-            buildConfigField("String", "TEST_ADDRESS", GOERLI_TEST_ADDRESS)
-            buildConfigField("int", "CHAIN_ID", GOERLI_CHAIN_ID)
+            buildConfigField("String", "INFURA_API_KEY", INFURA_API_KEY)
+            buildConfigField("String", "ETH_NODE_URL", INFURA_NODE_URL)
+            buildConfigField("String", "ETH_WSS_NODE_URL", INFURA_WSS_NODE_URL)
+            buildConfigField("String", "CONTRACT_ADDRESS", TESTNET_CONTRACT_ADDRESS)
+            buildConfigField("String", "TEST_MNEMONIC", TESTNET_TEST_MNEMONIC)
+            buildConfigField("int", "CHAIN_ID", TESTNET_CHAIN_ID)
         }
 
         local {
             dimension "environment"
+            buildConfigField("String", "INFURA_API_KEY", INFURA_API_KEY)
             buildConfigField("String", "ETH_NODE_URL", LOCAL_NODE_URL)
             buildConfigField("String", "ETH_WSS_NODE_URL", LOCAL_WSS_NODE_URL)
             buildConfigField("String", "CONTRACT_ADDRESS", LOCAL_CONTRACT_ADDRESS)

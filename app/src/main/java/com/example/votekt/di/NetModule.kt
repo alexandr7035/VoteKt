@@ -8,6 +8,7 @@ import by.alexandr7035.ethereum_impl.adapters.HexNumberAdapter
 import by.alexandr7035.ethereum_impl.adapters.WeiAdapter
 import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
 import com.example.votekt.BuildConfig
+import com.example.votekt.data.InfuraAuthInterceptor
 import com.squareup.moshi.Moshi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -18,12 +19,18 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import java.util.concurrent.TimeUnit
 
+private const val INFURA_TEST_FLAVOR = "infuraTestnet"
 
 val netModule = module {
     single {
-        OkHttpClient()
-        .newBuilder()
-        .build()
+        val builder = OkHttpClient()
+            .newBuilder().apply {
+                if (BuildConfig.FLAVOR == INFURA_TEST_FLAVOR) {
+                    addInterceptor(InfuraAuthInterceptor(BuildConfig.INFURA_API_KEY))
+                }
+            }
+
+        builder.build()
     }
 
     // Ktor
