@@ -71,4 +71,12 @@
     <string name="make_vote">Make vote</string>
     <string name="create_account">Create account</string>
     <string name="already_have_account">I already have account</string>
+    <string name="unknown_error">Unknown error. Please, contact developer</string>
+    <string name="error_mnemonic_incomplete">Your phrase is incomplete</string>
+    <string name="error_mnemonic_confirmation_incomplete">Please, fill all words</string>
+    <string name="error_mnemonic_invalid">Your phrase is invalid</string>
+    <string name="error_mnemonic_confirmation_invalid">Wrong words. Please, try again</string>
+    <string name="confirm">Confirm</string>
+    <string name="enter_your_recovery_phrase">Enter your recovery phrase</string>
+    <string name="i_ve_written_phrase">I\'ve written, proceed</string>
 </resources>

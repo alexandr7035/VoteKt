@@ -30,6 +30,8 @@ import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_create_account.welcome_screen.WelcomeScreen
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
+import com.example.votekt.ui.feature_restore_account.RestoreAccountScreen
+import com.example.votekt.ui.feature_restore_account.model.RestoreAccountNavigationEvent
 import com.example.votekt.ui.feature_wallet.WalletScreen
 import com.example.votekt.ui.feature_welcome.model.WelcomeScreenNavigationEvent
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
@@ -94,7 +96,23 @@ fun AppNavHost(
                                         navController.navigate(NavDestinations.GeneratePhrase.route)
                                     }
                                     WelcomeScreenNavigationEvent.ToRestoreAccount -> {
+                                        navController.navigate(NavDestinations.RestoreAccount.route)
+                                    }
+                                }
+                            }
+                        )
+                    }
 
+                    composable(NavDestinations.RestoreAccount.route) {
+                        RestoreAccountScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    RestoreAccountNavigationEvent.GoToHome -> {
+                                        navController.navigate(NavDestinations.Primary.Wallet.route) {
+                                            popUpTo(NavDestinations.RestoreAccount.route) {
+                                                inclusive = true
+                                            }
+                                        }
                                     }
                                 }
                             }
@@ -103,9 +121,9 @@ fun AppNavHost(
 
                     composable(NavDestinations.GeneratePhrase.route) {
                         GeneratePhraseScreen(onConfirm = { words ->
-                            val phrase = words.map {
+                            val phrase = words.joinToString(" ") {
                                 it.value
-                            }.joinToString(" ")
+                            }
 
                             navController.navigate("${NavDestinations.ConfirmPhrase.route}/$phrase")
                         })

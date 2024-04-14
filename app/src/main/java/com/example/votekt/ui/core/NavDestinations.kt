@@ -40,6 +40,10 @@ sealed class NavDestinations(
         route = "welcome"
     )
 
+    object RestoreAccount: NavDestinations(
+        route = "restore_account"
+    )
+
     object GeneratePhrase: NavDestinations(
         route = "generate_phrase"
     )

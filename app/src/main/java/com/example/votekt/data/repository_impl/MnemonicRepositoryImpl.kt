@@ -1,7 +1,8 @@
 package com.example.votekt.data.repository_impl
 
 import android.util.Log
-import com.example.votekt.data.helpers.MnemonicHelper
+import cash.z.ecc.android.bip39.Mnemonics
+import com.example.votekt.BuildConfig
 import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.domain.account.MnemonicWordConfirm
@@ -10,13 +11,40 @@ import com.example.votekt.domain.core.ErrorType
 import java.security.SecureRandom
 import java.util.Random
 
-class MnemonicRepositoryImpl(
-    private val mnemonicHelper: MnemonicHelper
-) : MnemonicRepository {
+class MnemonicRepositoryImpl : MnemonicRepository {
     private val secureRandom = SecureRandom()
 
-    override fun generateMnemonic(): List<MnemonicWord> {
-        return mnemonicHelper.generateMnemonic()
+    override fun generateMnemonic(wordCount: Int): List<MnemonicWord> {
+        val mnemonicCode = Mnemonics.MnemonicCode(Mnemonics.WordCount.valueOf(wordCount) ?: Mnemonics.WordCount.COUNT_12)
+        return mnemonicCode.mapIndexed { index, it ->
+            println("word ${it}")
+            MnemonicWord(
+                index = index,
+                value = it,
+            )
+        }
+    }
+
+    override fun verifyMnemonic(words: List<String>) {
+        val mnemonicCode = Mnemonics.MnemonicCode(words.joinToString(MNEMONIC_WORD_SEPARATOR))
+        try {
+            mnemonicCode.validate()
+        } catch (e: Exception) {
+            val errorType = when (e) {
+                is Mnemonics.WordCountException -> ErrorType.MNEMONIC_INVALID_WORD_COUNT
+                is Mnemonics.ChecksumException,
+                is Mnemonics.InvalidWordException -> ErrorType.MNEMONIC_INVALID
+                else -> ErrorType.UNKNOWN_ERROR
+            }
+
+            throw AppError(errorType)
+        }
+    }
+
+    override fun getTestMnemonic(): List<MnemonicWord> {
+        return BuildConfig.TEST_MNEMONIC.split(MNEMONIC_WORD_SEPARATOR).mapIndexed { index, it ->
+            MnemonicWord(index, it)
+        }
     }
 
     override fun getRandomMnemonicWords(mnemonic: List<MnemonicWord>): List<MnemonicWordConfirm> {
@@ -94,5 +122,6 @@ class MnemonicRepositoryImpl(
     companion object {
         private const val CONFIRMATION_WORDS_COUNT = 3
         private const val INCORRECT_WORDS_COUNT = 2
+        private const val MNEMONIC_WORD_SEPARATOR = " "
     }
 }

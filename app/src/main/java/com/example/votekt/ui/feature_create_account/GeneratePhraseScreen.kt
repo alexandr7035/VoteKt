@@ -18,12 +18,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.votekt.R
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.ui.components.FlowRow
 import com.example.votekt.ui.components.PrimaryButton
@@ -75,7 +77,7 @@ private fun GeneratePhraseScreen_Ui(
     ) {
 
         Text(
-            text = "Welcome to VoteKt!",
+            text = stringResource(id = R.string.welcome_to_app),
             style = TextStyle(
                 fontWeight = FontWeight.Bold,
                 fontSize = 24.sp
@@ -97,7 +99,7 @@ private fun GeneratePhraseScreen_Ui(
         Spacer(modifier = Modifier.weight(1f))
 
         PrimaryButton(
-            text = "I've written, proceed",
+            text = stringResource(R.string.i_ve_written_phrase),
             onClick = { onIntent(GenerateSeedIntent.Confirm) },
             modifier = Modifier.fillMaxWidth()
         )

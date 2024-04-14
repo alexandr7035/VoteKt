@@ -1,7 +1,11 @@
 package com.example.votekt.domain.account
 
 interface MnemonicRepository {
-    fun generateMnemonic(): List<MnemonicWord>
+    fun generateMnemonic(wordCount: Int): List<MnemonicWord>
+
+    fun verifyMnemonic(words: List<String>)
+
+    fun getTestMnemonic(): List<MnemonicWord>
 
     fun getRandomMnemonicWords(mnemonic: List<MnemonicWord>): List<MnemonicWordConfirm>
 
