@@ -23,4 +23,14 @@ object Dimensions {
     val tabTextLineHeight= 20.sp
 
     val cardListSpacing = 16.dp
+
+    val seedInputCorners = 20.dp
+    val seedInputPaddingHorizontal = 24.dp
+    val seedInputPaddingVertical= 24.dp
+
+    val tipPaddingHorizontal = 12.dp
+    val tipPaddingVertical = 8.dp
+    val tipIconSpacing = 8.dp
+    val tipIconSize = 32.dp
+    val tipFontSize = 14.sp
 }

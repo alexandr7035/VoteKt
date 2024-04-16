@@ -22,14 +22,23 @@ class RestoreAccountViewModel(
     private val getTestMnemonicUseCase: GetTestMnemonicUseCase,
     private val verifyMnemonicPhraseUseCase: VerifyMnemonicPhraseUseCase,
     private val addAccountUseCase: AddAccountUseCase,
-): ViewModel() {
+) : ViewModel() {
     private val _state = MutableStateFlow(RestoreAccountState())
     val state = _state.asStateFlow()
 
     fun onIntent(intent: RestoreAccountIntent) {
+        println("intent $intent")
         when (intent) {
             RestoreAccountIntent.EnterScreen -> onEnterScreen()
             RestoreAccountIntent.ConfirmClick -> onConfirm()
+            is RestoreAccountIntent.ChangePhrase -> {
+                _state.update {
+                    it.copy(
+                        wordInput = intent.value,
+                        error = null,
+                    )
+                }
+            }
         }
     }
 
@@ -38,7 +47,7 @@ class RestoreAccountViewModel(
         val testPhrase = getTestMnemonicUseCase.invoke()
 
         _state.update {
-            it.copy(wordInput = testPhrase)
+            it.copy(wordInput = testPhrase.joinToString(WORD_SEPARATOR) { word -> word.value })
         }
     }
 
@@ -47,12 +56,12 @@ class RestoreAccountViewModel(
 
         viewModelScope.launch {
             val verifyMnemonic = OperationResult.runWrapped {
-                verifyMnemonicPhraseUseCase.invoke(enteredMnemonic.map { it.value })
+                verifyMnemonicPhraseUseCase.invoke(enteredMnemonic.trim().split(WORD_SEPARATOR))
             }
 
             when (verifyMnemonic) {
                 is OperationResult.Success -> {
-                    addAccount(enteredMnemonic.map { it.value })
+                    addAccount(enteredMnemonic.trim().split(WORD_SEPARATOR))
                 }
 
                 is OperationResult.Failure -> {
@@ -93,5 +102,9 @@ class RestoreAccountViewModel(
 
     fun consumeNavigationEvent() {
         _state.update { it.copy(navigationEvent = consumed()) }
+    }
+
+    companion object {
+        private const val WORD_SEPARATOR = " "
     }
 }

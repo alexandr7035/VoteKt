@@ -29,6 +29,9 @@ import com.example.votekt.R
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.ui.components.FlowRow
 import com.example.votekt.ui.components.PrimaryButton
+import com.example.votekt.ui.components.TipType
+import com.example.votekt.ui.components.TipView
+import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.feature_create_account.model.GeneratePhraseNavigationEvent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedIntent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedState
@@ -97,6 +100,14 @@ private fun GeneratePhraseScreen_Ui(
         }
 
         Spacer(modifier = Modifier.weight(1f))
+
+        TipView(
+            text = UiText.StringResource(R.string.seed_phrase_save_explanation),
+            modifier = Modifier.fillMaxWidth(),
+            tipType = TipType.WARMING,
+        )
+
+        Spacer(Modifier.height(12.dp))
 
         PrimaryButton(
             text = stringResource(R.string.i_ve_written_phrase),
