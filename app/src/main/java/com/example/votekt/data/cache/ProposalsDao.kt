@@ -54,4 +54,7 @@ interface ProposalsDao {
 
     @Query("DELETE FROM proposals WHERE NOT isDraft AND uuid NOT IN (:remainingProposals)")
     suspend fun cleanUpProposals(remainingProposals: List<String>)
+
+    @Query("DELETE FROM proposals")
+    suspend fun clearAll()
 }

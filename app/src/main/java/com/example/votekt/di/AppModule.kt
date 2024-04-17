@@ -13,8 +13,6 @@ import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
 import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.TransactionsDatabase
-import com.example.votekt.data.helpers.MnemonicHelperDebugImpl
-import com.example.votekt.data.helpers.MnemonicHelperImpl
 import com.example.votekt.data.repository_impl.AccountRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
@@ -33,7 +31,9 @@ import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
+import com.example.votekt.ui.feature_restore_account.RestoreAccountViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
+import com.example.votekt.ui.feature_welcome.WelcomeScreenViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.kethereum.model.Address
@@ -50,6 +50,13 @@ val appModule = module {
     includes(ethereumModule)
     includes(domainModule)
 
+    viewModel { WelcomeScreenViewModel(
+    ) }
+    viewModel { RestoreAccountViewModel(
+        getTestMnemonicUseCase = get(),
+        verifyMnemonicPhraseUseCase = get(),
+        addAccountUseCase = get(),
+    ) }
     viewModel { AppViewModel(
         accountRepository = get(),
         sendTransactionRepository = get(),
@@ -65,10 +72,10 @@ val appModule = module {
         )
     }
     viewModel { VotingDetailsViewModel(get()) }
-    viewModel { ProposalsViewModel(get()) }
+    viewModel { ProposalsViewModel(get(), get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
-    viewModel { WalletViewModel(get()) }
+    viewModel { WalletViewModel(get(), get()) }
 
     single<CryptoHelper> {
         CryptoHelperImpl()
@@ -91,15 +98,6 @@ val appModule = module {
 
     single {
         get<TransactionsDatabase>().proposalsDao()
-    }
-
-    @Suppress("SENSELESS_COMPARISON")
-    single {
-        return@single if (BuildConfig.FLAVOR == "local") {
-            MnemonicHelperDebugImpl()
-        } else {
-            MnemonicHelperImpl()
-        }
     }
 
     single {
@@ -133,9 +131,7 @@ val appModule = module {
     }
 
     single<MnemonicRepository> {
-        MnemonicRepositoryImpl(
-            mnemonicHelper = get()
-        )
+        MnemonicRepositoryImpl()
     }
 
     single<AccountRepository> {

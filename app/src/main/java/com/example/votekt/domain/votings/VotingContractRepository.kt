@@ -20,5 +20,7 @@ interface VotingContractRepository {
     suspend fun voteOnProposal(proposalNumber: Int, vote: VoteType): OperationResult<Unit>
     suspend fun syncProposalsWithContract()
     suspend fun handleContractEvent(event: EthereumEvent.ContractEvent)
+
+    suspend fun clearContractData()
 }
 

@@ -8,6 +8,8 @@ import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
+import com.example.votekt.domain.core.OperationResult
+import com.example.votekt.domain.usecase.account.LogoutUseCase
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -24,7 +26,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class WalletViewModel(
-    private val accountRepository: AccountRepository
+    private val accountRepository: AccountRepository,
+    private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(WalletScreenState())
     val state = _state.asStateFlow()
@@ -33,6 +36,28 @@ class WalletViewModel(
         when (intent) {
             is WalletScreenIntent.LoadData -> subscribeToBalance()
             is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
+            is WalletScreenIntent.LogOut -> reduceLogOut()
+        }
+    }
+
+    private fun reduceLogOut() {
+        viewModelScope.launch {
+            val logoutRes = OperationResult.runWrapped {
+                logoutUseCase.invoke()
+            }
+
+            when (logoutRes) {
+                is OperationResult.Failure -> _state.update {
+                    it.copy(error = logoutRes.error.errorType.uiError)
+                }
+                is OperationResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            navigationEvent = triggered(WalletScreenNavigationEvent.ToWelcomeScreen)
+                        )
+                    }
+                }
+            }
         }
     }
 

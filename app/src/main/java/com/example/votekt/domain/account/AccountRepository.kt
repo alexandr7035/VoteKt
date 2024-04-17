@@ -10,4 +10,6 @@ interface AccountRepository {
     suspend fun createAndSaveAccount(seedPhrase: List<MnemonicWord>)
 
     fun getAccountBalance(): Flow<Wei>
+
+    suspend fun clearAccount()
 }

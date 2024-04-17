@@ -12,8 +12,12 @@ data class AppError(val errorType: ErrorType): Exception() {
 enum class ErrorType {
     NODE_CONNECTION_ERROR,
     UNKNOWN_ERROR,
+
+    // Account
     MNEMONIC_CONFIRMATION_INCOMPLETE,
     MNEMONIC_CONFIRMATION_WRONG,
+    MNEMONIC_INVALID_WORD_COUNT,
+    MNEMONIC_INVALID,
     ;
 
     companion object {

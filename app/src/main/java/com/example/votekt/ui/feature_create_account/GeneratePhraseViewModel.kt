@@ -3,6 +3,7 @@ package com.example.votekt.ui.feature_create_account
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.usecase.account.GenerateAccountUseCase
 import com.example.votekt.ui.feature_create_account.model.GeneratePhraseNavigationEvent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedIntent
 import com.example.votekt.ui.feature_create_account.model.GenerateSeedState
@@ -14,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class GeneratePhraseViewModel(
-    private val mnemonicRepository: MnemonicRepository,
+    private val generateAccountUseCase: GenerateAccountUseCase
 ): ViewModel() {
     private val _state = MutableStateFlow(GenerateSeedState())
     val state = _state.asStateFlow()
@@ -28,7 +29,7 @@ class GeneratePhraseViewModel(
 
     private fun reduceGeneratePhrase() {
         viewModelScope.launch {
-            val phrase = mnemonicRepository.generateMnemonic()
+            val phrase = generateAccountUseCase.invoke()
             _state.update {
                 it.copy(
                     words = phrase,

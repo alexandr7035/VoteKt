@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -27,9 +28,14 @@ import com.example.votekt.ui.feature_node_connection.NodeConnectionIntent
 import com.example.votekt.ui.feature_node_connection.NodeConnectionScreen
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
+import com.example.votekt.ui.feature_create_account.welcome_screen.WelcomeScreen
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
+import com.example.votekt.ui.feature_restore_account.RestoreAccountScreen
+import com.example.votekt.ui.feature_restore_account.model.RestoreAccountNavigationEvent
 import com.example.votekt.ui.feature_wallet.WalletScreen
+import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
+import com.example.votekt.ui.feature_welcome.model.WelcomeScreenNavigationEvent
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import org.koin.androidx.compose.koinViewModel
 
@@ -57,11 +63,7 @@ fun AppNavHost(
             // Conditional navigation
             LaunchedEffect(Unit) {
                 if (state.conditionalNavigation.requireCreateAccount) {
-                    navController.navigate(NavDestinations.GeneratePhrase.route) {
-                        popUpTo(NavDestinations.Primary.Wallet.route) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToWelcomeScreen(navController)
                 }
             }
 
@@ -83,11 +85,43 @@ fun AppNavHost(
                     startDestination = NavDestinations.Primary.Wallet.route,
                     modifier = Modifier.padding(bottom = pv.calculateBottomPadding())
                 ) {
+
+                    composable(NavDestinations.Welcome.route) {
+                        WelcomeScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    WelcomeScreenNavigationEvent.ToCreateAccount -> {
+                                        navController.navigate(NavDestinations.GeneratePhrase.route)
+                                    }
+                                    WelcomeScreenNavigationEvent.ToRestoreAccount -> {
+                                        navController.navigate(NavDestinations.RestoreAccount.route)
+                                    }
+                                }
+                            }
+                        )
+                    }
+
+                    composable(NavDestinations.RestoreAccount.route) {
+                        RestoreAccountScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    RestoreAccountNavigationEvent.GoToHome -> {
+                                        navController.navigate(NavDestinations.Primary.Wallet.route) {
+                                            popUpTo(NavDestinations.RestoreAccount.route) {
+                                                inclusive = true
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        )
+                    }
+
                     composable(NavDestinations.GeneratePhrase.route) {
                         GeneratePhraseScreen(onConfirm = { words ->
-                            val phrase = words.map {
+                            val phrase = words.joinToString(" ") {
                                 it.value
-                            }.joinToString(" ")
+                            }
 
                             navController.navigate("${NavDestinations.ConfirmPhrase.route}/$phrase")
                         })
@@ -113,7 +147,18 @@ fun AppNavHost(
                     }
 
                     composable(NavDestinations.Primary.Wallet.route) {
-                        WalletScreen()
+                        WalletScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    WalletScreenNavigationEvent.ToWelcomeScreen -> {
+                                        navigateToWelcomeScreen(navController)
+                                    }
+                                    else -> {
+                                        // TODO
+                                    }
+                                }
+                            }
+                        )
                     }
 
                     composable(NavDestinations.Primary.Proposals.route) {
@@ -171,5 +216,13 @@ fun AppNavHost(
                 }
             }
         )
+    }
+}
+
+private fun navigateToWelcomeScreen(navController: NavHostController) {
+    navController.navigate(NavDestinations.Welcome.route) {
+        popUpTo(NavDestinations.Primary.Wallet.route) {
+            inclusive = true
+        }
     }
 }

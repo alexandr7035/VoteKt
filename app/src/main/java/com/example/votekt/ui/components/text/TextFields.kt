@@ -18,11 +18,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.votekt.R
+import com.example.votekt.ui.core.resources.UiText
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.PrimaryFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,6 +64,10 @@ fun PrimaryTextField(
         errorContainerColor = Color.Transparent,
     ),
     shape: Shape = RoundedCornerShape(4.dp),
+    contentPadding: PaddingValues = PaddingValues(
+        vertical = 14.dp,
+        horizontal = 16.dp
+    ),
 ) {
     BasicTextField(
         value = value,
@@ -81,10 +90,7 @@ fun PrimaryTextField(
             singleLine = singleLine,
             enabled = enabled,
             interactionSource = interactionSource,
-            contentPadding = PaddingValues(
-                vertical = 14.dp,
-                horizontal = 16.dp
-            ),
+            contentPadding = contentPadding,
             placeholder = placeholder,
             colors = colors,
             isError = error != null,
@@ -105,4 +111,38 @@ fun PrimaryTextField(
             }
         )
     }
+}
+
+@Composable
+fun SeedPhraseInputField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    error: UiText? = null,
+) {
+    PrimaryTextField(
+        value = value,
+        onValueChange = onValueChange,
+        modifier = Modifier
+            .fillMaxWidth(),
+        error = error?.asString(),
+        textStyle = TextStyle(
+            textAlign = TextAlign.Center,
+            fontSize = 18.sp,
+        ),
+        shape = RoundedCornerShape(Dimensions.seedInputCorners),
+        contentPadding = PaddingValues(
+            vertical = Dimensions.seedInputPaddingVertical,
+            horizontal = Dimensions.seedInputPaddingHorizontal,
+        ),
+        placeholder = {
+            Text(
+                style = TextStyle(
+                    textAlign = TextAlign.Center,
+                    fontSize = 18.sp,
+                    color = Color.Gray
+                ),
+                text = stringResource(R.string.enter_your_words_here)
+            )
+        }
+    )
 }
