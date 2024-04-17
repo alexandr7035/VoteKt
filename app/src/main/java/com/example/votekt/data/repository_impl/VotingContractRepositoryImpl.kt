@@ -190,7 +190,7 @@ class VotingContractRepositoryImpl(
     }
 
     override suspend fun clearContractData() {
-        proposalsDao.cleanUpProposals(remainingProposals = emptyList())
+        proposalsDao.clearAll()
     }
 
     private suspend fun ProposalWithTransactions.mapToDomain(): Proposal = withContext(dispatcher) {
