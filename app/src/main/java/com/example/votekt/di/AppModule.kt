@@ -72,7 +72,7 @@ val appModule = module {
         )
     }
     viewModel { VotingDetailsViewModel(get()) }
-    viewModel { ProposalsViewModel(get()) }
+    viewModel { ProposalsViewModel(get(), get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
     viewModel { WalletViewModel(get(), get()) }
