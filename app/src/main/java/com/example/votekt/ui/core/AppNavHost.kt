@@ -9,6 +9,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -33,6 +34,7 @@ import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
 import com.example.votekt.ui.feature_restore_account.RestoreAccountScreen
 import com.example.votekt.ui.feature_restore_account.model.RestoreAccountNavigationEvent
 import com.example.votekt.ui.feature_wallet.WalletScreen
+import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_welcome.model.WelcomeScreenNavigationEvent
 import com.example.votekt.ui.tx_history.TransactionHistoryScreen
 import org.koin.androidx.compose.koinViewModel
@@ -61,11 +63,7 @@ fun AppNavHost(
             // Conditional navigation
             LaunchedEffect(Unit) {
                 if (state.conditionalNavigation.requireCreateAccount) {
-                    navController.navigate(NavDestinations.Welcome.route) {
-                        popUpTo(NavDestinations.Primary.Wallet.route) {
-                            inclusive = true
-                        }
-                    }
+                    navigateToWelcomeScreen(navController)
                 }
             }
 
@@ -149,7 +147,18 @@ fun AppNavHost(
                     }
 
                     composable(NavDestinations.Primary.Wallet.route) {
-                        WalletScreen()
+                        WalletScreen(
+                            onNavigationEvent = {
+                                when (it) {
+                                    WalletScreenNavigationEvent.ToWelcomeScreen -> {
+                                        navigateToWelcomeScreen(navController)
+                                    }
+                                    else -> {
+                                        // TODO
+                                    }
+                                }
+                            }
+                        )
                     }
 
                     composable(NavDestinations.Primary.Proposals.route) {
@@ -207,5 +216,13 @@ fun AppNavHost(
                 }
             }
         )
+    }
+}
+
+private fun navigateToWelcomeScreen(navController: NavHostController) {
+    navController.navigate(NavDestinations.Welcome.route) {
+        popUpTo(NavDestinations.Primary.Wallet.route) {
+            inclusive = true
+        }
     }
 }

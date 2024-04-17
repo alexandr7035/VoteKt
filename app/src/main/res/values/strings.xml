@@ -82,4 +82,5 @@
     <string name="enter_your_words_here">Enter your words here</string>
     <string name="seed_phrase_restore_explanation">Seed phrase is a sequence of 12 or 24 words to recover your account</string>
     <string name="seed_phrase_save_explanation">Please, write your seed phrase on paper. Otherwise you may loose your account!</string>
+    <string name="log_out">Log Out</string>
 </resources>

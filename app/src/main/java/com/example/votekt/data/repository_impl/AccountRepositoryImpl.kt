@@ -47,6 +47,10 @@ class AccountRepositoryImpl(
         }
     }.flowOn(dispatcher)
 
+    override suspend fun clearAccount() {
+        ksPrefs.clear()
+    }
+
     override suspend fun getSelfAddress(): Address {
         return Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY, ""))
     }

@@ -5,4 +5,5 @@ sealed class WalletScreenNavigationEvent {
     object ToReceive: WalletScreenNavigationEvent()
     object ToVote: WalletScreenNavigationEvent()
     object ToNetworkDetails: WalletScreenNavigationEvent()
+    object ToWelcomeScreen: WalletScreenNavigationEvent()
 }

@@ -75,7 +75,7 @@ val appModule = module {
     viewModel { ProposalsViewModel(get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
-    viewModel { WalletViewModel(get()) }
+    viewModel { WalletViewModel(get(), get()) }
 
     single<CryptoHelper> {
         CryptoHelperImpl()

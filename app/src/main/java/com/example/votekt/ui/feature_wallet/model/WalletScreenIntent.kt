@@ -8,4 +8,6 @@ sealed class WalletScreenIntent {
         object Receive: WalletAction()
         object Vote: WalletAction()
     }
+
+    object LogOut: WalletScreenIntent()
 }

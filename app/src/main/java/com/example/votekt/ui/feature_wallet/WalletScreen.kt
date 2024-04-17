@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -17,11 +16,14 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -45,6 +47,7 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.copyToClipboard
 import com.example.votekt.ui.utils.prettify
@@ -55,6 +58,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun WalletScreen(
     viewModel: WalletViewModel = koinViewModel(),
+    onNavigationEvent: (WalletScreenNavigationEvent) -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
     val context = LocalContext.current
@@ -74,23 +78,7 @@ fun WalletScreen(
         event = state.navigationEvent,
         onConsumed = viewModel::consumeNavigationEvent,
         action = {
-            when (it) {
-                WalletScreenNavigationEvent.ToNetworkDetails -> {
-                    context.showToast("Network details")
-                }
-
-                WalletScreenNavigationEvent.ToReceive -> {
-                    context.showToast("Receive")
-                }
-
-                WalletScreenNavigationEvent.ToSend -> {
-                    context.showToast("Send")
-                }
-
-                WalletScreenNavigationEvent.ToVote -> {
-                    context.showToast("Vote")
-                }
-            }
+            onNavigationEvent(it)
         }
     )
 }
@@ -113,7 +101,7 @@ private fun WalletScreen_Ui(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 Header(
-                    onWalletAction = onIntent,
+                    onIntent = onIntent,
                     balance = state.balanceFormatted,
                     isBalanceLoading = state.isBalanceLoading,
                     address = state.address,
@@ -148,56 +136,90 @@ private fun WalletScreen_Ui(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Header(
     address: Address,
     balance: String?,
     isBalanceLoading: Boolean,
-    onWalletAction: (WalletScreenIntent.WalletAction) -> Unit
+    onIntent: (WalletScreenIntent) -> Unit
 ) {
-    val context = LocalContext.current
-
     Column(
         modifier = Modifier
             .background(MaterialTheme.colorScheme.primary)
             .padding(
-                horizontal = 32.dp,
-                vertical = 20.dp
+                top = 12.dp,
+                start = Dimensions.screenPaddingHorizontal,
+                end = Dimensions.screenPaddingVertical,
+                bottom = 32.dp
             )
             .fillMaxWidth()
             .wrapContentSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Box(
-            modifier = Modifier
-                .background(
-                    shape = RoundedCornerShape(16.dp), color = Color(0x40FFFFFF)
-                )
-                .clip(RoundedCornerShape(16.dp))
-                .clickable {
-                    context.copyToClipboard("Address", address.value)
-                    context.showToast("Address copied")
+
+        CenterAlignedTopAppBar(
+            title = {
+                AddressComponent(address)
+            },
+            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                containerColor = Color.Transparent,
+                titleContentColor = MaterialTheme.colorScheme.onPrimary
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            actions = {
+                IconButton(
+                    onClick = {
+                        onIntent(WalletScreenIntent.LogOut)
+                    },
+                    modifier = Modifier.size(28.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_logout),
+                        contentDescription = stringResource(R.string.log_out),
+                        tint = MaterialTheme.colorScheme.onPrimary
+                    )
                 }
-                .padding(
-                    vertical = 8.dp, horizontal = 12.dp
-                )
-        ) {
-            Text(
-                text = address.prettify(),
-                style = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 16.sp
-                )
-            )
-        }
+            }
+        )
+
 
         Balance(
             balance = balance,
             isBalanceLoading = isBalanceLoading
         )
         Actions(
-            onWalletAction = onWalletAction
+            onWalletAction = onIntent
+        )
+    }
+}
+
+@Composable
+private fun AddressComponent(address: Address) {
+    val context = LocalContext.current
+
+    Box(
+        modifier = Modifier
+            .background(
+                shape = RoundedCornerShape(16.dp), color = Color(0x40FFFFFF)
+            )
+            .clip(RoundedCornerShape(16.dp))
+            .clickable {
+                context.copyToClipboard("Address", address.value)
+                context.showToast("Address copied")
+            }
+            .padding(
+                vertical = 8.dp,
+                horizontal = 12.dp
+            )
+    ) {
+        Text(
+            text = address.prettify(),
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = 16.sp
+            )
         )
     }
 }
