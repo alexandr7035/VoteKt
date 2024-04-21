@@ -1,7 +1,6 @@
-package by.alexandr7035.banking.ui.components.snackbar
+package com.example.votekt.ui.components.snackbar
 
 import androidx.compose.ui.graphics.Color
-import com.example.votekt.ui.components.snackbar.SnackbarColors
 
 sealed class SnackBarMode {
     object Positive : SnackBarMode()
