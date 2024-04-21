@@ -1,10 +1,10 @@
 package com.example.votekt.data.repository_impl
 
 import android.content.Context
-import android.content.SharedPreferences
 import android.util.Base64
 import androidx.biometric.BiometricManager
-import androidx.security.crypto.EncryptedSharedPreferences
+import com.cioccarellia.ksprefs.KsPrefs
+import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.data.security.BiometricsManager
 import com.example.votekt.data.security.CryptoUtils
 import com.example.votekt.data.security.model.BiometricEncryptedPinWrapper
@@ -17,15 +17,11 @@ import com.squareup.moshi.Moshi
 import javax.crypto.Cipher
 
 class AppLockRepositoryImpl(
-    private val securedPreferences: SharedPreferences,
+    private val ksPrefs: KsPrefs,
     private val context: Context,
     private val biometricsManager: BiometricsManager,
     private val moshi: Moshi,
 ) : AppLockRepository {
-
-    init {
-        require(securedPreferences is EncryptedSharedPreferences) { "Shared preferences must be encrypted" }
-    }
 
     override fun setupPinLock(pinCode: PinCode) {
         savePin(pin = pinCode.value)
@@ -39,8 +35,10 @@ class AppLockRepositoryImpl(
 
         val encryptedPinJson = jsonAdapter.toJson(encryptedPin)
 
-        securedPreferences.edit().putBoolean(BIOMETRICS_FLAG, isLocked).apply()
-        securedPreferences.edit().putString(BIOMETRICS_ENCRYPTED_PIN_KEY, encryptedPinJson.toString()).apply()
+        with(ksPrefs) {
+            push(PrefKeys.BIOMETRICS_FLAG, isLocked)
+            push(PrefKeys.BIOMETRICS_ENCRYPTED_PIN_KEY, encryptedPinJson.toString())
+        }
     }
 
     override fun getBiometricsDecryptionCipher(): Cipher {
@@ -49,12 +47,13 @@ class AppLockRepositoryImpl(
 
     override fun getEncryptedPinWithBiometrics(): EncryptedPinCode? {
         val jsonAdapter = moshi.adapter(BiometricEncryptedPinWrapper::class.java)
-        val json = securedPreferences.getString(BIOMETRICS_ENCRYPTED_PIN_KEY, null)
-        return json?.let {
-            jsonAdapter.fromJson(it)?.let { pinWrapper ->
+        val json = ksPrefs.pull(PrefKeys.BIOMETRICS_ENCRYPTED_PIN_KEY, "")
+
+        return if (json.isNotBlank()) {
+            jsonAdapter.fromJson(json)?.let { pinWrapper ->
                 EncryptedPinCode(pinWrapper.ciphertext)
             }
-        }
+        } else null
     }
 
     override fun decryptPinWithBiometrics(
@@ -88,17 +87,17 @@ class AppLockRepositoryImpl(
         val encodedPinData = Base64.encodeToString(secretKey.encoded, Base64.DEFAULT)
         val encodedSalt = Base64.encodeToString(salt, Base64.DEFAULT)
 
-        securedPreferences.edit()
-            .putString(PIN_KEY, encodedPinData)
-            .putString(PIN_SALT_KEY, encodedSalt)
-            .apply()
+        with(ksPrefs) {
+            push(PrefKeys.PIN_KEY, encodedPinData)
+            push(PrefKeys.PIN_SALT_KEY, encodedSalt)
+        }
     }
 
     private fun isPinValid(pin: String): Boolean {
-        val storedSalt = securedPreferences.getString(PIN_SALT_KEY, "todo")
+        val storedSalt = ksPrefs.pull<String>(PrefKeys.PIN_SALT_KEY)
         val decodedSalt = Base64.decode(storedSalt, Base64.DEFAULT)
 
-        val storedPinData = securedPreferences.getString(PIN_KEY, "todo")
+        val storedPinData = ksPrefs.pull<String>(PrefKeys.PIN_KEY)
         val decodedPinData = Base64.decode(storedPinData, Base64.DEFAULT)
 
         val enteredPinData = CryptoUtils.generatePbkdf2Key(pin.toCharArray(), decodedSalt)
@@ -107,18 +106,20 @@ class AppLockRepositoryImpl(
     }
 
     override fun checkIfAppLocked(): Boolean {
-        return securedPreferences.getString(PIN_SALT_KEY, null) != null
-                && securedPreferences.getString(PIN_KEY, null) != null
+        return ksPrefs.pull(PrefKeys.PIN_SALT_KEY, "").isNotBlank()
+                && ksPrefs.pull(PrefKeys.PIN_KEY, "").isNotBlank()
     }
 
     override fun checkIfAppLockedWithBiometrics(): Boolean {
-        return securedPreferences.getBoolean(BIOMETRICS_FLAG, false)
+        return ksPrefs.pull(PrefKeys.BIOMETRICS_FLAG, false)
     }
 
     override fun checkBiometricsAvailable(): BiometricsAvailability {
         val biometricManager = BiometricManager.from(context)
-        val result = biometricManager.canAuthenticate(BiometricManager.Authenticators.BIOMETRIC_STRONG
-                or BiometricManager.Authenticators.BIOMETRIC_WEAK)
+        val result = biometricManager.canAuthenticate(
+            BiometricManager.Authenticators.BIOMETRIC_STRONG
+                    or BiometricManager.Authenticators.BIOMETRIC_WEAK
+        )
 
         return when (result) {
             BiometricManager.BIOMETRIC_SUCCESS -> {
@@ -133,12 +134,5 @@ class AppLockRepositoryImpl(
                 BiometricsAvailability.NotAvailable
             }
         }
-    }
-
-    companion object {
-        private const val PIN_KEY = "PIN_KEY"
-        private const val PIN_SALT_KEY = "PIN_SALT"
-        private const val BIOMETRICS_ENCRYPTED_PIN_KEY = "BIOMETRICS_ENCRYPTED_PIN_KEY"
-        private const val BIOMETRICS_FLAG = "BIOMETRICS_LOCK_ENABLED"
     }
 }

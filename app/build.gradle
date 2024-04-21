@@ -157,7 +157,7 @@ dependencies {
     implementation "cash.z.ecc.android:kotlin-bip39:1.0.7"
 
     // Shared prefs
-    implementation 'com.github.cioccarellia:ksprefs:2.4.0'
+    implementation 'com.github.cioccarellia:ksprefs:2.4.1'
 
     // WorkManager
     def work_version = "2.9.0"

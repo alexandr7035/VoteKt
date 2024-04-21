@@ -1,7 +1,6 @@
 package com.example.votekt.di
 
 import androidx.room.Room
-import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.work.WorkManager
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
@@ -131,7 +130,10 @@ val appModule = module {
 
     single {
         KsPrefs(androidApplication().applicationContext) {
-            encryptionType = EncryptionType.PlainText()
+
+            encryptionType = EncryptionType.KeyStore(
+                alias = "shared_prefs_keystore_alias",
+            )
             autoSave = AutoSavePolicy.AUTOMATIC
             commitStrategy = CommitStrategy.APPLY
         }
@@ -219,13 +221,7 @@ val appModule = module {
 
         AppLockRepositoryImpl(
             context = context,
-            securedPreferences = EncryptedSharedPreferences.create(
-                "my_secure_prefs",
-                "my_keyset_alias",
-                context,
-                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
-            ),
+            ksPrefs = get(),
             biometricsManager = get(),
             moshi = get(),
         )
