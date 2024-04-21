@@ -1,18 +1,18 @@
-package com.example.votekt.ui.components.snackbar
+package by.alexandr7035.banking.ui.components.snackbar
 
 import androidx.compose.ui.graphics.Color
-import com.example.votekt.ui.theme.ResultColors
+import com.example.votekt.ui.components.snackbar.SnackbarColors
 
-sealed class SnackBarMode() {
+sealed class SnackBarMode {
     object Positive : SnackBarMode()
     object Negative : SnackBarMode()
     object Neutral : SnackBarMode()
 
     fun getSurfaceColor(): Color {
         return when (this) {
-            is Positive -> ResultColors.positiveColor
-            is Negative -> ResultColors.negativeColor
-            is Neutral -> ResultColors.neutralColor
+            is Positive -> SnackbarColors.positiveColor
+            is Negative -> SnackbarColors.negativeColor
+            is Neutral -> SnackbarColors.neutralColor
         }
     }
 }

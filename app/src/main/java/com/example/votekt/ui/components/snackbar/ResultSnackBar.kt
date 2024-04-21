@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.SnackbarData
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
@@ -20,9 +19,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.votekt.ui.theme.VoteKtTheme
+import by.alexandr7035.banking.ui.components.snackbar.SnackBarMode
+import com.example.votekt.ui.components.preview.ScreenPreview
 
-@OptIn(ExperimentalMaterial3Api::class)
 suspend fun SnackbarHostState.showResultSnackBar(
     message: String, snackBarMode: SnackBarMode = SnackBarMode.Neutral
 ) {
@@ -58,7 +57,7 @@ fun ResultSnackBar(
 private fun ResultSnackBar_UI(
     message: String,
     cornerRadius: Dp = 16.dp,
-    fontSize: TextUnit = 18.sp,
+    fontSize: TextUnit = 14.sp,
     snackBarMode: SnackBarMode
 ) {
     Surface(
@@ -85,7 +84,7 @@ private fun ResultSnackBar_UI(
 @Preview
 @Composable
 fun ResultSnackBar_Preview() {
-    VoteKtTheme() {
+    ScreenPreview {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             ResultSnackBar_UI(
                 message = "Test message", snackBarMode = SnackBarMode.Neutral
