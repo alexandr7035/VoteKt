@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import by.alexandr7035.banking.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.components.preview.ScreenPreview
 
 suspend fun SnackbarHostState.showResultSnackBar(
