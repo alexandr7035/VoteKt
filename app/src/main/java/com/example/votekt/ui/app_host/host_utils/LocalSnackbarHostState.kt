@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.compositionLocalOf
-import by.alexandr7035.banking.ui.components.snackbar.SnackBarMode
+import com.example.votekt.ui.components.snackbar.SnackBarMode
 import com.example.votekt.ui.components.snackbar.showResultSnackBar
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
