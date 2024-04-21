@@ -1,6 +1,7 @@
 package com.example.votekt.di
 
 import androidx.room.Room
+import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.work.WorkManager
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
@@ -18,15 +19,22 @@ import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingContractRepositoryImpl
+import com.example.votekt.data.repository_impl.AppLockRepositoryImpl
+import com.example.votekt.data.security.BiometricsManager
+import com.example.votekt.data.security.BiometricsManagerImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.security.AppLockRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
+import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenViewModel
+import com.example.votekt.ui.feature_app_lock.setup_applock.biometrics.EnableBiometricsViewModel
+import com.example.votekt.ui.feature_app_lock.setup_applock.create_pin.CreatePinViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
@@ -63,6 +71,7 @@ val appModule = module {
         web3EventsRepository = get(),
         votingContractRepository = get(),
         syncWithContractUseCase = get(),
+        checkAppLockUseCase = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -76,6 +85,26 @@ val appModule = module {
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
     viewModel { WalletViewModel(get(), get()) }
+
+    viewModel { LockScreenViewModel(
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+    ) }
+
+    viewModel {
+        CreatePinViewModel(get(), get())
+    }
+
+    viewModel {
+        EnableBiometricsViewModel(get(), get())
+    }
+
+    viewModel { EnableBiometricsViewModel(get(), get()) }
 
     single<CryptoHelper> {
         CryptoHelperImpl()
@@ -102,7 +131,6 @@ val appModule = module {
 
     single {
         KsPrefs(androidApplication().applicationContext) {
-            // TODO encryption
             encryptionType = EncryptionType.PlainText()
             autoSave = AutoSavePolicy.AUTOMATIC
             commitStrategy = CommitStrategy.APPLY
@@ -183,4 +211,23 @@ val appModule = module {
             NodeWssConfiguration.WSS
         }
     ) } bind EthereumEventListener::class
+
+    single { BiometricsManagerImpl() } bind BiometricsManager::class
+
+    single<AppLockRepository> {
+        val context = androidApplication().applicationContext
+
+        AppLockRepositoryImpl(
+            context = context,
+            securedPreferences = EncryptedSharedPreferences.create(
+                "my_secure_prefs",
+                "my_keyset_alias",
+                context,
+                EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+                EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM,
+            ),
+            biometricsManager = get(),
+            moshi = get(),
+        )
+    }
 }

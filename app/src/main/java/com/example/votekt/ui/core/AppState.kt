@@ -22,7 +22,9 @@ sealed class AppState {
 }
 
 data class ConditionalNavigation(
-    val requireCreateAccount: Boolean
+    val requireCreateAccount: Boolean,
+    val requireUnlockApp: Boolean,
+    val requireCreateAppLock: Boolean,
 )
 
 fun AppState.requiresTxConfirmation(): Boolean {

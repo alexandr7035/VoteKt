@@ -4,28 +4,22 @@ import androidx.annotation.DrawableRes
 import com.example.votekt.R
 
 // TODO refactoring of this
-sealed class NavDestinations(
-    open val route: String,
-) {
+sealed class NavDestinations {
     sealed class Primary(
-        override val route: String,
         val label: String,
         @DrawableRes val filledIcon: Int,
-    ): NavDestinations(route) {
+    ): NavDestinations() {
         object Wallet: Primary(
-            route = "wallet",
             filledIcon = R.drawable.ic_wallet,
             label = "Wallet"
         )
 
         object Proposals: Primary(
-            route = "proposals",
             filledIcon = R.drawable.ic_votings,
             label = "Proposals"
         )
 
         object Transactions: Primary(
-            route = "transactions",
             filledIcon = R.drawable.ic_transactions,
             label = "History"
         )
@@ -36,27 +30,25 @@ sealed class NavDestinations(
         }
     }
 
-    object Welcome: NavDestinations(
-        route = "welcome"
-    )
+    object AppLock: NavDestinations()
 
-    object RestoreAccount: NavDestinations(
-        route = "restore_account"
-    )
+    object SetupAppLockGraph : NavDestinations() {
+        object CreatePin : NavDestinations()
+        object EnableBiometrics : NavDestinations()
+    }
 
-    object GeneratePhrase: NavDestinations(
-        route = "generate_phrase"
-    )
-    object ConfirmPhrase: NavDestinations(
-        route = "confirm_phrase"
-    )
+    object Welcome: NavDestinations()
 
-    object NewProposal: NavDestinations(
-        route = "new_proposal",
-    )
+    object RestoreAccount: NavDestinations()
 
-    object VotingDetails : NavDestinations(
-        route = "voting",
-    )
+    object GeneratePhrase: NavDestinations()
+    object ConfirmPhrase: NavDestinations()
+
+    object NewProposal: NavDestinations()
+
+    object VotingDetails : NavDestinations()
+
+    val route: String
+        get() = this::class.java.simpleName
 }
 

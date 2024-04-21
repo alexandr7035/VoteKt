@@ -10,6 +10,7 @@ import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.datasync.SyncWithContractUseCase
+import com.example.votekt.domain.security.CheckAppLockUseCase
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.ReviewTransactionData
 import com.example.votekt.domain.votings.VotingContractRepository
@@ -31,6 +32,7 @@ class AppViewModel(
     private val web3EventsRepository: EthereumEventListener,
     private val votingContractRepository: VotingContractRepository,
     private val syncWithContractUseCase: SyncWithContractUseCase,
+    private val checkAppLockUseCase: CheckAppLockUseCase,
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(AppState.Loading)
     val appState = _appState.asStateFlow()
@@ -66,14 +68,18 @@ class AppViewModel(
 
     private fun reduceEnterApp() {
         viewModelScope.launch {
-            val shouldCreateAccount = accountRepository.isAccountPresent().not()
+            val isAccountCreated = accountRepository.isAccountPresent()
+            val isAppLocked = checkAppLockUseCase.invoke()
+            val shouldSetupAppLock = !isAppLocked && isAccountCreated
 
-            if (shouldCreateAccount) {
-                println("Create account")
+            if (!isAccountCreated) {
                 _appState.update {
                     AppState.Ready(
+                        // TODO
                         conditionalNavigation = ConditionalNavigation(
-                            requireCreateAccount = true
+                            requireCreateAccount = true,
+                            requireUnlockApp = false,
+                            requireCreateAppLock = false,
                         )
                     )
                 }
@@ -96,6 +102,8 @@ class AppViewModel(
                                     AppState.Ready(
                                         conditionalNavigation = ConditionalNavigation(
                                             requireCreateAccount = false,
+                                            requireUnlockApp = isAppLocked,
+                                            requireCreateAppLock = shouldSetupAppLock
                                         )
                                     )
                                 }

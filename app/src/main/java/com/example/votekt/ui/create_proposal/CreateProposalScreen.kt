@@ -15,7 +15,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,7 +40,6 @@ import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.selector_group.SelectorOption
-import com.example.votekt.ui.components.snackbar.ResultSnackBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.showToast
@@ -72,15 +70,14 @@ fun CreateProposalScreen(
     }
 
     CreateProposalScreen_Ui(
+        titleMaxLength = state.titleMaxLength,
+        descMaxLength = state.descMaxLength,
         onBack = onBack,
         onSubmit = { title, desc, duration ->
             viewModel.createProposal(
                 CreateProposal(title, desc, duration)
             )
         },
-        titleMaxLength = state.titleMaxLength,
-        descMaxLength = state.descMaxLength,
-        snackarHostState = snackBarHostState,
         isLoading = state.isLoading
     )
 }
@@ -93,7 +90,6 @@ private fun CreateProposalScreen_Ui(
     descMaxLength: Int,
     onBack: () -> Unit = {},
     onSubmit: (title: String, description: String, duration: ProposalDuration) -> Unit = { _, _, _ -> },
-    snackarHostState: SnackbarHostState = SnackbarHostState(),
     isLoading: Boolean = false,
 ) {
 
@@ -109,12 +105,6 @@ private fun CreateProposalScreen_Ui(
                 focusManager.clearFocus()
             })
         },
-        snackbarHost = {
-            SnackbarHost(
-                hostState = snackarHostState,
-                snackbar = { ResultSnackBar(snackbarData = it) }
-            )
-        }
     ) { pv ->
         Column(
             modifier = Modifier
