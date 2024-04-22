@@ -12,7 +12,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
-import com.example.votekt.ui.core.AppNavHost
+import com.example.votekt.ui.core.AppContainer
 import com.example.votekt.ui.theme.VoteKtTheme
 
 // AppCompatActivity extends FragmentActivity which extends ComponentActivity
@@ -34,7 +34,7 @@ class MainActivity : FragmentActivity() {
                         .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    AppNavHost(navController = navController)
+                    AppContainer(navController = navController)
                 }
             }
         }

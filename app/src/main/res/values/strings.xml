@@ -104,4 +104,6 @@
     <string name="please_unlock_the_app">PLease, unlock the app</string>
     <string name="error_biometrics_corrupted">Biometrics failed. Please, try with PIN code</string>
     <string name="invalid_pin">Invalid PIN</string>
+    <string name="connecting">Connecting...</string>
+    <string name="offline">Offline</string>
 </resources>

@@ -41,7 +41,7 @@ class AppLockRepositoryImpl(
         }
     }
 
-    override fun getBiometricsDecryptionCipher(): Cipher {
+    override fun getBiometricsDecryptionCipher(): Cipher? {
         return biometricsManager.getDecryptionCipher()
     }
 

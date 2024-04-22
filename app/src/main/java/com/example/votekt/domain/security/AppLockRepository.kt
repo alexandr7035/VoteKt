@@ -18,7 +18,7 @@ interface AppLockRepository {
     fun checkBiometricsAvailable(): BiometricsAvailability
     fun checkIfAppLockedWithBiometrics(): Boolean
 
-    fun getBiometricsDecryptionCipher(): Cipher
+    fun getBiometricsDecryptionCipher(): Cipher?
     fun getEncryptedPinWithBiometrics(): EncryptedPinCode?
     fun decryptPinWithBiometrics(
         encryptedPinCode: EncryptedPinCode,

@@ -55,6 +55,7 @@ class LockScreenViewModel(
                     it.copy(showBiometricsPromptEvent = triggered)
                 }
             }
+
             is LockScreenIntent.ConsumeBiometricAuthResult -> {
                 when (intent.result) {
                     is BiometricAuthResult.Success -> {
@@ -99,9 +100,12 @@ class LockScreenViewModel(
             is LockScreenIntent.AuthenticateWithBiometrics -> {
                 val prompt = intent.data.first
                 val promptUi = intent.data.second
-                val cipher = getBiometricDecryptionCipherUseCase.invoke()
 
-                prompt.authenticate(promptUi, BiometricPrompt.CryptoObject(cipher))
+                getBiometricDecryptionCipherUseCase.invoke()?.let {
+                    prompt.authenticate(promptUi, BiometricPrompt.CryptoObject(it))
+                } ?: run {
+                    reduceBiometricsError()
+                }
             }
 
             LockScreenIntent.LogOut -> {

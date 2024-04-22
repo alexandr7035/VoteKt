@@ -106,31 +106,6 @@ private fun WalletScreen_Ui(
                     isBalanceLoading = state.isBalanceLoading,
                     address = state.address,
                 )
-
-                if (state.noConnection) {
-                    Row(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .background(
-                                shape = RoundedCornerShape(8.dp),
-                                color = Color(0xFFD86C6C)
-                            )
-                            .padding(vertical = 8.dp, horizontal = 12.dp)
-                            .fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.error_node_no_connection),
-                            style = TextStyle(
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White
-                            )
-                        )
-
-                        // TODO retry
-                    }
-                }
             }
         }
     }

@@ -13,7 +13,7 @@ import java.security.PublicKey
 import javax.crypto.Cipher
 
 interface BiometricsManager {
-    fun getDecryptionCipher(): Cipher
+    fun getDecryptionCipher(): Cipher?
     fun getEncryptionCipher(): Cipher
 
     fun encryptData(plaintext: String, cipher: Cipher): BiometricEncryptedPinWrapper
@@ -35,11 +35,16 @@ class BiometricsManagerImpl : BiometricsManager {
         return String(plaintext, Charset.forName("UTF-8"))
     }
 
-    override fun getDecryptionCipher(): Cipher {
-        val cipher = getCipher()
-        val privateKey = getOrCreateKey(KeyType.PRIVATE_KEY) as PrivateKey
-        cipher.init(Cipher.DECRYPT_MODE, privateKey)
-        return cipher
+    override fun getDecryptionCipher(): Cipher? {
+        return try {
+            val cipher = getCipher()
+            val privateKey = getOrCreateKey(KeyType.PRIVATE_KEY) as PrivateKey
+            cipher.init(Cipher.DECRYPT_MODE, privateKey)
+            cipher
+        } catch (e: Exception) {
+            // TODO logging
+            null
+        }
     }
 
     override fun getEncryptionCipher(): Cipher {
@@ -82,7 +87,7 @@ class BiometricsManagerImpl : BiometricsManager {
             setBlockModes(ASYMMETRIC_ENCRYPTION_BLOCK_MODE)
             setEncryptionPaddings(ASYMMETRIC_ENCRYPTION_PADDING)
             setKeySize(RSA_KEY_SIZE)
-            setUserAuthenticationRequired(true)
+            setUserAuthenticationRequired(false)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
                 setUserAuthenticationParameters(

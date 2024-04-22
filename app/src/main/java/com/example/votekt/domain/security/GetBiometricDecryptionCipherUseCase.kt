@@ -5,7 +5,7 @@ import javax.crypto.Cipher
 class GetBiometricDecryptionCipherUseCase(
     private val appLockRepository: AppLockRepository
 ) {
-    fun invoke(): Cipher {
+    fun invoke(): Cipher? {
         return appLockRepository.getBiometricsDecryptionCipher()
     }
 }
