@@ -15,6 +15,7 @@ import com.example.votekt.domain.usecase.account.AddAccountUseCase
 import com.example.votekt.domain.usecase.account.GenerateAccountUseCase
 import com.example.votekt.domain.usecase.account.LogoutUseCase
 import com.example.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
+import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
 import org.koin.dsl.module
 
 val domainModule = module {
@@ -25,6 +26,8 @@ val domainModule = module {
     single { LogoutUseCase(get(), get()) }
 
     single { SyncWithContractUseCase(get()) }
+
+    single { ConnectToNodeUseCase(get()) }
 
     single { SetupAppLockUseCase(get()) }
     single { SetupAppLockedWithBiometricsUseCase(get()) }

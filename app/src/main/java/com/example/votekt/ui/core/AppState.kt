@@ -10,7 +10,6 @@ data class AppState(
     val conditionalNavigation: ConditionalNavigation = ConditionalNavigation(),
     val appError: UiErrorMessage? = null,
     val txConfirmationState: ReviewTransactionDataUi? = null,
-    val nodeConnection: NodeConnectionState = NodeConnectionState(),
     val appConnectionState: AppConnectionState = AppConnectionState.CONNECTING,
 )
 
@@ -25,11 +24,6 @@ enum class AppConnectionState {
     ONLINE,
     OFFLINE
 }
-
-data class NodeConnectionState(
-    val isLoading: Boolean = true,
-    val isConnected: Boolean = false,
-)
 
 fun AppState.isLoggedIn() = this.conditionalNavigation.requireCreateAccount.not()
 
