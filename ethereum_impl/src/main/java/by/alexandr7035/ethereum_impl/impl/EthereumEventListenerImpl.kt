@@ -89,12 +89,16 @@ class EthereumEventListenerImpl(
     }
 
     override suspend fun disconnect() {
-        ktorClient.webSocket(
-            method = HttpMethod.Get,
-            host = wssUrl,
-            request = getRequestBuilder()
-        ) {
-            outgoing.send(Frame.Close())
+        try {
+            ktorClient.webSocket(
+                method = HttpMethod.Get,
+                host = wssUrl,
+                request = getRequestBuilder()
+            ) {
+                outgoing.send(Frame.Close())
+            }
+        } catch (e: Exception) {
+            reduceWssDisconnected(e)
         }
         reduceWssDisconnected(null)
     }

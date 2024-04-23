@@ -14,20 +14,20 @@ import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.repository_impl.AccountRepositoryImpl
+import com.example.votekt.data.repository_impl.AppLockRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingContractRepositoryImpl
-import com.example.votekt.data.repository_impl.AppLockRepositoryImpl
 import com.example.votekt.data.security.BiometricsManager
 import com.example.votekt.data.security.BiometricsManagerImpl
 import com.example.votekt.data.websockets.WebsocketActivityCallbacks
-import com.example.votekt.domain.repository.WebsocketManager
 import com.example.votekt.data.websockets.WebsocketManagerImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.repository.WebsocketManager
 import com.example.votekt.domain.security.AppLockRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
@@ -46,7 +46,6 @@ import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.feature_welcome.WelcomeScreenViewModel
 import com.example.votekt.ui.tx_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import org.kethereum.model.Address
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -240,7 +239,6 @@ val appModule = module {
         WebsocketManagerImpl(
             ethereumEventListener = get(),
             votingContractRepository = get(),
-            coroutineScope = MainScope(),
         )
     }
 }

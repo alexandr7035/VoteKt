@@ -6,8 +6,10 @@ import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.repository.WebsocketManager
 import com.example.votekt.domain.votings.VotingContractRepository
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -18,8 +20,14 @@ import kotlinx.coroutines.launch
 class WebsocketManagerImpl(
     private val ethereumEventListener: EthereumEventListener,
     private val votingContractRepository: VotingContractRepository,
-    private val coroutineScope: CoroutineScope,
 ): WebsocketManager {
+
+    private val exceptionHandler = CoroutineExceptionHandler { coroutineContext, throwable ->
+        Log.e(TAG, "uncaught exception $throwable")
+    }
+
+    private val coroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO + exceptionHandler)
+
     override fun connect() {
         coroutineScope.launch {
             subscribeToWssEvents()
@@ -45,16 +53,16 @@ class WebsocketManagerImpl(
                     is OperationResult.Failure -> throw syncResult.error
                 }
             }
-            .catch {
-                Log.d(TAG, "error in subscription ${it}")
-                disconnect()
-            }
             .onEach {
                 if (it is EthereumEvent.ContractEvent) {
                     votingContractRepository.handleContractEvent(it)
                 }
             }
             .flowOn(Dispatchers.IO)
+            .catch {
+                Log.d(TAG, "error in subscription ${it}")
+                disconnect()
+            }
             .launchIn(coroutineScope)
     }
 
