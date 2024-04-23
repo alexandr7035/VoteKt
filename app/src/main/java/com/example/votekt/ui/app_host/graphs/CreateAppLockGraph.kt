@@ -11,6 +11,9 @@ import com.example.votekt.ui.feature_app_lock.setup_applock.create_pin.CreatePin
 import com.example.votekt.ui.core.NavDestinations
 
 private val targetRoot = NavDestinations.Primary.Wallet.route
+private val thisGraph = NavDestinations.SetupAppLockGraph.route
+// This is not secure, consider using better approach
+private const val ARG_PIN = "pinToEncrypt"
 
 fun NavGraphBuilder.createAppLockGraph(
     navController: NavController
@@ -19,7 +22,6 @@ fun NavGraphBuilder.createAppLockGraph(
         route = NavDestinations.SetupAppLockGraph.route,
         startDestination = NavDestinations.SetupAppLockGraph.CreatePin.route
     ) {
-        val thisGraph = NavDestinations.SetupAppLockGraph.route
 
         composable(NavDestinations.SetupAppLockGraph.CreatePin.route) {
             CreatePinScreen(
@@ -42,13 +44,13 @@ fun NavGraphBuilder.createAppLockGraph(
         }
 
         composable(
-            route = "${NavDestinations.SetupAppLockGraph.EnableBiometrics.route}/{pinToEncrypt}",
-            arguments = listOf(navArgument("pinToEncrypt") {
+            route = "${NavDestinations.SetupAppLockGraph.EnableBiometrics.route}/{${ARG_PIN}}",
+            arguments = listOf(navArgument(ARG_PIN) {
                 type = NavType.StringType
             })
         ) {
             EnableBiometricsScreen(
-                pinToEncrypt = it.arguments?.getString("pinToEncrypt")!!,
+                pinToEncrypt = it.arguments?.getString(ARG_PIN)!!,
                 onExit = {
                     navController.navigate(targetRoot) {
                         popUpTo(thisGraph) {

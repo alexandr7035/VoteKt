@@ -86,7 +86,7 @@ class RestoreAccountViewModel(
             is OperationResult.Success -> {
                 _state.update {
                     it.copy(
-                        navigationEvent = triggered(RestoreAccountNavigationEvent.GoToHome)
+                        navigationEvent = triggered(RestoreAccountNavigationEvent.GoToSetupAppLock)
                     )
                 }
             }

@@ -250,8 +250,8 @@ private fun AppNavHost(
         composable(NavDestinations.RestoreAccount.route) {
             RestoreAccountScreen(onNavigationEvent = {
                 when (it) {
-                    RestoreAccountNavigationEvent.GoToHome -> {
-                        navController.navigate(NavDestinations.Primary.Wallet.route) {
+                    RestoreAccountNavigationEvent.GoToSetupAppLock -> {
+                        navController.navigate(NavDestinations.SetupAppLockGraph.route) {
                             popUpTo(NavDestinations.RestoreAccount.route) {
                                 inclusive = true
                             }
