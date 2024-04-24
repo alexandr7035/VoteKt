@@ -7,6 +7,8 @@ import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import by.alexandr7035.utils.asEthereumAddressString
+import com.cioccarellia.ksprefs.KsPrefs
+import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.data.cache.ProposalEntity
 import com.example.votekt.data.cache.ProposalWithTransactions
 import com.example.votekt.data.cache.ProposalsDao
@@ -17,6 +19,7 @@ import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.core.Uuid
+import com.example.votekt.domain.model.contract.ContractState
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.votings.CreateProposal
@@ -32,6 +35,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import pm.gnosis.model.Solidity
+import pm.gnosis.model.safeIntValueExact
 import pm.gnosis.utils.hexToByteArray
 import java.util.UUID
 
@@ -42,11 +46,46 @@ class VotingContractRepositoryImpl(
     private val proposalsDao: ProposalsDao,
     private val dispatcher: CoroutineDispatcher,
     private val sendTransactionRepository: SendTransactionRepository,
+    private val ksPrefs: KsPrefs,
 ) : VotingContractRepository {
     override fun getProposalById(id: String): Flow<Proposal> {
         return proposalsDao.observeProposalByUuid(id).flowOn(dispatcher).map {
             it.mapToDomain()
         }
+    }
+
+    override fun getContractState(): Flow<ContractState> {
+        return getProposals()
+            .map {
+                val filtered = it.filterIsInstance<Proposal.Deployed>()
+                val currentCount = filtered.size
+
+                val max = ksPrefs.pull<Int>(PrefKeys.CONTRACT_MAX_PROPOSALS)
+                val percentage = (currentCount / max.toFloat())
+
+                val pending = filtered.count { proposal ->
+                    proposal.isFinished.not()
+                }
+
+                val supported = filtered.count { proposal ->
+                    proposal.isFinished && proposal.votingData.isSupported
+                }
+
+                val notSupported = filtered.count { proposal ->
+                    proposal.isFinished && proposal.votingData.isSupported.not()
+                }
+
+                ContractState(
+                    address = org.kethereum.model.Address(contractAddress),
+                    owner = org.kethereum.model.Address(ksPrefs.pull(PrefKeys.CONTRACT_CREATOR_ADDRESS)),
+                    maxProposals = max,
+                    currentProposals = currentCount,
+                    fullPercentage = percentage,
+                    supportedProposals = supported,
+                    notSupportedProposals = notSupported,
+                    pendingProposals = pending,
+                )
+            }
     }
 
     override fun getProposals(): Flow<List<Proposal>> {
@@ -154,15 +193,36 @@ class VotingContractRepositoryImpl(
     override suspend fun syncProposalsWithContract(): Unit = withContext(dispatcher) {
         val proposalCreator = getContractOwner(contractAddress)
 
-        val contractCallRes = VoteKtContractV1.GetProposalsList.encode()
-        val callRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
-            input = contractCallRes,
-        )
-        val decoded = VoteKtContractV1.GetProposalsList.decode(callRes).param0.items
+        updateContractConfiguration()
 
-        decoded.forEach { raw -> updateProposalInCache(proposalCreator, raw) }
-        proposalsDao.cleanUpProposals(remainingProposals = decoded.map { it.uuid.value })
+        val getProposalsCall = VoteKtContractV1.GetProposalsList.encode()
+        val getProposalRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = getProposalsCall,
+        )
+        val decodedGetProposalRes = VoteKtContractV1.GetProposalsList.decode(getProposalRes).param0.items
+
+        decodedGetProposalRes.forEach { raw -> updateProposalInCache(proposalCreator, raw) }
+        proposalsDao.cleanUpProposals(remainingProposals = decodedGetProposalRes.map { it.uuid.value })
+    }
+
+    private suspend fun updateContractConfiguration() {
+        val maxProposalsCall = VoteKtContractV1.MaxProposals.encode()
+        val maxProposalRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = maxProposalsCall
+        )
+        val decodedMaxProposals = VoteKtContractV1.MaxProposals.decode(maxProposalRes).param0.value.safeIntValueExact()
+
+        ksPrefs.push(PrefKeys.CONTRACT_MAX_PROPOSALS, decodedMaxProposals)
+
+        val ownerInput = VoteKtContractV1.Owner.encode()
+        val ownerRes = web3.sendEthCall(
+            to = org.kethereum.model.Address(contractAddress),
+            input = ownerInput
+        )
+        val ownerDecoded = VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
+        ksPrefs.push(PrefKeys.CONTRACT_CREATOR_ADDRESS, ownerDecoded)
     }
 
     override suspend fun handleContractEvent(event: EthereumEvent.ContractEvent) {

@@ -9,4 +9,7 @@ object PrefKeys {
     const val PIN_SALT_KEY = "PIN_SALT"
     const val BIOMETRICS_ENCRYPTED_PIN_KEY = "BIOMETRICS_ENCRYPTED_PIN_KEY"
     const val BIOMETRICS_FLAG = "BIOMETRICS_LOCK_ENABLED"
+
+    const val CONTRACT_MAX_PROPOSALS = "contract.max_proposals"
+    const val CONTRACT_CREATOR_ADDRESS = "contract.creator"
 }

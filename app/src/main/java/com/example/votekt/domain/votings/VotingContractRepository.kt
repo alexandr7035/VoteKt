@@ -3,11 +3,13 @@ package com.example.votekt.domain.votings
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.core.Uuid
+import com.example.votekt.domain.model.contract.ContractState
 import kotlinx.coroutines.flow.Flow
 
 // TODO redeploy proposal
 // TODO delete draft proposal
 interface VotingContractRepository {
+    fun getContractState(): Flow<ContractState>
     fun getProposals(): Flow<List<Proposal>>
     fun getProposalById(id: String): Flow<Proposal>
 
