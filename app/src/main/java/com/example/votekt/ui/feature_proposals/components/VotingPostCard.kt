@@ -84,7 +84,10 @@ fun VotingPostCard(
             )
         )
 
-        Creator(address = proposal.creatorAddress.value)
+        Creator(
+            address = proposal.creatorAddress.value,
+            isSelf = proposal.isSelfCreated
+        )
 
         Text(
             text = proposal.description,
@@ -117,7 +120,8 @@ fun VotingPostCard(
 
             if (proposal is Proposal.Draft
                 && proposal.deployStatus is BlockchainActionStatus.NotCompleted.Failed
-                && !isExpanded) {
+                && !isExpanded
+            ) {
                 Image(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(id = R.drawable.ic_status_rejected),

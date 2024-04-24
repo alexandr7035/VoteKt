@@ -1,7 +1,6 @@
 package com.example.votekt
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -11,11 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.view.WindowCompat
+import androidx.fragment.app.FragmentActivity
 import androidx.navigation.compose.rememberNavController
-import com.example.votekt.ui.core.AppNavHost
+import com.example.votekt.ui.core.AppContainer
 import com.example.votekt.ui.theme.VoteKtTheme
 
-class MainActivity : ComponentActivity() {
+// AppCompatActivity extends FragmentActivity which extends ComponentActivity
+// Need FragmentActivity at least for biometrics
+class MainActivity : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -32,7 +34,7 @@ class MainActivity : ComponentActivity() {
                         .fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    AppNavHost(navController = navController)
+                    AppContainer(navController = navController)
                 }
             }
         }

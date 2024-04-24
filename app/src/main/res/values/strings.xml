@@ -83,4 +83,27 @@
     <string name="seed_phrase_restore_explanation">Seed phrase is a sequence of 12 or 24 words to recover your account</string>
     <string name="seed_phrase_save_explanation">Please, write your seed phrase on paper. Otherwise you may loose your account!</string>
     <string name="log_out">Log Out</string>
+
+    <string name="unlock_app">Unlock App</string>
+    <string name="unlock_app_biometrics">Unlock with Biometrics</string>
+    <string name="cancel">Cancel</string>
+
+    <string name="error_template">Error: %1$s</string>
+    <string name="error_auth_failed">Authentication failed</string>
+
+    <string name="create_pin">Create PIN</string>
+    <string name="confirm_pin">Confirm PIN</string>
+    <string name="enable_biometrics">Enable Biometrics</string>
+    <string name="setup_biometrics">Setup Biometrics</string>
+    <string name="biometrics_explanation">Logging in with biometrics is an easier way to access your account</string>
+    <string name="go_to_settings">Go to Settings</string>
+    <string name="biometrics_enable_explanation">You should enable Biometrics in System Settings</string>
+    <string name="skip_this_step">Skip This Step</string>
+    <string name="error_biometrics_not_available">Biometrics not available</string>
+    <string name="pins_don_t_match">PINs don\'t match</string>
+    <string name="please_unlock_the_app">PLease, unlock the app</string>
+    <string name="error_biometrics_corrupted">Biometrics failed. Please, try with PIN code</string>
+    <string name="invalid_pin">Invalid PIN</string>
+    <string name="connecting">Connecting...</string>
+    <string name="offline">Offline</string>
 </resources>

@@ -5,12 +5,13 @@ import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.EthNodeMethods
 import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
-import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.ethereum_impl.model.EthWebsocketEventRaw
+import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.utils.removeHexPrefix
 import com.squareup.moshi.Moshi
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.http.HttpMethod
 import io.ktor.http.URLProtocol
 import io.ktor.websocket.Frame
@@ -44,36 +45,19 @@ class EthereumEventListenerImpl(
         Log.d(LOG_TAG, "establishing websocket connection")
 
         try {
-            val subscribeRequest = JsonRpcRequest(
-                method = EthNodeMethods.FUNCTION_SUBSCRIBE,
-                params = listOf("logs", mapOf(
-                    "address" to contractAddress.hex
-                ))
-            )
-
             ktorClient.webSocket(
                 method = HttpMethod.Get,
                 host = wssUrl,
-                request = when (wssConfiguration) {
-                    NodeWssConfiguration.CLEARTEXT -> {
-                        {}
-                    }
-                    NodeWssConfiguration.WSS -> {
-                        {
-                            url.protocol = URLProtocol.WSS
-                            url.port = url.protocol.defaultPort
-                        }
-                    }
-                }
+                request = getRequestBuilder()
             ) {
                 wssStatusFlow.emit(EthEventsSubscriptionState.Connected)
-                outgoing.send(Frame.Text(requestAdapter.toJson(subscribeRequest)))
+                outgoing.send(getSubscribeToContractRequest(contractAddress))
 
                 try {
                     while(isActive) {
                         when (val frame = incoming.receive()) {
                             is Frame.Ping -> {
-                                send(Frame.Pong(frame.buffer))
+                                send(getPongRequest(frame))
                             }
                             is Frame.Text -> {
                                 emit(parseWssEvent(frame.readText()))
@@ -91,12 +75,36 @@ class EthereumEventListenerImpl(
         }
     }.flowOn(Dispatchers.IO)
 
-    override suspend fun disconnect() {
-        ktorClient.close()
+    private fun getRequestBuilder(): HttpRequestBuilder.() -> Unit = when (wssConfiguration) {
+        NodeWssConfiguration.CLEARTEXT -> {
+            {}
+        }
+
+        NodeWssConfiguration.WSS -> {
+            {
+                url.protocol = URLProtocol.WSS
+                url.port = url.protocol.defaultPort
+            }
+        }
     }
 
-    private suspend fun reduceWssDisconnected(e: Exception) {
-        Log.d(LOG_TAG,"websocket disconnected with ${e} ${e.message}")
+    override suspend fun disconnect() {
+        try {
+            ktorClient.webSocket(
+                method = HttpMethod.Get,
+                host = wssUrl,
+                request = getRequestBuilder()
+            ) {
+                outgoing.send(Frame.Close())
+            }
+        } catch (e: Exception) {
+            reduceWssDisconnected(e)
+        }
+        reduceWssDisconnected(null)
+    }
+
+    private suspend fun reduceWssDisconnected(e: Exception?) {
+        Log.d(LOG_TAG,"websocket disconnected with error ${e} ${e?.message}")
         wssStatusFlow.emit(EthEventsSubscriptionState.Disconnected)
     }
 
@@ -117,6 +125,23 @@ class EthereumEventListenerImpl(
         }
 
         return EthereumEvent.UnknownEvent
+    }
+
+    private fun getSubscribeToContractRequest(contractAddress: Address): Frame {
+        val raw = requestAdapter.toJson(
+            JsonRpcRequest(
+                method = EthNodeMethods.FUNCTION_SUBSCRIBE,
+                params = listOf("logs", mapOf(
+                    "address" to contractAddress.hex
+                ))
+            )
+        )
+
+        return Frame.Text(raw)
+    }
+
+    private fun getPongRequest(ping: Frame.Ping): Frame {
+        return Frame.Pong(ping.buffer)
     }
 
     private companion object {

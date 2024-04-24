@@ -14,19 +14,29 @@ import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.repository_impl.AccountRepositoryImpl
+import com.example.votekt.data.repository_impl.AppLockRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.VotingContractRepositoryImpl
+import com.example.votekt.data.security.BiometricsManager
+import com.example.votekt.data.security.BiometricsManagerImpl
+import com.example.votekt.data.websockets.WebsocketActivityCallbacks
+import com.example.votekt.data.websockets.WebsocketManagerImpl
 import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.repository.WebsocketManager
+import com.example.votekt.domain.security.AppLockRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
 import com.example.votekt.ui.create_proposal.CreateProposalViewModel
+import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenViewModel
+import com.example.votekt.ui.feature_app_lock.setup_applock.biometrics.EnableBiometricsViewModel
+import com.example.votekt.ui.feature_app_lock.setup_applock.create_pin.CreatePinViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
@@ -61,8 +71,8 @@ val appModule = module {
         accountRepository = get(),
         sendTransactionRepository = get(),
         web3EventsRepository = get(),
-        votingContractRepository = get(),
-        syncWithContractUseCase = get(),
+        checkAppLockUseCase = get(),
+        connectToNodeUseCase = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -76,6 +86,26 @@ val appModule = module {
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
     viewModel { WalletViewModel(get(), get()) }
+
+    viewModel { LockScreenViewModel(
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+        get(),
+    ) }
+
+    viewModel {
+        CreatePinViewModel(get(), get())
+    }
+
+    viewModel {
+        EnableBiometricsViewModel(get(), get())
+    }
+
+    viewModel { EnableBiometricsViewModel(get(), get()) }
 
     single<CryptoHelper> {
         CryptoHelperImpl()
@@ -102,8 +132,10 @@ val appModule = module {
 
     single {
         KsPrefs(androidApplication().applicationContext) {
-            // TODO encryption
-            encryptionType = EncryptionType.PlainText()
+
+            encryptionType = EncryptionType.KeyStore(
+                alias = "shared_prefs_keystore_alias",
+            )
             autoSave = AutoSavePolicy.AUTOMATIC
             commitStrategy = CommitStrategy.APPLY
         }
@@ -183,4 +215,30 @@ val appModule = module {
             NodeWssConfiguration.WSS
         }
     ) } bind EthereumEventListener::class
+
+    single { BiometricsManagerImpl() } bind BiometricsManager::class
+
+    single<AppLockRepository> {
+        val context = androidApplication().applicationContext
+
+        AppLockRepositoryImpl(
+            context = context,
+            ksPrefs = get(),
+            biometricsManager = get(),
+            moshi = get(),
+        )
+    }
+
+    single {
+        WebsocketActivityCallbacks(
+            websocketManager = get(),
+        )
+    }
+
+    single<WebsocketManager> {
+        WebsocketManagerImpl(
+            ethereumEventListener = get(),
+            votingContractRepository = get(),
+        )
+    }
 }

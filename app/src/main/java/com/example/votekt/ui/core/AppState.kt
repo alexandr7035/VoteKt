@@ -5,26 +5,32 @@ import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDataUi
 
 // Global app state, can include auth check result, app lock flag and so on
 // consider researching better approach
-sealed class AppState {
-    object Loading : AppState()
-
-    data class Ready(
-        val conditionalNavigation: ConditionalNavigation,
-        val requireUnlock: Boolean = false,
-        val txConfirmationState: ReviewTransactionDataUi? = null,
-    ) : AppState()
-
-    object NodeConnectionError: AppState()
-
-    data class InitFailure(
-        val error: UiErrorMessage
-    ) : AppState()
-}
-
-data class ConditionalNavigation(
-    val requireCreateAccount: Boolean
+data class AppState(
+    val isLoading: Boolean = true,
+    val conditionalNavigation: ConditionalNavigation = ConditionalNavigation(),
+    val appError: UiErrorMessage? = null,
+    val txConfirmationState: ReviewTransactionDataUi? = null,
+    val appConnectionState: AppConnectionState = AppConnectionState.CONNECTING,
 )
 
+data class ConditionalNavigation(
+    val requireCreateAccount: Boolean = false,
+    val requireUnlockApp: Boolean = true,
+    val requireCreateAppLock: Boolean = false,
+)
+
+enum class AppConnectionState {
+    CONNECTING,
+    ONLINE,
+    OFFLINE
+}
+
+fun AppState.isLoggedIn() = this.conditionalNavigation.requireCreateAccount.not()
+
+fun AppState.isAppLocked() = this.conditionalNavigation.requireUnlockApp
+
+fun AppState.isOffline() = this.appConnectionState != AppConnectionState.ONLINE
+
 fun AppState.requiresTxConfirmation(): Boolean {
-    return this is AppState.Ready && this.txConfirmationState != null
+    return this.txConfirmationState != null
 }
