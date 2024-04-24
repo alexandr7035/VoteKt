@@ -152,6 +152,7 @@ dependencies {
     // Libs for compose
     implementation("androidx.lifecycle:lifecycle-runtime-compose:2.7.0-alpha03")
     implementation 'com.github.leonard-palm:compose-state-events:2.1.0'
+    implementation 'com.valentinilk.shimmer:compose-shimmer:1.0.5'
 
     // Bip39
     implementation "cash.z.ecc.android:kotlin-bip39:1.0.7"
