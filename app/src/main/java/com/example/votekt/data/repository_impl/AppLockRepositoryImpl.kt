@@ -41,6 +41,16 @@ class AppLockRepositoryImpl(
         }
     }
 
+    override fun removeAppLock() {
+        with(ksPrefs) {
+            push(PrefKeys.PIN_KEY, "")
+            push(PrefKeys.PIN_SALT_KEY, "")
+            push(PrefKeys.BIOMETRICS_FLAG, false)
+            push(PrefKeys.BIOMETRICS_ENCRYPTED_PIN_KEY, "")
+            biometricsManager.deleteKey()
+        }
+    }
+
     override fun getBiometricsDecryptionCipher(): Cipher? {
         return biometricsManager.getDecryptionCipher()
     }

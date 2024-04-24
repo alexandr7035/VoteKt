@@ -24,4 +24,6 @@ interface AppLockRepository {
         encryptedPinCode: EncryptedPinCode,
         cipher: Cipher
     ): PinCode
+
+    fun removeAppLock()
 }

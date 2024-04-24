@@ -23,7 +23,7 @@ val domainModule = module {
     single { GetTestMnemonicUseCase(get()) }
     single { AddAccountUseCase(get()) }
     single { VerifyMnemonicPhraseUseCase(get()) }
-    single { LogoutUseCase(get(), get()) }
+    single { LogoutUseCase(get(), get(), get(), get()) }
 
     single { SyncWithContractUseCase(get()) }
 
