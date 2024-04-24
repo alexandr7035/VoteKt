@@ -203,7 +203,7 @@ private fun ProposalsList(
                     ) { _, proposal ->
                         Card(
                             onClick = { onProposalClick(proposal.uuid) },
-                            elevation = CardDefaults.cardElevation(4.dp)
+                            elevation = CardDefaults.cardElevation(Dimensions.defaultCardElevation)
                         ) {
                             VotingPostCard(
                                 proposal = proposal

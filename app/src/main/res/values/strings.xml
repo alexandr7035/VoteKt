@@ -106,4 +106,7 @@
     <string name="invalid_pin">Invalid PIN</string>
     <string name="connecting">Connecting...</string>
     <string name="offline">Offline</string>
+    <string name="storage">Storage</string>
+    <string name="on_voting">On Voting</string>
+    <string name="contract">Contract</string>
 </resources>

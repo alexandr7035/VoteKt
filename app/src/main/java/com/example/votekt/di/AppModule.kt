@@ -85,7 +85,7 @@ val appModule = module {
     viewModel { ProposalsViewModel(get(), get()) }
     viewModel { TransactionsViewModel(get()) }
     viewModel { CreateProposalViewModel(get()) }
-    viewModel { WalletViewModel(get(), get()) }
+    viewModel { WalletViewModel(get(), get(), get()) }
 
     viewModel { LockScreenViewModel(
         get(),
@@ -184,7 +184,8 @@ val appModule = module {
             proposalsDao = get(),
             dispatcher = Dispatchers.IO,
             sendTransactionRepository = get(),
-            web3 = get()
+            web3 = get(),
+            ksPrefs = get(),
         )
     }
 

@@ -1,6 +1,7 @@
 package com.example.votekt.ui.feature_wallet.model
 
 import by.alexandr7035.ethereum.model.Address
+import com.example.votekt.domain.model.contract.ContractState
 import com.example.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
@@ -8,8 +9,8 @@ import de.palm.composestateevents.consumed
 data class WalletScreenState(
     val isBalanceLoading: Boolean = true,
     val address: Address = Address(""),
+    val contractState: ContractState? = null,
     val balanceFormatted: String? = null,
     val navigationEvent: StateEventWithContent<WalletScreenNavigationEvent> = consumed(),
-    val noConnection: Boolean = false,
     val error: UiErrorMessage? = null,
 )

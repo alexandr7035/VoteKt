@@ -10,6 +10,7 @@ import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.usecase.account.LogoutUseCase
+import com.example.votekt.domain.usecase.contract.GetContractStateUseCase
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -27,6 +28,7 @@ import kotlinx.coroutines.launch
 
 class WalletViewModel(
     private val accountRepository: AccountRepository,
+    private val contractStateUseCase: GetContractStateUseCase,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(WalletScreenState())
@@ -34,7 +36,7 @@ class WalletViewModel(
 
     fun onWalletIntent(intent: WalletScreenIntent) {
         when (intent) {
-            is WalletScreenIntent.LoadData -> subscribeToBalance()
+            is WalletScreenIntent.LoadData -> reduceLoadData()
             is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
             is WalletScreenIntent.LogOut -> reduceLogOut()
         }
@@ -63,7 +65,7 @@ class WalletViewModel(
 
     // Consider using offline-first approach
     // Without full-screen errors
-    private fun subscribeToBalance() {
+    private fun reduceLoadData() {
         viewModelScope.launch {
             val address = accountRepository.getSelfAddress()
             _state.update {
@@ -76,21 +78,21 @@ class WalletViewModel(
             .onEach {
                 reduceBalance(it)
             }
-            .catch {
-                Log.d("DEBUG_TAG", "catch ${it}")
-                if (ErrorType.fromThrowable(it) == ErrorType.NODE_CONNECTION_ERROR) {
-                    reduceNoConnection()
+            .onCompletion { error ->
+                error?.let {
+                    reduceError(ErrorType.fromThrowable(error))
                 }
             }
-            .onCompletion { error ->
-                Log.d("DEBUG_TAG", "balance flow completes! ${error}")
-                error?.let {
-                    if (ErrorType.fromThrowable(it) == ErrorType.NODE_CONNECTION_ERROR) {
-                        reduceNoConnection()
-                    } else {
-                        reduceError(ErrorType.fromThrowable(error))
-                    }
+            .launchIn(viewModelScope)
+
+        contractStateUseCase.invoke()
+            .onEach { contractState ->
+                _state.update {
+                    it.copy(contractState = contractState)
                 }
+            }
+            .catch { error ->
+                reduceError(ErrorType.fromThrowable(error))
             }
             .launchIn(viewModelScope)
     }
@@ -108,18 +110,11 @@ class WalletViewModel(
         _state.update {
             it.copy(
                 error = null,
-                noConnection = false,
                 isBalanceLoading = false,
                 balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
                     balance.toEther(), "ETH"
                 )
             )
-        }
-    }
-
-    private fun reduceNoConnection() {
-        _state.update {
-            it.copy(noConnection = true)
         }
     }
 

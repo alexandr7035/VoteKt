@@ -52,6 +52,7 @@ import com.example.votekt.ui.utils.DateFormatters
 import com.example.votekt.ui.utils.prettifyAddress
 import com.example.votekt.ui.feature_proposals.model.ProposalStatusUi
 import com.example.votekt.ui.feature_proposals.model.getStatusUi
+import com.example.votekt.ui.theme.Dimensions
 import kotlinx.coroutines.delay
 
 @Composable
@@ -64,10 +65,12 @@ fun VotingPostCard(
             .fillMaxWidth()
             .wrapContentHeight()
             .background(
-                color = Color.White, shape = RoundedCornerShape(4.dp)
+                color = Color.White,
+                shape = RoundedCornerShape(Dimensions.defaultCardCorners)
             )
             .padding(
-                vertical = 12.dp, horizontal = 8.dp
+                vertical = 12.dp,
+                horizontal = 8.dp
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {

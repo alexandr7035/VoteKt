@@ -33,4 +33,7 @@ object Dimensions {
     val tipIconSpacing = 8.dp
     val tipIconSize = 32.dp
     val tipFontSize = 14.sp
+
+    val defaultCardElevation = 4.dp
+    val defaultCardCorners = 4.dp
 }

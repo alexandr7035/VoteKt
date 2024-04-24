@@ -44,6 +44,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.R
 import com.example.votekt.ui.components.ErrorFullScreen
+import com.example.votekt.ui.feature_contract_status.ContractCard
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
@@ -61,7 +62,6 @@ fun WalletScreen(
     onNavigationEvent: (WalletScreenNavigationEvent) -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         viewModel.onWalletIntent(WalletScreenIntent.LoadData)
@@ -106,6 +106,17 @@ private fun WalletScreen_Ui(
                     isBalanceLoading = state.isBalanceLoading,
                     address = state.address,
                 )
+
+                Box(
+                    modifier = Modifier.padding(
+                        horizontal = Dimensions.screenPaddingHorizontal,
+                        vertical = Dimensions.screenPaddingVertical,
+                    )
+                ) {
+                    ContractCard(
+                        contractState = state.contractState
+                    )
+                }
             }
         }
     }
@@ -136,7 +147,7 @@ private fun Header(
 
         CenterAlignedTopAppBar(
             title = {
-                AddressComponent(address)
+                WalletAddressComponent(address)
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color.Transparent,
@@ -171,7 +182,7 @@ private fun Header(
 }
 
 @Composable
-private fun AddressComponent(address: Address) {
+private fun WalletAddressComponent(address: Address) {
     val context = LocalContext.current
 
     Box(
@@ -240,8 +251,6 @@ private fun Actions(
         modifier = Modifier.wrapContentSize(),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        val context = LocalContext.current
-
         ActionBtn(icon = R.drawable.ic_send) {
             onWalletAction(WalletScreenIntent.WalletAction.Send)
         }
@@ -288,15 +297,14 @@ private fun ActionBtn(
     }
 }
 
+
 @Preview
 @Composable
 private fun WalletScreen_Preview() {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
             WalletScreen_Ui(
-                state = WalletScreenState(
-                    noConnection = true
-                ),
+                state = WalletScreenState(),
             )
         }
     }

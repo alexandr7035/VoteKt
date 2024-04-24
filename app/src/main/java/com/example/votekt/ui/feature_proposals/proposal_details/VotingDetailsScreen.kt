@@ -46,7 +46,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.Uuid
-import com.example.votekt.domain.transactions.TransactionStatus
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
@@ -171,7 +170,7 @@ private fun VotingDetailsScreen_Ui(
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             Card(
-                elevation = CardDefaults.cardElevation(4.dp),
+                elevation = CardDefaults.cardElevation(Dimensions.defaultCardElevation),
             ) {
                 VotingPostCard(
                     proposal = proposal,
