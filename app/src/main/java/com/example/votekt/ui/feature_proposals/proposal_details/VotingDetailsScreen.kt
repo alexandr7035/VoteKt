@@ -53,6 +53,7 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.RoundedButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
+import com.example.votekt.ui.components.voting_bar.VotingBarCircle
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
@@ -192,12 +193,16 @@ private fun VotingDetailsScreen_Ui(
                 }
 
                 is Proposal.Deployed -> {
-                    VoteStatusPanel(
-                        proposal = proposal,
-                        onVote = {
-                            onVote(it)
-                        }
-                    )
+                    if (proposal.isFinished.not()) {
+                        VoteStatusPanel(
+                            proposal = proposal,
+                            onVote = {
+                                onVote(it)
+                            }
+                        )
+                    } else {
+                        // TODO voting summary
+                    }
                 }
             }
         }
