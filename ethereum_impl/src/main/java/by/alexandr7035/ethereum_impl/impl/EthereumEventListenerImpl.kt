@@ -10,108 +10,82 @@ import by.alexandr7035.ethereum_impl.model.JsonRpcRequest
 import by.alexandr7035.utils.removeHexPrefix
 import com.squareup.moshi.Moshi
 import io.ktor.client.HttpClient
-import io.ktor.client.plugins.websocket.webSocket
-import io.ktor.client.request.HttpRequestBuilder
-import io.ktor.http.HttpMethod
-import io.ktor.http.URLProtocol
+import io.ktor.client.plugins.websocket.DefaultClientWebSocketSession
+import io.ktor.client.plugins.websocket.webSocketSession
+import io.ktor.client.request.url
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
 import io.ktor.websocket.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.isActive
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import org.kethereum.model.Address
 
 class EthereumEventListenerImpl(
     private val wssUrl: String,
     private val contractAddress: Address,
     private val ktorClient: HttpClient,
-    private val wssConfiguration: NodeWssConfiguration,
-): EthereumEventListener {
+) : EthereumEventListener {
     private val wssStatusFlow = MutableStateFlow<EthEventsSubscriptionState>(EthEventsSubscriptionState.Connecting)
 
     private val moshi = Moshi.Builder().build()
     private val requestAdapter = moshi.adapter(JsonRpcRequest::class.java)
     private val responseAdapter = moshi.adapter(EthWebsocketEventRaw::class.java)
 
+    private var session: DefaultClientWebSocketSession? = null
+
     override fun subscriptionStateFlow(): Flow<EthEventsSubscriptionState> {
         return wssStatusFlow
     }
 
     override suspend fun subscribeToEthereumEvents(): Flow<EthereumEvent> = flow {
-        wssStatusFlow.emit(EthEventsSubscriptionState.Connecting)
-        Log.d(LOG_TAG, "establishing websocket connection")
-
         try {
-            ktorClient.webSocket(
-                method = HttpMethod.Get,
-                host = wssUrl,
-                request = getRequestBuilder()
-            ) {
-                wssStatusFlow.emit(EthEventsSubscriptionState.Connected)
-                outgoing.send(getSubscribeToContractRequest(contractAddress))
+            wssStatusFlow.emit(EthEventsSubscriptionState.Connecting)
+            Log.d(LOG_TAG, "establishing websocket connection")
 
-                try {
-                    while(isActive) {
-                        when (val frame = incoming.receive()) {
-                            is Frame.Ping -> {
-                                send(getPongRequest(frame))
-                            }
-                            is Frame.Text -> {
-                                emit(parseWssEvent(frame.readText()))
-                            }
-                            else -> {}
-                        }
-                    }
-                } catch (e: Exception) {
-                    reduceWssDisconnected(e)
-                }
+            session = ktorClient.webSocketSession() {
+                url(wssUrl)
             }
 
+            session!!.incoming
+                .consumeAsFlow()
+                .onStart {
+                    session!!.outgoing.send(getSubscribeToContractRequest(contractAddress))
+                    wssStatusFlow.emit(EthEventsSubscriptionState.Connected)
+                }
+                .filterIsInstance<Frame.Text>()
+                .onEach {
+                    Log.d("WSS_TAG", "raw websocket event $it")
+                    emit(parseWssEvent(it.readText()))
+                }
+                .collect()
         } catch (e: Exception) {
             reduceWssDisconnected(e)
         }
     }.flowOn(Dispatchers.IO)
 
-    private fun getRequestBuilder(): HttpRequestBuilder.() -> Unit = when (wssConfiguration) {
-        NodeWssConfiguration.CLEARTEXT -> {
-            {}
-        }
-
-        NodeWssConfiguration.WSS -> {
-            {
-                url.protocol = URLProtocol.WSS
-                url.port = url.protocol.defaultPort
-            }
-        }
-    }
-
     override suspend fun disconnect() {
-        try {
-            ktorClient.webSocket(
-                method = HttpMethod.Get,
-                host = wssUrl,
-                request = getRequestBuilder()
-            ) {
-                outgoing.send(Frame.Close())
-            }
-        } catch (e: Exception) {
-            reduceWssDisconnected(e)
-        }
+        session?.close()
+        session = null
         reduceWssDisconnected(null)
     }
 
-    private suspend fun reduceWssDisconnected(e: Exception?) {
-        Log.d(LOG_TAG,"websocket disconnected with error ${e} ${e?.message}")
+    private suspend fun reduceWssDisconnected(e: Throwable?) {
+        Log.d(LOG_TAG, "websocket disconnected with error ${e} ${e?.message}")
         wssStatusFlow.emit(EthEventsSubscriptionState.Disconnected)
     }
 
     private fun parseWssEvent(rawEvent: String): EthereumEvent {
         try {
             val res = responseAdapter.fromJson(rawEvent)
-            Log.d(LOG_TAG, "Contract event?: ${res?.params?.result}")
+            Log.d(LOG_TAG, "incoming websocket event: ${res?.params?.result}")
 
             res?.params?.result?.let {
                 return EthereumEvent.ContractEvent(
@@ -119,9 +93,8 @@ class EthereumEventListenerImpl(
                     encodedData = it.data,
                 )
             }
-        }
-        catch (e: Exception) {
-            Log.d(LOG_TAG, "failed to handle raw event $rawEvent")
+        } catch (e: Exception) {
+            Log.d(LOG_TAG, "failed to handle raw event, skip: $rawEvent")
         }
 
         return EthereumEvent.UnknownEvent
@@ -131,20 +104,16 @@ class EthereumEventListenerImpl(
         val raw = requestAdapter.toJson(
             JsonRpcRequest(
                 method = EthNodeMethods.FUNCTION_SUBSCRIBE,
-                params = listOf("logs", mapOf(
-                    "address" to contractAddress.hex
-                ))
+                params = listOf(KEY_LOGS, mapOf(KEY_ADDRESS to contractAddress.hex))
             )
         )
 
         return Frame.Text(raw)
     }
 
-    private fun getPongRequest(ping: Frame.Ping): Frame {
-        return Frame.Pong(ping.buffer)
-    }
-
     private companion object {
         private const val LOG_TAG = "WSS_TAG"
+        private const val KEY_LOGS = "logs"
+        private const val KEY_ADDRESS = "address"
     }
 }
