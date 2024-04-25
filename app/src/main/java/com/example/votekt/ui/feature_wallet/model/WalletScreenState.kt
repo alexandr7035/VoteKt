@@ -8,6 +8,7 @@ import de.palm.composestateevents.consumed
 
 data class WalletScreenState(
     val isBalanceLoading: Boolean = true,
+    val isHeaderVisible: Boolean = true,
     val address: Address = Address(""),
     val contractState: ContractState? = null,
     val balanceFormatted: String? = null,

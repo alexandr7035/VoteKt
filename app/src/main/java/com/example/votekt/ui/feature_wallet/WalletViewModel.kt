@@ -1,6 +1,5 @@
 package com.example.votekt.ui.feature_wallet
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.model.Address
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -39,6 +37,13 @@ class WalletViewModel(
             is WalletScreenIntent.LoadData -> reduceLoadData()
             is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
             is WalletScreenIntent.LogOut -> reduceLogOut()
+            is WalletScreenIntent.ChangeHeaderVisibility -> reduceHeaderVisibility(intent.isVisible)
+        }
+    }
+
+    private fun reduceHeaderVisibility(isVisible: Boolean) {
+        _state.update {
+            it.copy(isHeaderVisible = isVisible)
         }
     }
 
@@ -75,13 +80,11 @@ class WalletViewModel(
 
         accountRepository
             .getAccountBalance()
+            .catch { error ->
+                reduceError(ErrorType.fromThrowable(error))
+            }
             .onEach {
                 reduceBalance(it)
-            }
-            .onCompletion { error ->
-                error?.let {
-                    reduceError(ErrorType.fromThrowable(error))
-                }
             }
             .launchIn(viewModelScope)
 
@@ -119,8 +122,11 @@ class WalletViewModel(
     }
 
     private fun reduceError(errorType: ErrorType) {
-        _state.update {
-            it.copy(error = errorType.uiError)
+        // Connection error is displayed separately
+        if (errorType != ErrorType.NODE_CONNECTION_ERROR) {
+            _state.update {
+                it.copy(error = errorType.uiError)
+            }
         }
     }
 

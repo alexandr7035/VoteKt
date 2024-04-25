@@ -9,5 +9,7 @@ sealed class WalletScreenIntent {
         object Vote: WalletAction()
     }
 
+    data class ChangeHeaderVisibility(val isVisible: Boolean): WalletScreenIntent()
+
     object LogOut: WalletScreenIntent()
 }

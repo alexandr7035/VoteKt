@@ -1,6 +1,7 @@
 package com.example.votekt.ui.feature_wallet
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -8,13 +9,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -30,7 +35,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -100,18 +109,50 @@ private fun WalletScreen_Ui(
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
-                Header(
-                    onIntent = onIntent,
-                    balance = state.balanceFormatted,
-                    isBalanceLoading = state.isBalanceLoading,
+
+                WalletToolBar(
                     address = state.address,
+                    onIntent = onIntent
                 )
 
-                Box(
-                    modifier = Modifier.padding(
-                        horizontal = Dimensions.screenPaddingHorizontal,
-                        vertical = Dimensions.screenPaddingVertical,
+                val nestedScrollConnection = remember {
+                    object : NestedScrollConnection {
+                        override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                            if (available.y < -10) {
+                                onIntent(WalletScreenIntent.ChangeHeaderVisibility(false))
+                            }
+
+                            if (available.y > 1) {
+                                onIntent(WalletScreenIntent.ChangeHeaderVisibility(true))
+                            }
+
+                            return Offset.Zero
+                        }
+                    }
+                }
+
+                AnimatedVisibility(
+                    visible = state.isHeaderVisible,
+                ) {
+                    Header(
+                        balance = state.balanceFormatted,
+                        isBalanceLoading = state.isBalanceLoading,
+                        onIntent = onIntent,
                     )
+                }
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScrollConnection)
+                        .verticalScroll(rememberScrollState())
+                        .padding(
+                            start = Dimensions.screenPaddingVertical,
+                            end = Dimensions.screenPaddingVertical,
+                            top = 12.dp,
+                            bottom = Dimensions.screenPaddingVertical
+                        ),
+                    verticalArrangement = Arrangement.spacedBy(Dimensions.cardListSpacing)
                 ) {
                     ContractCard(
                         contractState = state.contractState
@@ -122,10 +163,8 @@ private fun WalletScreen_Ui(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Header(
-    address: Address,
     balance: String?,
     isBalanceLoading: Boolean,
     onIntent: (WalletScreenIntent) -> Unit
@@ -137,20 +176,38 @@ private fun Header(
                 top = 12.dp,
                 start = Dimensions.screenPaddingHorizontal,
                 end = Dimensions.screenPaddingVertical,
-                bottom = 32.dp
+                bottom = 24.dp
             )
             .fillMaxWidth()
             .wrapContentSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        Balance(
+            balance = balance,
+            isBalanceLoading = isBalanceLoading
+        )
+        Actions(
+            onWalletAction = onIntent
+        )
+    }
+}
 
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun WalletToolBar(
+    address: Address,
+    onIntent: (WalletScreenIntent) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxWidth()
+    ) {
         CenterAlignedTopAppBar(
             title = {
                 WalletAddressComponent(address)
             },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = Color.Transparent,
+                containerColor = MaterialTheme.colorScheme.primary,
                 titleContentColor = MaterialTheme.colorScheme.onPrimary
             ),
             modifier = Modifier.fillMaxWidth(),
@@ -167,16 +224,9 @@ private fun Header(
                         tint = MaterialTheme.colorScheme.onPrimary
                     )
                 }
+
+                Spacer(Modifier.width(Dimensions.screenPaddingHorizontal))
             }
-        )
-
-
-        Balance(
-            balance = balance,
-            isBalanceLoading = isBalanceLoading
-        )
-        Actions(
-            onWalletAction = onIntent
         )
     }
 }
