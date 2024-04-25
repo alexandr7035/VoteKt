@@ -8,19 +8,18 @@ import by.alexandr7035.ethereum.errors.RequestNotExecutedException
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
 import by.alexandr7035.ethereum.model.GWEI
 import by.alexandr7035.ethereum.model.Wei
-import cash.z.ecc.android.bip39.Mnemonics
 import com.cioccarellia.ksprefs.KsPrefs
 import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.PrefKeys
 import com.example.votekt.data.cache.ProposalsDao
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.transactions.PrepareTransactionData
+import com.example.votekt.domain.transactions.ReviewTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
+import com.example.votekt.domain.transactions.TransactionEstimationError
 import com.example.votekt.domain.transactions.TransactionHash
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.transactions.TransactionType
-import com.example.votekt.domain.transactions.ReviewTransactionData
-import com.example.votekt.domain.transactions.TransactionEstimationError
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -48,86 +47,94 @@ class SendTransactionRepositoryImpl(
     override val state = _state
 
     override suspend fun requirePrepareTransaction(data: PrepareTransactionData) = withContext(Dispatchers.IO) {
-        val selfAddress = accountRepository.getSelfAddress()
-
-        val recipientAddress = when (data) {
-            is PrepareTransactionData.SendValue -> data.receiver
-            is PrepareTransactionData.ContractInteraction -> data.contractAddress
-        }
-
-        transaction = createEmptyTransaction().apply {
-            this.from = selfAddress
-            this.to = recipientAddress
-            this.chain = BuildConfig.CHAIN_ID.toBigInteger()
-        }
-
-        // Initial state
-        _state.update {
-            ReviewTransactionData(
-                data = data,
-                transactionType = when (data) {
-                    is PrepareTransactionData.ContractInteraction -> {
-                        when (data) {
-                            is PrepareTransactionData.ContractInteraction.CreateProposal
-                            -> TransactionType.CREATE_PROPOSAL
-
-                            is PrepareTransactionData.ContractInteraction.VoteOnProposal
-                            -> TransactionType.VOTE
-                        }
-                    }
-
-                    is PrepareTransactionData.SendValue -> TransactionType.PAYMENT
-                },
-                to = recipientAddress,
-                value = if (data is PrepareTransactionData.SendValue) data.amount else null,
-                input = if (data is PrepareTransactionData.ContractInteraction) data.contractInput.value.toHexString() else null,
-                totalEstimatedFee = null,
-                minerTipFee = null,
-                estimationError = null,
-            )
-        }
-
-        when (data) {
-            is PrepareTransactionData.ContractInteraction -> {
-                transaction.input = data.contractInput.value
-                transaction.value = BigInteger.ZERO
-            }
-
-            is PrepareTransactionData.SendValue -> {
-                transaction.value = data.amount.value
-            }
-        }
-
         try {
+            val selfAddress = accountRepository.getSelfAddress()
+
+            val recipientAddress = when (data) {
+                is PrepareTransactionData.SendValue -> data.receiver
+                is PrepareTransactionData.ContractInteraction -> data.contractAddress
+            }
+
+            transaction = createEmptyTransaction().apply {
+                this.from = selfAddress
+                this.to = recipientAddress
+                this.chain = BuildConfig.CHAIN_ID.toBigInteger()
+            }
+
+            // Initial state
+            _state.update {
+                ReviewTransactionData(
+                    data = data,
+                    transactionType = when (data) {
+                        is PrepareTransactionData.ContractInteraction -> {
+                            when (data) {
+                                is PrepareTransactionData.ContractInteraction.CreateProposal
+                                -> TransactionType.CREATE_PROPOSAL
+
+                                is PrepareTransactionData.ContractInteraction.VoteOnProposal
+                                -> TransactionType.VOTE
+                            }
+                        }
+
+                        is PrepareTransactionData.SendValue -> TransactionType.PAYMENT
+                    },
+                    to = recipientAddress,
+                    value = if (data is PrepareTransactionData.SendValue) data.amount else null,
+                    input = if (data is PrepareTransactionData.ContractInteraction) data.contractInput.value.toHexString() else null,
+                    totalEstimatedFee = null,
+                    minerTipFee = null,
+                    estimationError = null,
+                )
+            }
+
+            when (data) {
+                is PrepareTransactionData.ContractInteraction -> {
+                    transaction.input = data.contractInput.value
+                    transaction.value = BigInteger.ZERO
+                }
+
+                is PrepareTransactionData.SendValue -> {
+                    transaction.value = data.amount.value
+                }
+            }
+
             val transactionEstimation = ethereumClient.estimateTransaction(transaction)
             transaction.applyGasEstimation(transactionEstimation)
         } catch (e: Exception) {
-            when (e) {
-                is RequestFailedException -> {
-                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
-                }
+            reduceTransactionError(e)
+        }
+    }
 
-                is RequestNotExecutedException -> {
-                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
-                }
+    private fun reduceTransactionError(e: Exception) {
+        when (e) {
+            is RequestFailedException -> {
+                _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
+            }
 
-                else -> {
-                    _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(null)) }
-                }
+            is RequestNotExecutedException -> {
+                _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.error)) }
+            }
+
+            else -> {
+                _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(null)) }
             }
         }
     }
 
     override suspend fun confirmTransaction() = withContext(Dispatchers.IO) {
-        val currentState = _state.value ?: return@withContext
+        try {
+            val currentState = _state.value ?: return@withContext
 
-        val credentials = loadCredentials()
-        val signedTxData = transaction.signAndEncode(credentials)
-        val hash = ethereumClient.sendRawTransaction(signedTxData)
+            val credentials = loadCredentials()
+            val signedTxData = transaction.signAndEncode(credentials)
+            val hash = ethereumClient.sendRawTransaction(signedTxData)
 
-        cacheLocalTransactionData(currentState.data, hash)
+            cacheLocalTransactionData(currentState.data, hash)
 
-        _state.update { null }
+            _state.update { null }
+        } catch (e: Exception) {
+            reduceTransactionError(e)
+        }
     }
 
     override suspend fun cancelTransaction() {
@@ -177,7 +184,7 @@ class SendTransactionRepositoryImpl(
     private suspend fun cacheLocalTransactionData(
         prepareTransactionData: PrepareTransactionData,
         transactionHash: String
-    )  = withContext(Dispatchers.IO) {
+    ) = withContext(Dispatchers.IO) {
         transactionRepository.addNewTransaction(
             transactionHash = TransactionHash(transactionHash),
             transactionType = prepareTransactionData.transactionType,
@@ -208,8 +215,6 @@ class SendTransactionRepositoryImpl(
     }
 
     private suspend fun loadCredentials(): ECKeyPair = withContext(Dispatchers.IO) {
-        // TODO proper account storing
-        Log.d(LOG_TAG, "load credentials for seed: ${ ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)}")
         val phrase = ksPrefs.pull<String>(PrefKeys.ACCOUNT_MNEMONIC_PHRASE)
         return@withContext cryptoHelper.generateCredentialsFromMnemonic(phrase).ecKeyPair!!
     }

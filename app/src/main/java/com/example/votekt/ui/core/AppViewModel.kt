@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
 import com.example.votekt.domain.account.AccountRepository
+import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.security.CheckAppLockUseCase
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.ReviewTransactionData
@@ -57,7 +58,14 @@ class AppViewModel(
         when (intent) {
             ReviewTransactionIntent.SubmitTransaction -> {
                 viewModelScope.launch {
-                    sendTransactionRepository.confirmTransaction()
+                    val confirmTx = OperationResult.runWrapped {
+                        sendTransactionRepository.confirmTransaction()
+                    }
+
+                    when (confirmTx) {
+                        is OperationResult.Failure -> {}
+                        is OperationResult.Success -> {}
+                    }
                 }
             }
 
