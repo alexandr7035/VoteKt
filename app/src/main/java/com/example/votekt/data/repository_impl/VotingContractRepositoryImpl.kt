@@ -91,11 +91,6 @@ class VotingContractRepositoryImpl(
     override fun getProposals(): Flow<List<Proposal>> {
         return proposalsDao.observeProposals()
             .flowOn(dispatcher)
-            .onStart {
-                withContext(dispatcher) {
-                    syncProposalsWithContract()
-                }
-            }
             .map { list ->
                 list.map { it.mapToDomain() }
             }

@@ -127,6 +127,10 @@ fun ProposalsScreen(
             }
         }
     }
+
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(ProposalsScreenIntent.EnterScreen)
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)

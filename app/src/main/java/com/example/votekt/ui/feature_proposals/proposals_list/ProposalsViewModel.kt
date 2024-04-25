@@ -12,8 +12,8 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class ProposalsViewModel(
     private val votingContractRepository: VotingContractRepository,
@@ -22,15 +22,32 @@ class ProposalsViewModel(
     private val _state = MutableStateFlow(ProposalsScreenState())
     val state = _state.asStateFlow()
 
-    init {
-        subscribeToProposals()
-    }
-
     fun onIntent(intent: ProposalsScreenIntent) {
         when (intent) {
             is ProposalsScreenIntent.ChangeControlsVisibility -> {
                 _state.update {
                     it.copy(controlsAreVisible = intent.isVisible)
+                }
+            }
+
+            ProposalsScreenIntent.EnterScreen -> {
+                reduceEnterScreen()
+            }
+        }
+    }
+
+    private fun reduceEnterScreen() {
+        subscribeToProposals()
+
+        viewModelScope.launch {
+            val syncProposalsResult = OperationResult.runWrapped {
+                syncWithContractUseCase.invoke()
+            }
+
+            when (syncProposalsResult) {
+                is OperationResult.Success -> {}
+                is OperationResult.Failure -> {
+                    reduceError(ErrorType.fromThrowable(syncProposalsResult.error))
                 }
             }
         }
@@ -39,16 +56,6 @@ class ProposalsViewModel(
     fun subscribeToProposals() {
         votingContractRepository
             .getProposals()
-            .onStart {
-                val syncResult = OperationResult.runWrapped {
-                    syncWithContractUseCase.invoke()
-                }
-
-                when (syncResult) {
-                    is OperationResult.Success -> {}
-                    is OperationResult.Failure -> throw syncResult.error
-                }
-            }
             .onEach { proposals ->
                 _state.update {
                     it.copy(
@@ -59,13 +66,17 @@ class ProposalsViewModel(
                 }
             }
             .catch { error ->
-                _state.update {
-                    it.copy(
-                        error = ErrorType.fromThrowable(error).uiError,
-                        isLoading = false
-                    )
-                }
+                reduceError(ErrorType.fromThrowable(error))
             }
             .launchIn(viewModelScope)
+    }
+
+    private fun reduceError(error: ErrorType) {
+        _state.update {
+            it.copy(
+                error = error.uiError,
+                isLoading = false
+            )
+        }
     }
 }
