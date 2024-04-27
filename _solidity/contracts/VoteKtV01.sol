@@ -61,8 +61,8 @@ contract VotingContract is Ownable {
     {
         require(!uuidExists[uuid], "Proposal with this UUID already exists");
         require(msg.value >= CREATE_PROPOSAL_FEE, "Insufficient fee to create proposal");
-        require(durationInHours * 3600 * 1000 >= NIN_PROPOSAL_DURATION, "Duration is less than minimal");
-        require(durationInHours * 3600 * 1000 <= MAX_PROPOSAL_DURATION, "Duration is greater than max");
+        require(durationInHours * 3600 >= NIN_PROPOSAL_DURATION, "Duration is less than minimal");
+        require(durationInHours * 3600 <= MAX_PROPOSAL_DURATION, "Duration is greater than max");
 
         uint256 proposalNumber = proposals.length;
 
