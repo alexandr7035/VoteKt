@@ -2,7 +2,7 @@ package com.example.votekt.di
 
 import com.example.votekt.domain.security.CheckAppLockUseCase
 import com.example.votekt.domain.security.CheckAppLockedWithBiometricsUseCase
-import com.example.votekt.domain.usecase.account.GetTestMnemonicUseCase
+import com.example.votekt.domain.usecase.debug.GetTestMnemonicUseCase
 import com.example.votekt.domain.datasync.SyncWithContractUseCase
 import com.example.votekt.domain.security.AuthenticateWithPinUseCase
 import com.example.votekt.domain.security.CheckIfBiometricsAvailableUseCase
@@ -15,6 +15,8 @@ import com.example.votekt.domain.usecase.account.AddAccountUseCase
 import com.example.votekt.domain.usecase.account.GenerateAccountUseCase
 import com.example.votekt.domain.usecase.account.LogoutUseCase
 import com.example.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
+import com.example.votekt.domain.usecase.contract.CreateDraftProposalUseCase
+import com.example.votekt.domain.usecase.contract.GetContractConfigurationUseCase
 import com.example.votekt.domain.usecase.contract.GetContractStateUseCase
 import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
 import org.koin.dsl.module
@@ -42,5 +44,7 @@ val domainModule = module {
     single { GetBiometricDecryptionCipherUseCase(get()) }
     single { DecryptPinWithBiometricsUseCase(get()) }
 
+    single { CreateDraftProposalUseCase(get()) }
     single { GetContractStateUseCase(get()) }
+    single { GetContractConfigurationUseCase(get()) }
 }
