@@ -12,6 +12,7 @@ sealed class OperationResult<out T> {
                 val res = block()
                 Success(res)
             } catch (e: Exception) {
+                throw e
                 Failure(AppError.fromThrowable(e))
             }
         }

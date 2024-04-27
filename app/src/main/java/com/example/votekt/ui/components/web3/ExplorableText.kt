@@ -48,7 +48,8 @@ fun ExplorableText(
 
         Icon(
             painter = painterResource(id = R.drawable.ic_link),
-            contentDescription = null
+            contentDescription = null,
+            tint = color,
         )
     }
 

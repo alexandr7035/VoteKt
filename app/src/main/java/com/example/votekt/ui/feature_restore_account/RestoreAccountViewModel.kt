@@ -5,7 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.usecase.account.AddAccountUseCase
-import com.example.votekt.domain.usecase.account.GetTestMnemonicUseCase
+import com.example.votekt.domain.usecase.debug.GetTestMnemonicUseCase
 import com.example.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
 import com.example.votekt.ui.asTextError
 import com.example.votekt.ui.feature_restore_account.model.RestoreAccountIntent

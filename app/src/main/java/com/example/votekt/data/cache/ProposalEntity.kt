@@ -15,7 +15,7 @@ data class ProposalEntity(
     val number: Int? = null,
     val createdAt: Long,
     val expiresAt: Long? = null,
-    val durationInDays: ProposalDuration? = null,
+    val durationInHours: Int? = null,
     val title: String,
     val description: String,
     val votesFor: Int = 0,

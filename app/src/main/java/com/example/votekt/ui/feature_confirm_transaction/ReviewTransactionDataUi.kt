@@ -15,35 +15,39 @@ sealed class ReviewTransactionDataUi(
     open val totalEstimatedFee: Wei?,
     open val minerTipFee: Wei?,
     open val estimationError: UiText?,
+    open val value: Wei?,
 ) {
     data class SendAmount(
-        val value: Wei,
+        override val value: Wei,
         override val transactionType: TransactionType,
         override val recipient: Address,
         override val totalEstimatedFee: Wei?,
         override val minerTipFee: Wei?,
         override val estimationError: UiText?,
-    ): ReviewTransactionDataUi(
+    ) : ReviewTransactionDataUi(
         recipient = recipient,
         totalEstimatedFee = totalEstimatedFee,
         minerTipFee = minerTipFee,
         transactionType = transactionType,
         estimationError = estimationError,
+        value = value,
     )
 
     data class ContractInteraction(
         val contractInput: String,
+        override val value: Wei?,
         override val transactionType: TransactionType,
         override val recipient: Address,
         override val totalEstimatedFee: Wei?,
         override val minerTipFee: Wei?,
         override val estimationError: UiText?,
-    ): ReviewTransactionDataUi(
+    ) : ReviewTransactionDataUi(
         recipient = recipient,
         totalEstimatedFee = totalEstimatedFee,
         minerTipFee = minerTipFee,
         transactionType = transactionType,
         estimationError = estimationError,
+        value = value,
     )
 }
 
@@ -54,6 +58,7 @@ fun ReviewTransactionData.mapToUi(): ReviewTransactionDataUi {
         this.transactionType.isContractInteraction() -> {
             ReviewTransactionDataUi.ContractInteraction(
                 recipient = this.to,
+                value = this.value,
                 contractInput = this.input!!,
                 minerTipFee = this.minerTipFee,
                 totalEstimatedFee = this.totalEstimatedFee,
@@ -77,9 +82,10 @@ fun ReviewTransactionData.mapToUi(): ReviewTransactionDataUi {
 
 private fun TransactionEstimationError.mapToUi(): UiText {
     return when (this) {
-        is TransactionEstimationError.InsufficientBalance -> { 
+        is TransactionEstimationError.InsufficientBalance -> {
             UiText.StringResource(R.string.insufficient_balance)
         }
+
         is TransactionEstimationError.ExecutionError -> {
             this.message?.let {
                 UiText.DynamicString(it)

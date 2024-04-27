@@ -26,6 +26,7 @@ class TransactionReviewPreviewProvider : PreviewParameterProvider<ReviewTransact
                 minerTipFee = 1.GWEI,
                 totalEstimatedFee = 30.GWEI,
                 estimationError = null,
+                value = 0.1.ETHER,
             )
         )
 
