@@ -1,7 +1,6 @@
 package com.example.votekt.ui.utils
 
 import android.content.Context
-import android.util.Log
 import com.example.votekt.R
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
