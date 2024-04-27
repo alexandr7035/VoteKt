@@ -97,6 +97,8 @@ Choose localDebug build variant and build
 [Goerli’s Deprecation: Navigating the Transition to Sepolia](https://medium.com/buildbear/goerlis-deprecation-navigating-the-transition-to-sepolia-84ea374bed9a#:~:text=We're%20here%20to%20announce,by%20the%20Ethereum%20Foundation%20team.)  
 [Deprecation Notice for all Infura-Supported Goerli Endpoints](https://www.infura.io/blog/post/deprecation-notice-for-all-infura-supported-goerli-endpoints)
 
+[Exploring the Differences Between Payable and Non-Payable Functions in Solidity: An In-Depth Analysis](https://medium.com/coinmonks/exploring-the-differences-between-payable-and-non-payable-functions-in-solidity-an-in-depth-d031c6ae577b#:~:text=In%20Solidity%2C%20a%20payable%20function,balance%E2%80%9D%20property.)
+
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)  
