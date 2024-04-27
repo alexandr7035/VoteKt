@@ -78,6 +78,84 @@
       "type": "event"
     },
     {
+      "inputs": [],
+      "name": "CREATE_PROPOSAL_FEE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_PROPOSAL_COUNT",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_PROPOSAL_DESCRIPTION_LENGTH",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_PROPOSAL_DURATION",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_PROPOSAL_TITLE_LENGTH",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "NIN_PROPOSAL_DURATION",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
       "inputs": [
         {
           "internalType": "string",
@@ -96,13 +174,13 @@
         },
         {
           "internalType": "uint256",
-          "name": "durationInDays",
+          "name": "durationInHours",
           "type": "uint256"
         }
       ],
       "name": "createProposal",
       "outputs": [],
-      "stateMutability": "nonpayable",
+      "stateMutability": "payable",
       "type": "function"
     },
     {
@@ -161,13 +239,18 @@
               "type": "uint256"
             },
             {
+              "internalType": "address",
+              "name": "creatorAddress",
+              "type": "address"
+            },
+            {
               "internalType": "uint256",
-              "name": "creationTime",
+              "name": "creationTimeMills",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "expirationTime",
+              "name": "expirationTimeMills",
               "type": "uint256"
             }
           ],
@@ -216,13 +299,18 @@
               "type": "uint256"
             },
             {
+              "internalType": "address",
+              "name": "creatorAddress",
+              "type": "address"
+            },
+            {
               "internalType": "uint256",
-              "name": "creationTime",
+              "name": "creationTimeMills",
               "type": "uint256"
             },
             {
               "internalType": "uint256",
-              "name": "expirationTime",
+              "name": "expirationTimeMills",
               "type": "uint256"
             }
           ],
@@ -253,19 +341,6 @@
           "internalType": "bool",
           "name": "",
           "type": "bool"
-        }
-      ],
-      "stateMutability": "view",
-      "type": "function"
-    },
-    {
-      "inputs": [],
-      "name": "maxProposals",
-      "outputs": [
-        {
-          "internalType": "uint256",
-          "name": "",
-          "type": "uint256"
         }
       ],
       "stateMutability": "view",
@@ -325,13 +400,18 @@
           "type": "uint256"
         },
         {
+          "internalType": "address",
+          "name": "creatorAddress",
+          "type": "address"
+        },
+        {
           "internalType": "uint256",
-          "name": "creationTime",
+          "name": "creationTimeMills",
           "type": "uint256"
         },
         {
           "internalType": "uint256",
-          "name": "expirationTime",
+          "name": "expirationTimeMills",
           "type": "uint256"
         }
       ],
