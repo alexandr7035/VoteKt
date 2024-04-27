@@ -3,6 +3,14 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract VotingContract is Ownable {
+    uint256 public constant MAX_PROPOSAL_TITLE_LENGTH = 100;
+    uint256 public constant MAX_PROPOSAL_DESCRIPTION_LENGTH = 500;
+    uint256 public constant NIN_PROPOSAL_DURATION = 1 hours;
+    uint256 public constant MAX_PROPOSAL_DURATION = 365 days;
+    uint public constant MAX_PROPOSAL_COUNT = 50;
+
+    uint256 public CREATE_PROPOSAL_FEE = 0.025 ether;
+
     struct ProposalRaw {
         uint number;
         string uuid;
@@ -10,13 +18,13 @@ contract VotingContract is Ownable {
         string description;
         uint votesFor;
         uint votesAgainst;
-        uint256 creationTime;
-        uint256 expirationTime;
+        address creatorAddress;
+        uint256 creationTimeMills;
+        uint256 expirationTimeMills;
     }
 
     ProposalRaw[] public proposals;
     mapping(uint256 => mapping(address => bool)) public hasVoted;
-    uint256 public maxProposals = 10;
 
     mapping(string => bool) private uuidExists;
     
@@ -26,7 +34,7 @@ contract VotingContract is Ownable {
 
     modifier onlyBeforeExpiration(uint256 proposalNumber) {
         require(
-            block.timestamp < proposals[proposalNumber].expirationTime,
+            block.timestamp < proposals[proposalNumber].expirationTimeMills,
             "Voting period has expired"
         );
         _;
@@ -38,7 +46,7 @@ contract VotingContract is Ownable {
     }
 
     modifier checkActiveProposalsLimit() {
-        require(proposals.length < maxProposals, "Max proposals reached");
+        require(proposals.length < MAX_PROPOSAL_COUNT, "Max proposals reached");
         _;
     }
 
@@ -46,13 +54,15 @@ contract VotingContract is Ownable {
         string memory uuid,
         string memory title,
         string memory description,
-        uint durationInDays
+        uint durationInHours
     )
-        public
-        onlyOwner
+        public payable
         checkActiveProposalsLimit
     {
         require(!uuidExists[uuid], "Proposal with this UUID already exists");
+        require(msg.value >= CREATE_PROPOSAL_FEE, "Insufficient fee to create proposal");
+        require(durationInHours * 3600 >= NIN_PROPOSAL_DURATION, "Duration is less than minimal");
+        require(durationInHours * 3600 <= MAX_PROPOSAL_DURATION, "Duration is greater than max");
 
         uint256 proposalNumber = proposals.length;
 
@@ -61,10 +71,12 @@ contract VotingContract is Ownable {
         newProposal.title = title;
         newProposal.description = description;
         newProposal.uuid = uuid;
-        newProposal.creationTime = block.timestamp;
+        newProposal.creationTimeMills = block.timestamp;
+        newProposal.creatorAddress = msg.sender;
 
-        uint256 expiration = block.timestamp + durationInDays * 86400;
-        newProposal.expirationTime = expiration;
+        uint256 expiration = block.timestamp + durationInHours * 3600;
+
+        newProposal.expirationTimeMills = expiration;
 
         proposals.push(newProposal);
         emit ProposalCreated(proposalNumber, title);

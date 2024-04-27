@@ -1,6 +1,5 @@
-package com.example.votekt.ui.create_proposal
+package com.example.votekt.ui.feature_create_proposal
 
-import android.annotation.SuppressLint
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,17 +32,20 @@ import com.example.votekt.BuildConfig
 import com.example.votekt.R
 import com.example.votekt.core.config.ProposalConfig
 import com.example.votekt.domain.core.Uuid
-import com.example.votekt.domain.votings.CreateProposal
-import com.example.votekt.domain.votings.ProposalDuration
+import com.example.votekt.domain.model.contract.CreateDraftProposal
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.selector_group.SelectorOption
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenIntent
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.showToast
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.days
+import kotlin.time.Duration.Companion.hours
 
 @Composable
 fun CreateProposalScreen(
@@ -53,8 +54,7 @@ fun CreateProposalScreen(
     onProposalCreated: (proposalUuid: Uuid) -> Unit = {},
 ) {
     val context = LocalContext.current
-    val snackBarHostState = remember { SnackbarHostState() }
-    val state = viewModel.uiState.collectAsStateWithLifecycle().value
+    val state = viewModel.state.collectAsStateWithLifecycle().value
 
     EventEffect(
         event = state.submitProposalEvent,
@@ -69,27 +69,37 @@ fun CreateProposalScreen(
         }
     }
 
+    LaunchedEffect(Unit) {
+        viewModel.onIntent(CreateProposalScreenIntent.EnterScreen)
+    }
+
     CreateProposalScreen_Ui(
         titleMaxLength = state.titleMaxLength,
         descMaxLength = state.descMaxLength,
         onBack = onBack,
-        onSubmit = { title, desc, duration ->
+        onSubmit = { title, desc ->
             viewModel.createProposal(
-                CreateProposal(title, desc, duration)
+                CreateDraftProposal(title, desc, state.proposalDuration)
             )
         },
-        isLoading = state.isLoading
+        isLoading = state.isLoading,
+        onDurationSelected = {
+            viewModel.onIntent(CreateProposalScreenIntent.SelectProposalDuration(it))
+        },
     )
 }
 
 // TODO error
-@SuppressLint("RememberReturnType")
 @Composable
 private fun CreateProposalScreen_Ui(
     titleMaxLength: Int,
     descMaxLength: Int,
+    onDurationSelected: (Duration) -> Unit,
     onBack: () -> Unit = {},
-    onSubmit: (title: String, description: String, duration: ProposalDuration) -> Unit = { _, _, _ -> },
+    onSubmit: (
+        title: String,
+        description: String,
+    ) -> Unit = { _, _ -> },
     isLoading: Boolean = false,
 ) {
 
@@ -110,21 +120,21 @@ private fun CreateProposalScreen_Ui(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    top = pv.calculateTopPadding() + 8.dp, bottom = pv.calculateBottomPadding(), start = 8.dp, end = 8.dp
+                    top = pv.calculateTopPadding() + 8.dp,
+                    bottom = pv.calculateBottomPadding(),
+                    start = 8.dp,
+                    end = 8.dp
                 )
         ) {
             // Input values
             val titleText = remember { mutableStateOf("") }
             val descText = remember { mutableStateOf("") }
 
-            // FIXME better solution
-            val selectedDuration = remember {
-                mutableStateOf(ProposalDuration.DURATION_24_HOURS)
-            }
-
+            // TODO remove
             if (BuildConfig.DEBUG) {
                 val ctx = LocalContext.current
 
+                // TODO remove
                 LaunchedEffect(Unit) {
                     val mock = ProposalConfig.getRandomMockProposalText(ctx)
                     titleText.value = mock.first
@@ -160,7 +170,8 @@ private fun CreateProposalScreen_Ui(
                 Text(
                     modifier = Modifier
                         .wrapContentSize()
-                        .align(Alignment.End), text = "${titleText.value.length} / $titleMaxLength"
+                        .align(Alignment.End),
+                    text = stringResource(id = R.string.field_length_template, titleText.value.length, titleMaxLength)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -189,7 +200,8 @@ private fun CreateProposalScreen_Ui(
                 Text(
                     modifier = Modifier
                         .wrapContentSize()
-                        .align(Alignment.End), text = "${descText.value.length} / $descMaxLength"
+                        .align(Alignment.End),
+                    text = stringResource(id = R.string.field_length_template, descText.value.length, descMaxLength)
                 )
 
                 Spacer(Modifier.height(16.dp))
@@ -203,12 +215,12 @@ private fun CreateProposalScreen_Ui(
 
                 SelectorGroup(
                     onSelectedChanged = {
-                        selectedDuration.value = it.value
+                        onDurationSelected(it.value)
                     },
                     options = listOf(
-                        SelectorOption(ProposalDuration.DURATION_24_HOURS, ProposalDuration.DURATION_24_HOURS.getDurationInString()),
-                        SelectorOption(ProposalDuration.DURATION_7_DAYS, ProposalDuration.DURATION_7_DAYS.getDurationInString()),
-                        SelectorOption(ProposalDuration.DURATION_30_DAYS, ProposalDuration.DURATION_30_DAYS.getDurationInString()),
+                        SelectorOption(1.hours, "1 hour"),
+                        SelectorOption(24.hours, "24 hours"),
+                        SelectorOption(7.days, "7 days"),
                     ),
                 )
             }
@@ -219,7 +231,7 @@ private fun CreateProposalScreen_Ui(
                     modifier = Modifier.fillMaxWidth(),
                     text = stringResource(R.string.create_proposal),
                     onClick = {
-                        onSubmit.invoke(titleText.value, descText.value, selectedDuration.value)
+                        onSubmit.invoke(titleText.value, descText.value)
                     },
                     enabled = titleText.value.isNotBlank() && descText.value.isNotBlank()
                 )
@@ -236,6 +248,10 @@ private fun CreateProposalScreen_Ui(
 @Composable
 fun CreateProposalScreen_Preview() {
     VoteKtTheme(darkTheme = false) {
-        CreateProposalScreen_Ui(50, 250)
+        CreateProposalScreen_Ui(
+            titleMaxLength = 50,
+            descMaxLength = 250,
+            onDurationSelected = {}
+        )
     }
 }

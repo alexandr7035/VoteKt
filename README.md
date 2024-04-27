@@ -24,6 +24,8 @@ INFURA_API_KEY="...."
 mpx hardhat node
 
 # Deploy contract
+# (Sometimes may not compile automatically)
+npx hardhat compile
 npx hardhat --network localhost deploy
 
 # Create random proposal

@@ -1,4 +1,4 @@
-package com.example.votekt.ui.create_proposal
+package com.example.votekt.ui.feature_create_proposal.model
 
 import com.example.votekt.domain.core.AppError
 import com.example.votekt.domain.core.Uuid

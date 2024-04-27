@@ -1,5 +1,6 @@
 package com.example.votekt.ui.feature_proposals.components
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -17,10 +18,13 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -28,6 +32,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -35,6 +40,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -45,20 +52,27 @@ import coil.request.ImageRequest
 import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.votings.Proposal
+import com.example.votekt.ui.components.preview.ProposalPreviewProvider
+import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.components.voting_bar.HorizontalVotingBar
 import com.example.votekt.ui.components.web3.ExplorableText
-import com.example.votekt.ui.utils.AvatarHelper
-import com.example.votekt.ui.utils.DateFormatters
-import com.example.votekt.ui.utils.prettifyAddress
 import com.example.votekt.ui.feature_proposals.model.ProposalStatusUi
 import com.example.votekt.ui.feature_proposals.model.getStatusUi
 import com.example.votekt.ui.theme.Dimensions
+import com.example.votekt.ui.utils.AvatarHelper
+import com.example.votekt.ui.utils.DateFormatters
+import com.example.votekt.ui.utils.prettifyAddress
 import kotlinx.coroutines.delay
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 @Composable
 fun VotingPostCard(
     proposal: Proposal,
-    isExpanded: Boolean = false
+    isExpanded: Boolean = false,
+    showVotingBar: Boolean = true,
 ) {
     Column(
         modifier = Modifier
@@ -102,7 +116,9 @@ fun VotingPostCard(
             )
         )
 
-        VotingBar(proposal = proposal)
+        if (showVotingBar) {
+            VotingBar(proposal = proposal)
+        }
 
         val uiStatus = remember(proposal) {
             proposal.getStatusUi()
@@ -112,11 +128,17 @@ fun VotingPostCard(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (proposal is Proposal.Deployed && !proposal.isFinished) {
-                // TODO accent color for expiring soon
-                RemainingTimeText(
-                    time = proposal.expirationTime,
-                )
+            if (proposal is Proposal.Deployed) {
+                if (proposal.isFinished.not()) {
+                    RemainingTimeText(
+                        time = proposal.expirationTime,
+                    )
+                } else {
+                    TimeText(
+                        text = stringResource(id = R.string.finished),
+                        showAccent = false,
+                    )
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -203,24 +225,65 @@ private fun Creator(
     }
 }
 
+@SuppressLint("AutoboxingStateCreation")
 @Composable
 private fun RemainingTimeText(time: Long) {
     val context = LocalContext.current
     var timeLeft by remember { mutableStateOf(time) }
 
-    LaunchedEffect(key1 = timeLeft) {
+    val showAccent = remember {
+        derivedStateOf {
+            calculateRemainingTime(timeLeft) < 1.hours
+        }
+    }
+
+    LaunchedEffect(Unit) {
         while (timeLeft > 0) {
             delay(200L)
             timeLeft--
         }
     }
 
-    Text(
+    TimeText(
         text = stringResource(
             id = R.string.proposal_time_left_template,
             DateFormatters.formatRemainingTime(timeLeft, context)
-        )
+        ),
+        showAccent = showAccent.value,
     )
+}
+
+private fun calculateRemainingTime(timeLeft: Long): Duration =
+    (timeLeft.toDuration(DurationUnit.MILLISECONDS) - System.currentTimeMillis().toDuration(DurationUnit.MILLISECONDS))
+
+@Composable
+private fun TimeText(
+    text: String,
+    showAccent: Boolean,
+) {
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Image(
+            modifier = Modifier.size(20.dp),
+            painter = painterResource(id = R.drawable.ic_clock),
+            contentDescription = null,
+            colorFilter = ColorFilter.tint(
+                color = if (showAccent) {
+                    MaterialTheme.colorScheme.error
+                } else {
+                    Color.Gray
+                }
+            )
+        )
+
+        Text(
+            text = text,
+            color = if (showAccent) MaterialTheme.colorScheme.error else Color.Gray,
+            fontWeight = FontWeight.Medium,
+        )
+    }
 }
 
 @Composable
@@ -230,10 +293,21 @@ private fun VotingBar(proposal: Proposal) {
             HorizontalVotingBar(
                 votingData = proposal.votingData, modifier = Modifier
                     .fillMaxWidth()
-                    .height(12.dp), corners = 4.dp
+                    .height(12.dp),
+                corners = 4.dp
             )
         } else {
             // TODO
         }
+    }
+}
+
+@Preview
+@Composable
+private fun VotingPostCard_Preview(
+    @PreviewParameter(ProposalPreviewProvider::class) proposal: Proposal
+) {
+    ScreenPreview {
+        VotingPostCard(proposal = proposal)
     }
 }

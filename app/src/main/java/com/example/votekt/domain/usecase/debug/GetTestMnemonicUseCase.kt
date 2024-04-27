@@ -1,4 +1,4 @@
-package com.example.votekt.domain.usecase.account
+package com.example.votekt.domain.usecase.debug
 
 import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.domain.account.MnemonicWord

@@ -56,6 +56,7 @@ import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.components.voting_bar.VotingBarCircle
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
+import com.example.votekt.ui.feature_proposals.components.VotingBarExtended
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
@@ -175,7 +176,8 @@ private fun VotingDetailsScreen_Ui(
             ) {
                 VotingPostCard(
                     proposal = proposal,
-                    isExpanded = true
+                    isExpanded = true,
+                    showVotingBar = false,
                 )
             }
 
@@ -193,6 +195,8 @@ private fun VotingDetailsScreen_Ui(
                 }
 
                 is Proposal.Deployed -> {
+                    VotingBarExtended(votingData = proposal.votingData)
+
                     if (proposal.isFinished.not()) {
                         VoteStatusPanel(
                             proposal = proposal,

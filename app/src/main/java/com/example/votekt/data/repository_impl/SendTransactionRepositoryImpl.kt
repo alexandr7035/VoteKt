@@ -30,7 +30,6 @@ import org.kethereum.model.ECKeyPair
 import org.kethereum.model.Transaction
 import org.kethereum.model.createEmptyTransaction
 import org.komputing.khex.extensions.toHexString
-import java.math.BigInteger
 
 class SendTransactionRepositoryImpl(
     private val ethereumClient: EthereumClient,
@@ -47,6 +46,7 @@ class SendTransactionRepositoryImpl(
     override val state = _state
 
     override suspend fun requirePrepareTransaction(data: PrepareTransactionData) = withContext(Dispatchers.IO) {
+        Log.d(LOG_TAG, "require prepare transaction ${data}")
         try {
             val selfAddress = accountRepository.getSelfAddress()
 
@@ -59,27 +59,19 @@ class SendTransactionRepositoryImpl(
                 this.from = selfAddress
                 this.to = recipientAddress
                 this.chain = BuildConfig.CHAIN_ID.toBigInteger()
+                this.value = data.value.value
+                this.input = if (data is PrepareTransactionData.ContractInteraction) {
+                    data.contractInput.value
+                } else ByteArray(0)
             }
 
             // Initial state
             _state.update {
                 ReviewTransactionData(
                     data = data,
-                    transactionType = when (data) {
-                        is PrepareTransactionData.ContractInteraction -> {
-                            when (data) {
-                                is PrepareTransactionData.ContractInteraction.CreateProposal
-                                -> TransactionType.CREATE_PROPOSAL
-
-                                is PrepareTransactionData.ContractInteraction.VoteOnProposal
-                                -> TransactionType.VOTE
-                            }
-                        }
-
-                        is PrepareTransactionData.SendValue -> TransactionType.PAYMENT
-                    },
+                    transactionType = data.mapTransactionType(),
                     to = recipientAddress,
-                    value = if (data is PrepareTransactionData.SendValue) data.amount else null,
+                    value = data.value,
                     input = if (data is PrepareTransactionData.ContractInteraction) data.contractInput.value.toHexString() else null,
                     totalEstimatedFee = null,
                     minerTipFee = null,
@@ -87,22 +79,17 @@ class SendTransactionRepositoryImpl(
                 )
             }
 
-            when (data) {
-                is PrepareTransactionData.ContractInteraction -> {
-                    transaction.input = data.contractInput.value
-                    transaction.value = BigInteger.ZERO
-                }
-
-                is PrepareTransactionData.SendValue -> {
-                    transaction.value = data.amount.value
-                }
-            }
-
             val transactionEstimation = ethereumClient.estimateTransaction(transaction)
             transaction.applyGasEstimation(transactionEstimation)
         } catch (e: Exception) {
             reduceTransactionError(e)
         }
+    }
+
+    private fun PrepareTransactionData.mapTransactionType() = when (this) {
+        is PrepareTransactionData.ContractInteraction.CreateProposal -> TransactionType.CREATE_PROPOSAL
+        is PrepareTransactionData.ContractInteraction.VoteOnProposal -> TransactionType.VOTE
+        is PrepareTransactionData.SendValue -> TransactionType.PAYMENT
     }
 
     private fun reduceTransactionError(e: Exception) {
@@ -116,7 +103,7 @@ class SendTransactionRepositoryImpl(
             }
 
             else -> {
-                _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(null)) }
+                _state.update { it?.copy(estimationError = TransactionEstimationError.ExecutionError(e.message)) }
             }
         }
     }
@@ -188,10 +175,7 @@ class SendTransactionRepositoryImpl(
         transactionRepository.addNewTransaction(
             transactionHash = TransactionHash(transactionHash),
             transactionType = prepareTransactionData.transactionType,
-            value = when (prepareTransactionData) {
-                is PrepareTransactionData.ContractInteraction -> null
-                is PrepareTransactionData.SendValue -> prepareTransactionData.amount
-            }
+            value = prepareTransactionData.value,
         )
 
         when (prepareTransactionData) {

@@ -46,7 +46,7 @@ import com.example.votekt.ui.app_host.host_utils.ScopedSnackBarState
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.loading.LoadingScreen
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
-import com.example.votekt.ui.create_proposal.CreateProposalScreen
+import com.example.votekt.ui.feature_create_proposal.CreateProposalScreen
 import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreen
 import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenNavigationEvent
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDialog
@@ -313,11 +313,14 @@ private fun AppNavHost(
         }
 
         composable(NavDestinations.NewProposal.route) {
-            CreateProposalScreen(onProposalCreated = { proposalId ->
-                navController.navigate("${NavDestinations.VotingDetails.route}/${proposalId.value}")
-            }, onBack = {
-                navController.popBackStack()
-            })
+            CreateProposalScreen(
+                onProposalCreated = { proposalId ->
+                    navController.navigate("${NavDestinations.VotingDetails.route}/${proposalId.value}")
+                },
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
         }
 
         composable(NavDestinations.Primary.Transactions.route) {

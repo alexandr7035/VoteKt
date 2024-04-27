@@ -1,31 +1,38 @@
 package com.example.votekt.domain.transactions
 
 import by.alexandr7035.ethereum.model.EthTransactionInput
+import by.alexandr7035.ethereum.model.WEI
 import by.alexandr7035.ethereum.model.Wei
 import org.kethereum.model.Address
+import java.math.BigInteger
 
-sealed class PrepareTransactionData {
+sealed class PrepareTransactionData(
+    open val value: Wei
+) {
     data class SendValue(
-        val amount: Wei,
+        override val value: Wei,
         val receiver: Address,
-    ): PrepareTransactionData()
+    ): PrepareTransactionData(value)
 
     sealed class ContractInteraction(
         open val contractAddress: Address,
         open val contractInput: EthTransactionInput,
-    ): PrepareTransactionData() {
+        override val value: Wei,
+    ): PrepareTransactionData(value) {
         data class CreateProposal(
             override val contractAddress: Address,
             override val contractInput: EthTransactionInput,
+            override val value: Wei,
             val proposalUuid: String,
-        ): ContractInteraction(contractAddress, contractInput)
+        ): ContractInteraction(contractAddress, contractInput, value)
 
         data class VoteOnProposal(
             override val contractAddress: Address,
             override val contractInput: EthTransactionInput,
+            override val value: Wei = 0.WEI,
             val proposalNumber: Int,
             val vote: Boolean,
-        ): ContractInteraction(contractAddress, contractInput)
+        ): ContractInteraction(contractAddress, contractInput, value)
     }
 
     val to: Address

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -18,25 +19,26 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import by.alexandr7035.ethereum.model.WEI
 import com.example.votekt.R
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.DotsProgressIndicator
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.preview.TransactionReviewPreviewProvider
+import com.example.votekt.ui.components.web3.ExplorableText
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.ui.utils.prettifyAddress
@@ -55,16 +57,11 @@ fun ReviewTransactionDialog(
     ModalBottomSheet(
         onDismissRequest = {
             onIntent(ReviewTransactionIntent.DismissDialog)
-        },
-        sheetState = dialogState,
-        containerColor = MaterialTheme.colorScheme.background
+        }, sheetState = dialogState, containerColor = MaterialTheme.colorScheme.background
     ) {
-        ConfirmTransactionDialog_Ui(
-            state = state,
-            onConfirmTransaction = {
-                onIntent(ReviewTransactionIntent.SubmitTransaction)
-            }
-        )
+        ConfirmTransactionDialog_Ui(state = state, onConfirmTransaction = {
+            onIntent(ReviewTransactionIntent.SubmitTransaction)
+        })
     }
 }
 
@@ -80,14 +77,10 @@ fun ConfirmTransactionDialog_Ui(
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         Text(
-            text = stringResource(R.string.confirm_transaction),
-            style = MaterialTheme.typography.titleLarge
+            text = stringResource(R.string.confirm_transaction), style = MaterialTheme.typography.titleLarge
         )
 
-        when (state) {
-            is ReviewTransactionDataUi.ContractInteraction -> ContractInputComponent(state)
-            is ReviewTransactionDataUi.SendAmount -> SendAmountComponent(state)
-        }
+        AmountComponent(state)
 
         TransactionFeeComponent(txReview = state)
 
@@ -104,12 +97,10 @@ fun ConfirmTransactionDialog_Ui(
 private fun TransactionFeeComponent(txReview: ReviewTransactionDataUi) {
     Column() {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = stringResource(R.string.estimated_gas),
-                style = MaterialTheme.typography.titleSmall
+                text = stringResource(R.string.estimated_gas), style = MaterialTheme.typography.titleSmall
             )
 
             txReview.totalEstimatedFee?.let { weiFee ->
@@ -135,21 +126,17 @@ private fun TransactionFeeComponent(txReview: ReviewTransactionDataUi) {
         }
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
-                text = stringResource(R.string.including_miner_tip),
-                style = MaterialTheme.typography.titleSmall
+                text = stringResource(R.string.including_miner_tip), style = MaterialTheme.typography.titleSmall
             )
 
             txReview.minerTipFee?.let { minerTipFee ->
                 Text(
                     text = BalanceFormatter.formatAmountWithSymbol(
-                        amount = minerTipFee.toGWei(),
-                        symbol = stringResource(R.string.gwei)
-                    ),
-                    style = MaterialTheme.typography.titleSmall
+                        amount = minerTipFee.toGWei(), symbol = stringResource(R.string.gwei)
+                    ), style = MaterialTheme.typography.titleSmall
                 )
             } ?: run {
                 EstimationProgressIndicator(txReview)
@@ -159,8 +146,7 @@ private fun TransactionFeeComponent(txReview: ReviewTransactionDataUi) {
         txReview.estimationError?.let {
             Spacer(Modifier.height(12.dp))
             Text(
-                text = it.asString(),
-                style = TextStyle(
+                text = it.asString(), style = TextStyle(
                     color = MaterialTheme.colorScheme.error,
                     fontSize = 14.sp,
                 )
@@ -175,14 +161,12 @@ private fun ContractInputComponent(txReview: ReviewTransactionDataUi.ContractInt
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFE0E0E0),
-                shape = RoundedCornerShape(16.dp)
+                color = Color(0xFFE0E0E0), shape = RoundedCornerShape(16.dp)
             )
             .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(
                 text = when (txReview.transactionType) {
@@ -192,7 +176,7 @@ private fun ContractInputComponent(txReview: ReviewTransactionDataUi.ContractInt
                 }
             )
 
-            AddressComponent(recipient = txReview.recipient)
+            ExplorableText(text = txReview.recipient.hex.prettifyAddress(), explorerUrl = "todo", onClick = {})
         }
 
         Row(
@@ -218,35 +202,25 @@ private fun ContractInputComponent(txReview: ReviewTransactionDataUi.ContractInt
 }
 
 @Composable
-private fun SendAmountComponent(txReview: ReviewTransactionDataUi.SendAmount) {
+private fun AmountComponent(txReview: ReviewTransactionDataUi) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .background(
-                color = Color(0xFFE0E0E0),
-                shape = RoundedCornerShape(16.dp)
+                color = Color(0xFFE0E0E0), shape = RoundedCornerShape(16.dp)
             )
-            .padding(horizontal = 12.dp, vertical = 8.dp)
+            .padding(horizontal = 12.dp, vertical = 8.dp), verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(text = stringResource(R.string.send_to))
-            AddressComponent(recipient = txReview.recipient)
-        }
+        Text(text = getTransactionTypeText(txReview))
 
         Row(
-            modifier = Modifier.fillMaxWidth(),
-            verticalAlignment = Alignment.CenterVertically
+            modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "-${
-                    BalanceFormatter.formatAmount(
-                        amount = txReview.value.toEther(),
-                    )
-                }",
-                fontSize = 32.sp,
+                text = BalanceFormatter.formatAmount(
+                    amount = txReview.value?.toEther() ?: 0.WEI.toEther(),
+                ),
+                fontSize = 28.sp,
             )
 
             Image(
@@ -254,34 +228,79 @@ private fun SendAmountComponent(txReview: ReviewTransactionDataUi.SendAmount) {
                 painter = painterResource(id = R.drawable.ic_ethereum),
                 contentDescription = stringResource(R.string.eth)
             )
-        }
 
+            Spacer(Modifier.weight(1f))
+
+            Image(
+                modifier = Modifier.size(20.dp),
+                painter = painterResource(id = R.drawable.ic_arrow_doubled),
+                contentDescription = stringResource(id = R.string.send_to),
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+            )
+
+            Spacer(Modifier.width(20.dp))
+
+            RecipientBubble(
+                recipient = txReview.recipient,
+                isContract = txReview is ReviewTransactionDataUi.ContractInteraction,
+            )
+        }
     }
 }
 
 @Composable
-private fun AddressComponent(recipient: Address) {
-    Text(
-        text = recipient.hex.prettifyAddress(),
-        style = TextStyle(
-            textDecoration = TextDecoration.Underline
+private fun getTransactionTypeText(txReview: ReviewTransactionDataUi) = when (txReview.transactionType) {
+    TransactionType.CREATE_PROPOSAL -> stringResource(id = R.string.create_proposal)
+    TransactionType.VOTE -> stringResource(id = R.string.vote)
+    TransactionType.PAYMENT -> stringResource(R.string.send_amount)
+}
+
+@Composable
+fun RecipientBubble(
+    recipient: Address,
+    isContract: Boolean,
+) {
+    Column(
+        modifier = Modifier
+            .background(
+                color = MaterialTheme.colorScheme.primary.copy(0.7f), shape = RoundedCornerShape(16.dp)
+            )
+            .padding(
+                horizontal = 12.dp, vertical = 8.dp
+            ), horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        ExplorableText(
+            text = recipient.hex.prettifyAddress(),
+            onClick = {},
+            explorerUrl = "",
+            color = MaterialTheme.colorScheme.onPrimary,
+            fontSize = 14.sp,
         )
-    )
+
+        if (isContract) {
+            Text(
+                text = "(${stringResource(id = R.string.contract)})",
+                style = TextStyle(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    fontSize = 12.sp,
+                ),
+            )
+        }
+    }
+
 }
 
 @Composable
 private fun EstimationProgressIndicator(txReview: ReviewTransactionDataUi) {
     if (txReview.estimationError == null) {
         DotsProgressIndicator(
-            circleSize = 12.dp,
-            spaceBetween = 4.dp
+            circleSize = 12.dp, spaceBetween = 4.dp
         )
     } else {
         Text(
             text = stringResource(R.string.metric_na),
             style = TextStyle(
-                fontSize = 16.sp,
-                fontWeight = FontWeight.SemiBold
+                fontSize = 16.sp, fontWeight = FontWeight.SemiBold
             ),
         )
     }
@@ -294,10 +313,7 @@ fun ConfirmTransactionDialog_Preview(
 ) {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
-            ConfirmTransactionDialog_Ui(
-                state = txReview,
-                onConfirmTransaction = {}
-            )
+            ConfirmTransactionDialog_Ui(state = txReview, onConfirmTransaction = {})
         }
     }
 }

@@ -9,16 +9,128 @@ import pm.gnosis.model.SolidityBase
 import pm.gnosis.utils.BigIntegerUtils
 
 public class VoteKtContractV1 {
+    public object CREATE_PROPOSAL_FEE {
+        public const val METHOD_ID: String = "fef60742"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
+    public object MAX_PROPOSAL_COUNT {
+        public const val METHOD_ID: String = "dfe9ec58"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
+    public object MAX_PROPOSAL_DESCRIPTION_LENGTH {
+        public const val METHOD_ID: String = "037d20f5"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
+    public object MAX_PROPOSAL_DURATION {
+        public const val METHOD_ID: String = "bd968216"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
+    public object MAX_PROPOSAL_TITLE_LENGTH {
+        public const val METHOD_ID: String = "670a1c7e"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
+    public object NIN_PROPOSAL_DURATION {
+        public const val METHOD_ID: String = "111da574"
+
+        public fun encode(): String = "0x" + METHOD_ID
+
+        public fun decode(`data`: String): Return {
+            val source = SolidityBase.PartitionData.of(data)
+
+            // Add decoders
+            val arg0 = Solidity.UInt256.DECODER.decode(source)
+
+            return Return(arg0)
+        }
+
+        public data class Return(
+            public val param0: Solidity.UInt256
+        )
+    }
+
     public object CreateProposal {
         public const val METHOD_ID: String = "4c15676b"
 
         public fun encode(
-            uuid: Solidity.String,
-            title: Solidity.String,
-            description: Solidity.String,
-            durationInDays: Solidity.UInt256
-        ): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(uuid,
-            title, description, durationInDays)
+            uuid: Solidity.String, title: Solidity.String, description: Solidity.String, durationInHours: Solidity.UInt256
+        ): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(
+            uuid, title, description, durationInHours
+        )
 
         public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
@@ -39,7 +151,7 @@ public class VoteKtContractV1 {
             public val uuid: Solidity.String,
             public val title: Solidity.String,
             public val description: Solidity.String,
-            public val durationindays: Solidity.UInt256
+            public val durationinhours: Solidity.UInt256
         )
     }
 
@@ -147,27 +259,7 @@ public class VoteKtContractV1 {
         )
 
         public data class Arguments(
-            public val param0: Solidity.UInt256,
-            public val param1: Solidity.Address
-        )
-    }
-
-    public object MaxProposals {
-        public const val METHOD_ID: String = "2f3fe24c"
-
-        public fun encode(): String = "0x" + METHOD_ID
-
-        public fun decode(`data`: String): Return {
-            val source = SolidityBase.PartitionData.of(data)
-
-            // Add decoders
-            val arg0 = Solidity.UInt256.DECODER.decode(source)
-
-            return Return(arg0)
-        }
-
-        public data class Return(
-            public val param0: Solidity.UInt256
+            public val param0: Solidity.UInt256, public val param1: Solidity.Address
         )
     }
 
@@ -193,8 +285,7 @@ public class VoteKtContractV1 {
     public object Proposals {
         public const val METHOD_ID: String = "013cf08b"
 
-        public fun encode(arg1: Solidity.UInt256): String =
-            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1)
+        public fun encode(arg1: Solidity.UInt256): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(arg1)
 
         public fun decode(`data`: String): Return {
             val source = SolidityBase.PartitionData.of(data)
@@ -209,10 +300,11 @@ public class VoteKtContractV1 {
             val arg3 = Solidity.String.DECODER.decode(source.subData(arg3Offset))
             val arg4 = Solidity.UInt256.DECODER.decode(source)
             val arg5 = Solidity.UInt256.DECODER.decode(source)
-            val arg6 = Solidity.UInt256.DECODER.decode(source)
+            val arg6 = Solidity.Address.DECODER.decode(source)
             val arg7 = Solidity.UInt256.DECODER.decode(source)
+            val arg8 = Solidity.UInt256.DECODER.decode(source)
 
-            return Return(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+            return Return(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
         }
 
         public fun decodeArguments(`data`: String): Arguments {
@@ -231,8 +323,9 @@ public class VoteKtContractV1 {
             public val description: Solidity.String,
             public val votesfor: Solidity.UInt256,
             public val votesagainst: Solidity.UInt256,
-            public val creationtime: Solidity.UInt256,
-            public val expirationtime: Solidity.UInt256
+            public val creatoraddress: Solidity.Address,
+            public val creationtimemills: Solidity.UInt256,
+            public val expirationtimemills: Solidity.UInt256
         )
 
         public data class Arguments(
@@ -270,8 +363,9 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "c9d27afe"
 
         public fun encode(proposalNumber: Solidity.UInt256, inFavor: Solidity.Bool): String =
-            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(proposalNumber,
-                inFavor)
+            "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(
+                proposalNumber, inFavor
+            )
 
         public fun decodeArguments(`data`: String): Arguments {
             val source = SolidityBase.PartitionData.of(data)
@@ -284,15 +378,13 @@ public class VoteKtContractV1 {
         }
 
         public data class Arguments(
-            public val proposalnumber: Solidity.UInt256,
-            public val infavor: Solidity.Bool
+            public val proposalnumber: Solidity.UInt256, public val infavor: Solidity.Bool
         )
     }
 
     public object Events {
         public object OwnershipTransferred {
-            public const val EVENT_ID: String =
-                "8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
+            public const val EVENT_ID: String = "8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0"
 
             public fun decode(topics: List<String>): Arguments {
                 // Decode topics
@@ -305,14 +397,12 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val previousowner: Solidity.Address,
-                public val newowner: Solidity.Address
+                public val previousowner: Solidity.Address, public val newowner: Solidity.Address
             )
         }
 
         public object ProposalCreated {
-            public const val EVENT_ID: String =
-                "9c770c289ab5bf7e57cb1d23c8ceae993aea46eb64847072fd3d78ca60d3e432"
+            public const val EVENT_ID: String = "9c770c289ab5bf7e57cb1d23c8ceae993aea46eb64847072fd3d78ca60d3e432"
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
@@ -327,14 +417,12 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val proposalnumber: Solidity.UInt256,
-                public val title: Solidity.String
+                public val proposalnumber: Solidity.UInt256, public val title: Solidity.String
             )
         }
 
         public object ProposalDeleted {
-            public const val EVENT_ID: String =
-                "61c0d93dc2b610877e420b107c8d12e9185e46e04a505da758cc7f7329ae545f"
+            public const val EVENT_ID: String = "61c0d93dc2b610877e420b107c8d12e9185e46e04a505da758cc7f7329ae545f"
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
@@ -352,8 +440,7 @@ public class VoteKtContractV1 {
         }
 
         public object VoteCasted {
-            public const val EVENT_ID: String =
-                "98b03f1463128a74cc9dd4acc43b54ef12ac07daacbcd621d2e4266091b7024a"
+            public const val EVENT_ID: String = "98b03f1463128a74cc9dd4acc43b54ef12ac07daacbcd621d2e4266091b7024a"
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
@@ -367,8 +454,7 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val proposalnumber: Solidity.UInt256,
-                public val infavor: Solidity.Bool
+                public val proposalnumber: Solidity.UInt256, public val infavor: Solidity.Bool
             )
         }
     }
@@ -380,11 +466,13 @@ public class VoteKtContractV1 {
         public val description: Solidity.String,
         public val votesfor: Solidity.UInt256,
         public val votesagainst: Solidity.UInt256,
-        public val creationtime: Solidity.UInt256,
-        public val expirationtime: Solidity.UInt256
+        public val creatoraddress: Solidity.Address,
+        public val creationtimemills: Solidity.UInt256,
+        public val expirationtimemills: Solidity.UInt256
     ) : SolidityBase.DynamicType {
-        public override fun encode(): String = SolidityBase.encodeFunctionArguments(number, uuid,
-            title, description, votesfor, votesagainst, creationtime, expirationtime)
+        public override fun encode(): String = SolidityBase.encodeFunctionArguments(
+            number, uuid, title, description, votesfor, votesagainst, creatoraddress, creationtimemills, expirationtimemills
+        )
 
         public override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
 
@@ -401,9 +489,10 @@ public class VoteKtContractV1 {
                 val arg3 = Solidity.String.DECODER.decode(source.subData(arg3Offset))
                 val arg4 = Solidity.UInt256.DECODER.decode(source)
                 val arg5 = Solidity.UInt256.DECODER.decode(source)
-                val arg6 = Solidity.UInt256.DECODER.decode(source)
+                val arg6 = Solidity.Address.DECODER.decode(source)
                 val arg7 = Solidity.UInt256.DECODER.decode(source)
-                return TupleA(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7)
+                val arg8 = Solidity.UInt256.DECODER.decode(source)
+                return TupleA(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)
             }
         }
 
@@ -412,3 +501,5 @@ public class VoteKtContractV1 {
         }
     }
 }
+
+

@@ -1,9 +1,13 @@
 async function createProposal() {
+  const fee = ethers.utils.parseEther('0.025')
+
   const VotingContract = await ethers.getContractFactory('VotingContract');
   const contract = await VotingContract.attach('0x5FbDB2315678afecb367f032d93F642f64180aa3');
 
   const proposal = await getRandomProposal();
-  await contract.createProposal(`uuid${Math.random() * 100}`, proposal.title, proposal.description, 1);
+  await contract.createProposal(`uuid${Math.random() * 100}`, proposal.title, proposal.description, 1, {
+    value: fee
+  });
   console.log(`Created proposal ${proposal.title}`)
 }
 

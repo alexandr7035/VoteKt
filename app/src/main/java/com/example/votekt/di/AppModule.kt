@@ -32,7 +32,7 @@ import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
-import com.example.votekt.ui.create_proposal.CreateProposalViewModel
+import com.example.votekt.ui.feature_create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenViewModel
 import com.example.votekt.ui.feature_app_lock.setup_applock.biometrics.EnableBiometricsViewModel
 import com.example.votekt.ui.feature_app_lock.setup_applock.create_pin.CreatePinViewModel
@@ -83,7 +83,7 @@ val appModule = module {
     viewModel { VotingDetailsViewModel(get()) }
     viewModel { ProposalsViewModel(get(), get()) }
     viewModel { TransactionsViewModel(get()) }
-    viewModel { CreateProposalViewModel(get()) }
+    viewModel { CreateProposalViewModel(get(), get()) }
     viewModel { WalletViewModel(get(), get(), get()) }
 
     viewModel { LockScreenViewModel(
