@@ -7,12 +7,16 @@ import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.security.CheckAppLockUseCase
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.ReviewTransactionData
+import com.example.votekt.domain.usecase.blockchain_explorer.GetBlockchainExplorerUrlUseCase
 import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionIntent
 import com.example.votekt.ui.feature_confirm_transaction.mapToUi
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -26,6 +30,7 @@ class AppViewModel(
     private val sendTransactionRepository: SendTransactionRepository,
     private val web3EventsRepository: EthereumEventListener,
     private val checkAppLockUseCase: CheckAppLockUseCase,
+    private val getBlockchainExplorerUrlUseCase: GetBlockchainExplorerUrlUseCase,
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(
         AppState()
@@ -39,24 +44,27 @@ class AppViewModel(
 
     fun onAppIntent(intent: AppIntent) {
         when (intent) {
-            AppIntent.EnterApp -> reduceEnterApp()
-            AppIntent.ReconnectToNode -> reduceReconnectToNode()
-            AppIntent.ConsumeAppUnlocked -> reduceAppUnlocked()
+            is AppIntent.EnterApp -> reduceEnterApp()
+            is AppIntent.ReconnectToNode -> reduceReconnectToNode()
+            is AppIntent.ConsumeAppUnlocked -> reduceAppUnlocked()
+            is AppIntent.OpenBlockExplorer -> onOpenExplorer(intent.payload, intent.exploreType)
         }
     }
 
     private fun reduceAppUnlocked() {
         println("STATE_TAG app unlocked ${_appState.value}")
         _appState.update {
-            it.copy(conditionalNavigation = it.conditionalNavigation.copy(
-                requireUnlockApp = false
-            ))
+            it.copy(
+                conditionalNavigation = it.conditionalNavigation.copy(
+                    requireUnlockApp = false
+                )
+            )
         }
     }
 
     fun onTransactionIntent(intent: ReviewTransactionIntent) {
         when (intent) {
-            ReviewTransactionIntent.SubmitTransaction -> {
+            is ReviewTransactionIntent.SubmitTransaction -> {
                 viewModelScope.launch {
                     val confirmTx = OperationResult.runWrapped {
                         sendTransactionRepository.confirmTransaction()
@@ -69,11 +77,13 @@ class AppViewModel(
                 }
             }
 
-            ReviewTransactionIntent.DismissDialog -> {
+            is ReviewTransactionIntent.DismissDialog -> {
                 viewModelScope.launch {
                     sendTransactionRepository.cancelTransaction()
                 }
             }
+
+            is ReviewTransactionIntent.ExplorerUrlClick -> onOpenExplorer(intent.payload, intent.exploreType)
         }
     }
 
@@ -159,6 +169,31 @@ class AppViewModel(
             EthEventsSubscriptionState.Connecting -> AppConnectionState.CONNECTING
             EthEventsSubscriptionState.Disconnected -> AppConnectionState.OFFLINE
         }
+    }
+
+    private fun onOpenExplorer(
+        payload: String,
+        exploreType: ExploreType,
+    ) {
+        viewModelScope.launch {
+            val res = getBlockchainExplorerUrlUseCase.invoke(
+                value = payload,
+                exploreType = exploreType,
+            )
+            println("EXPLORER_TAG open ${res}")
+
+            res?.let { url ->
+                _appState.update {
+                    it.copy(
+                        openExplorerEvent = triggered(url)
+                    )
+                }
+            }
+        }
+    }
+
+    fun consumeOpenExplorerEvent() {
+        _appState.update { it.copy(openExplorerEvent = consumed()) }
     }
 
     private companion object {

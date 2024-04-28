@@ -45,17 +45,17 @@ import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.pager.Page
 import com.example.votekt.ui.components.pager.PagerTabRow
 import com.example.votekt.ui.components.preview.ProposalListPreviewProvider
+import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.Dimensions
-import com.example.votekt.ui.theme.VoteKtTheme
+import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun ProposalsScreen(
-    onProposalClick: (proposalId: String) -> Unit = {},
-    onNewProposalClick: () -> Unit = {},
+    onNavigationEvent: (ProposalsScreenNavigationEvent) -> Unit,
     viewModel: ProposalsViewModel = koinViewModel()
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
@@ -87,7 +87,9 @@ fun ProposalsScreen(
                 exit = slideOutVertically(targetOffsetY = { it * 2 }),
             ) {
                 FloatingActionButton(
-                    onClick = onNewProposalClick,
+                    onClick = {
+                      viewModel.onIntent(ProposalsScreenIntent.AddProposalClick)  
+                    },
                     containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                 ) {
@@ -117,19 +119,24 @@ fun ProposalsScreen(
                 ProposalsList(
                     proposals = state.proposals,
                     pv = pv,
-                    onProposalClick = onProposalClick,
                     nestedScrollConnection = nestedScrollConnection,
-                    isTabBarVisible = state.controlsAreVisible,
-                    onIntent = {
-                        viewModel.onIntent(it)
-                    }
-                )
+                    isTabBarVisible = state.controlsAreVisible
+                ) {
+                    viewModel.onIntent(it)
+                }
             }
         }
     }
 
     LaunchedEffect(Unit) {
         viewModel.onIntent(ProposalsScreenIntent.EnterScreen)
+    }
+
+    NavigationEventEffect(
+        event = state.navigationEvent,
+        onConsumed = viewModel::consumeNavigationEvent
+    ) {
+        onNavigationEvent(it)
     }
 }
 
@@ -138,10 +145,9 @@ fun ProposalsScreen(
 private fun ProposalsList(
     proposals: List<Proposal>,
     pv: PaddingValues,
-    onProposalClick: (proposalId: String) -> Unit,
     nestedScrollConnection: NestedScrollConnection = rememberNestedScrollInteropConnection(),
     isTabBarVisible: Boolean = true,
-    onIntent: (ProposalsScreenIntent) -> Unit = {}
+    onIntent: (ProposalsScreenIntent) -> Unit = {},
 ) {
     Column(
         modifier = Modifier
@@ -181,7 +187,7 @@ private fun ProposalsList(
             }
         }
 
-        HorizontalPager(state = pagerState) {pageIndex ->
+        HorizontalPager(state = pagerState) { pageIndex ->
             LaunchedEffect(pageIndex) {
                 onIntent(ProposalsScreenIntent.ChangeControlsVisibility(true))
             }
@@ -206,11 +212,21 @@ private fun ProposalsList(
                         }
                     ) { _, proposal ->
                         Card(
-                            onClick = { onProposalClick(proposal.uuid) },
+                            onClick = {
+                                onIntent(ProposalsScreenIntent.ProposalClick(proposal.uuid))
+                            },
                             elevation = CardDefaults.cardElevation(Dimensions.defaultCardElevation)
                         ) {
                             VotingPostCard(
-                                proposal = proposal
+                                proposal = proposal,
+                                onExplorerClick = { payload, exploreType ->
+                                    onIntent(
+                                        ProposalsScreenIntent.ExplorerUrlClick(
+                                            payload = payload,
+                                            exploreType = exploreType
+                                        )
+                                    )
+                                }
                             )
                         }
                     }
@@ -240,15 +256,14 @@ private fun NoProposalsStub(
 }
 
 @Composable
-@Preview()
+@Preview
 fun ProposalsScreen_Preview(
     @PreviewParameter(ProposalListPreviewProvider::class) proposals: List<Proposal>
 ) {
-    VoteKtTheme(darkTheme = false) {
+    ScreenPreview {
         ProposalsList(
             proposals = proposals,
-            pv = PaddingValues(),
-            onProposalClick = {}
+            pv = PaddingValues()
         )
     }
 }

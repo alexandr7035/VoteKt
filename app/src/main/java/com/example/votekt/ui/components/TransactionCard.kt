@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.votekt.R
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.preview.TransactionPreviewProvider
@@ -41,18 +42,19 @@ import com.example.votekt.ui.utils.showToast
 @Composable
 fun TransactionCard(
     transaction: TransactionDomain,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit
 ) {
     TransactionCardUi(
         transaction = transaction,
+        onExplorerClick = onExplorerClick,
     )
 }
 
 @Composable
 private fun TransactionCardUi(
-    transaction: TransactionDomain
+    transaction: TransactionDomain,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit,
 ) {
-    val context = LocalContext.current
-
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(4.dp)
@@ -80,9 +82,8 @@ private fun TransactionCardUi(
 
                 ExplorableText(
                     text = transaction.hash.prettifyAddress(),
-                    explorerUrl = "todo",
                     onClick = {
-                        context.showToast("click on transaction")
+                        onExplorerClick(transaction.hash, ExploreType.TRANSACTION)
                     }
                 )
             }
@@ -136,8 +137,8 @@ fun TransactionCard_Preview(
 ) {
     VoteKtTheme {
         TransactionCardUi(
-            transaction = transaction
+            transaction = transaction,
+            onExplorerClick = { _, _ -> }
         )
     }
 }
-

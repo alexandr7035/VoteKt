@@ -7,6 +7,8 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.datasync.SyncWithContractUseCase
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.uiError
+import de.palm.composestateevents.consumed
+import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
@@ -32,6 +34,33 @@ class ProposalsViewModel(
 
             ProposalsScreenIntent.EnterScreen -> {
                 reduceEnterScreen()
+            }
+
+            is ProposalsScreenIntent.ExplorerUrlClick -> _state.update {
+                it.copy(
+                    navigationEvent = triggered(
+                        ProposalsScreenNavigationEvent.ToExplorer(
+                            intent.payload,
+                            intent.exploreType
+                        )
+                    )
+                )
+            }
+
+            is ProposalsScreenIntent.ProposalClick -> {
+                _state.update {
+                    it.copy(navigationEvent = triggered(
+                        ProposalsScreenNavigationEvent.ToProposal(intent.proposalId)
+                    ))
+                }
+            }
+
+            ProposalsScreenIntent.AddProposalClick -> {
+                _state.update {
+                    it.copy(navigationEvent = triggered(
+                        ProposalsScreenNavigationEvent.ToAddProposal
+                    ))
+                }
             }
         }
     }
@@ -78,5 +107,9 @@ class ProposalsViewModel(
                 isLoading = false
             )
         }
+    }
+
+    fun consumeNavigationEvent() {
+        _state.update { it.copy(navigationEvent = consumed()) }
     }
 }

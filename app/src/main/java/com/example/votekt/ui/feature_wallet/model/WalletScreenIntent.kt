@@ -1,15 +1,23 @@
 package com.example.votekt.ui.feature_wallet.model
 
-sealed class WalletScreenIntent {
-    object LoadData: WalletScreenIntent()
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 
-    sealed class WalletAction: WalletScreenIntent() {
-        object Send: WalletAction()
-        object Receive: WalletAction()
-        object Vote: WalletAction()
+sealed class WalletScreenIntent {
+    object LoadData : WalletScreenIntent()
+
+    sealed class WalletAction : WalletScreenIntent() {
+        object Send : WalletAction()
+        object Receive : WalletAction()
+        object Vote : WalletAction()
     }
 
-    data class ChangeHeaderVisibility(val isVisible: Boolean): WalletScreenIntent()
+    data class ChangeHeaderVisibility(val isVisible: Boolean) : WalletScreenIntent()
 
-    object LogOut: WalletScreenIntent()
+    data class ExplorerUrlClick(
+        val payload: String,
+        val exploreType: ExploreType,
+    ): WalletScreenIntent()
+
+    object LogOut : WalletScreenIntent()
+
 }

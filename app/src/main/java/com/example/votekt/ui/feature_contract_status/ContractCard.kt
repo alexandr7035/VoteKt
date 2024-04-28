@@ -33,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.votekt.R
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.model.contract.ContractState
 import com.example.votekt.ui.components.PercentageIndicator
 import com.example.votekt.ui.components.SkeletonShape
@@ -46,6 +47,7 @@ import org.kethereum.model.Address
 @Composable
 fun ContractCard(
     contractState: ContractState?,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit = { _, _ -> },
 ) {
     Card(
         elevation = CardDefaults.cardElevation(Dimensions.defaultCardElevation)
@@ -73,9 +75,11 @@ fun ContractCard(
 
                     ExplorableText(
                         text = contractState.address.hex.prettifyAddress(),
-                        explorerUrl = "todo",
                         onClick = {
-                            // TODO
+                            onExplorerClick(
+                                contractState.address.hex,
+                                ExploreType.ADDRESS
+                            )
                         }
                     )
                 }
@@ -241,7 +245,7 @@ private fun ContractCard_Preview() {
                     notSupportedProposals = 50,
                     currentProposals = 10,
                     maxProposals = 12,
-                )
+                ),
             )
         }
     }

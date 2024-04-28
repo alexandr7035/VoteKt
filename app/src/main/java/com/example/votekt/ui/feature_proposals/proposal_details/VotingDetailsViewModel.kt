@@ -30,6 +30,28 @@ class VotingDetailsViewModel(
 
     val state = _state.asStateFlow()
 
+    fun onIntent(intent: ProposalDetailsScreenIntent) {
+        when (intent) {
+            is ProposalDetailsScreenIntent.EnterScreen -> loadProposalById(intent.proposalUuid)
+            is ProposalDetailsScreenIntent.ErrorRetryClick -> loadProposalById(intent.proposalUuid)
+            is ProposalDetailsScreenIntent.ExplorerUrlClick -> _state.update {
+                it.copy(navigationEvent = triggered(
+                    ProposalDetailsScreenNavigationEvent.ToExplorer(intent.payload, intent.exploreType)
+                ))
+            }
+
+            is ProposalDetailsScreenIntent.GoBack -> _state.update {
+                it.copy(navigationEvent = triggered(
+                    ProposalDetailsScreenNavigationEvent.PopupBack
+                ))
+            }
+
+            is ProposalDetailsScreenIntent.MakeVoteClick -> onMakeVoteClick(intent.proposalNumber, intent.voteType)
+            is ProposalDetailsScreenIntent.DeployClick -> onDeployClick(intent.proposalUuid)
+            is ProposalDetailsScreenIntent.DeleteClick -> onDeleteDraftClick(intent.proposalUuid)
+        }
+    }
+
     fun loadProposalById(id: String) {
         votingContractRepository
             .getProposalById(id)
@@ -53,7 +75,7 @@ class VotingDetailsViewModel(
             .launchIn(viewModelScope)
     }
 
-    fun makeVote(proposalNumber: Int, voteType: VoteType) {
+    private fun onMakeVoteClick(proposalNumber: Int, voteType: VoteType) {
         viewModelScope.launch {
             when (val res = votingContractRepository.voteOnProposal(proposalNumber, voteType)) {
                 is OperationResult.Success -> {}
@@ -66,7 +88,7 @@ class VotingDetailsViewModel(
         }
     }
 
-    fun deployProposal(proposalUuid: Uuid) {
+    private fun onDeployClick(proposalUuid: Uuid) {
         viewModelScope.launch {
             when (val res = votingContractRepository.deployDraftProposal(proposalUuid)) {
                 is OperationResult.Success -> {}
@@ -79,14 +101,15 @@ class VotingDetailsViewModel(
         }
     }
 
-    fun deleteDraft(proposalUuid: Uuid) {
-        println("call delete draft ${proposalUuid}")
+    private fun onDeleteDraftClick(proposalUuid: Uuid) {
         viewModelScope.launch {
             when (val res = votingContractRepository.deleteDraftProposal(proposalUuid)) {
                 is OperationResult.Success -> {
                     _state.update {
                         it.copy(
-                            draftDeletedEvent = triggered
+                            navigationEvent = triggered(
+                                ProposalDetailsScreenNavigationEvent.PopupBack
+                            ),
                         )
                     }
                 }
@@ -99,11 +122,9 @@ class VotingDetailsViewModel(
         }
     }
 
-    fun consumeDraftDeletedEvent() {
+    fun consumeNavigationEvent() {
         _state.update {
-            it.copy(
-                draftDeletedEvent = consumed
-            )
+            it.copy(navigationEvent = consumed())
         }
     }
 }

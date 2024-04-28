@@ -2,6 +2,8 @@ package com.example.votekt.ui.core
 
 import com.example.votekt.ui.UiErrorMessage
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDataUi
+import de.palm.composestateevents.StateEventWithContent
+import de.palm.composestateevents.consumed
 
 // Global app state, can include auth check result, app lock flag and so on
 // consider researching better approach
@@ -11,6 +13,7 @@ data class AppState(
     val appError: UiErrorMessage? = null,
     val txConfirmationState: ReviewTransactionDataUi? = null,
     val appConnectionState: AppConnectionState = AppConnectionState.CONNECTING,
+    val openExplorerEvent: StateEventWithContent<String> = consumed()
 )
 
 data class ConditionalNavigation(

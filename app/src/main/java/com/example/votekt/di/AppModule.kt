@@ -14,6 +14,7 @@ import com.example.votekt.BuildConfig
 import com.example.votekt.data.cache.TransactionsDatabase
 import com.example.votekt.data.repository_impl.AccountRepositoryImpl
 import com.example.votekt.data.repository_impl.AppLockRepositoryImpl
+import com.example.votekt.data.repository_impl.BlockchainExplorerRepositoryImpl
 import com.example.votekt.data.repository_impl.MnemonicRepositoryImpl
 import com.example.votekt.data.repository_impl.SendTransactionRepositoryImpl
 import com.example.votekt.data.repository_impl.TransactionRepositoryImpl
@@ -26,24 +27,25 @@ import com.example.votekt.data.workers.AwaitTransactionWorker
 import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
+import com.example.votekt.domain.repository.BlockchainExplorerRepository
 import com.example.votekt.domain.repository.WebsocketManager
 import com.example.votekt.domain.security.AppLockRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.TransactionRepository
 import com.example.votekt.domain.votings.VotingContractRepository
 import com.example.votekt.ui.core.AppViewModel
-import com.example.votekt.ui.feature_create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenViewModel
 import com.example.votekt.ui.feature_app_lock.setup_applock.biometrics.EnableBiometricsViewModel
 import com.example.votekt.ui.feature_app_lock.setup_applock.create_pin.CreatePinViewModel
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseViewModel
 import com.example.votekt.ui.feature_create_account.GeneratePhraseViewModel
+import com.example.votekt.ui.feature_create_proposal.CreateProposalViewModel
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsViewModel
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsViewModel
 import com.example.votekt.ui.feature_restore_account.RestoreAccountViewModel
 import com.example.votekt.ui.feature_wallet.WalletViewModel
 import com.example.votekt.ui.feature_welcome.WelcomeScreenViewModel
-import com.example.votekt.ui.tx_history.TransactionsViewModel
+import com.example.votekt.ui.feature_transaction_history.TransactionsViewModel
 import kotlinx.coroutines.Dispatchers
 import org.kethereum.model.Address
 import org.koin.android.ext.koin.androidApplication
@@ -72,6 +74,7 @@ val appModule = module {
         web3EventsRepository = get(),
         checkAppLockUseCase = get(),
         connectToNodeUseCase = get(),
+        getBlockchainExplorerUrlUseCase = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
@@ -235,5 +238,9 @@ val appModule = module {
             ethereumEventListener = get(),
             votingContractRepository = get(),
         )
+    }
+
+    single<BlockchainExplorerRepository> {
+        BlockchainExplorerRepositoryImpl()
     }
 }

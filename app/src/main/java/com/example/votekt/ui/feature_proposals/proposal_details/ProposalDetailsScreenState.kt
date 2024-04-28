@@ -10,6 +10,5 @@ data class ProposalDetailsScreenState(
     val isProposalLoading: Boolean = false,
     val proposal: Proposal? = null,
     val error: UiErrorMessage? = null,
-    val draftDeletedEvent: StateEvent = consumed,
-//    val isSelfVoteProcessing: Boolean = false,
+    val navigationEvent: StateEventWithContent<ProposalDetailsScreenNavigationEvent> = consumed()
 )
