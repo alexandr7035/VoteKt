@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
 import com.example.votekt.domain.account.MnemonicWord
@@ -27,10 +29,14 @@ import com.example.votekt.ui.components.TipView
 import com.example.votekt.ui.components.preview.MnemonicPreviewProvider
 import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.components.text.SeedPhraseInputField
+import com.example.votekt.ui.core.effects.ComposableLifeCycleEffect
 import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.feature_restore_account.model.RestoreAccountIntent
 import com.example.votekt.ui.feature_restore_account.model.RestoreAccountNavigationEvent
 import com.example.votekt.ui.theme.Dimensions
+import com.example.votekt.ui.utils.findActivity
+import com.example.votekt.ui.utils.lockScreenshots
+import com.example.votekt.ui.utils.unlockScreenshots
 import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,6 +46,7 @@ fun RestoreAccountScreen(
     onNavigationEvent: (RestoreAccountNavigationEvent) -> Unit,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
+    val activity = LocalContext.current.findActivity()
 
     RestoreAccountScreen_Ui(
         words = state.wordInput,
@@ -58,6 +65,20 @@ fun RestoreAccountScreen(
         onConsumed = viewModel::consumeNavigationEvent,
     ) {
         onNavigationEvent(it)
+    }
+
+    ComposableLifeCycleEffect { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_START-> {
+                activity?.lockScreenshots()
+            }
+
+            Lifecycle.Event.ON_PAUSE -> {
+                activity?.unlockScreenshots()
+            }
+
+            else -> {}
+        }
     }
 }
 
