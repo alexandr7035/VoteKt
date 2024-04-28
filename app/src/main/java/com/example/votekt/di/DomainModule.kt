@@ -15,6 +15,7 @@ import com.example.votekt.domain.usecase.account.AddAccountUseCase
 import com.example.votekt.domain.usecase.account.GenerateAccountUseCase
 import com.example.votekt.domain.usecase.account.LogoutUseCase
 import com.example.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
+import com.example.votekt.domain.usecase.blockchain_explorer.GetBlockchainExplorerUrlUseCase
 import com.example.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import com.example.votekt.domain.usecase.contract.GetContractConfigurationUseCase
 import com.example.votekt.domain.usecase.contract.GetContractStateUseCase
@@ -47,4 +48,6 @@ val domainModule = module {
     single { CreateDraftProposalUseCase(get()) }
     single { GetContractStateUseCase(get()) }
     single { GetContractConfigurationUseCase(get()) }
+
+    single { GetBlockchainExplorerUrlUseCase(get()) }
 }
