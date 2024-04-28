@@ -120,7 +120,6 @@ class VotingContractRepositoryImpl(
                 ProposalEntity(
                     uuid = uuid,
                     isDraft = true,
-                    isSelfCreated = true,
                     title = req.title,
                     description = req.desc,
                     deployTransactionHash = null,
@@ -290,7 +289,7 @@ class VotingContractRepositoryImpl(
                 proposalNumber = proposal.number!!,
                 expirationTime = proposal.expiresAt!!,
                 creatorAddress = Address(proposal.creatorAddress),
-                isSelfCreated = proposal.isSelfCreated,
+                isSelfCreated = accountRepository.getSelfAddress().hex == proposal.creatorAddress,
                 votingData = VotingData(
                     votesFor = proposal.votesFor,
                     votesAgainst = proposal.votesAgainst,
@@ -305,7 +304,7 @@ class VotingContractRepositoryImpl(
                 title = proposal.title,
                 description = proposal.description,
                 creatorAddress = Address(proposal.creatorAddress),
-                isSelfCreated = proposal.isSelfCreated,
+                isSelfCreated = accountRepository.getSelfAddress().hex == proposal.creatorAddress,
                 deploymentTransaction = deploymentTransaction?.mapToData(),
                 deployStatus = mapDeployStatus(),
             )
