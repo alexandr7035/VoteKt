@@ -155,7 +155,13 @@ private fun WalletScreen_Ui(
                     verticalArrangement = Arrangement.spacedBy(Dimensions.cardListSpacing)
                 ) {
                     ContractCard(
-                        contractState = state.contractState
+                        contractState = state.contractState,
+                        onExplorerClick = { payload, exploreType ->
+                            onIntent(WalletScreenIntent.ExplorerUrlClick(
+                                payload = payload,
+                                exploreType = exploreType,
+                            ))
+                        }
                     )
                 }
             }
@@ -243,7 +249,7 @@ private fun WalletAddressComponent(address: Address) {
             .clip(RoundedCornerShape(16.dp))
             .clickable {
                 context.copyToClipboard("Address", address.value)
-                context.showToast("Address copied")
+                context.showToast(R.string.address_copied)
             }
             .padding(
                 vertical = 8.dp,

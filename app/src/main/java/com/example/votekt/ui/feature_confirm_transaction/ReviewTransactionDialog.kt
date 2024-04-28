@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import by.alexandr7035.ethereum.model.WEI
 import com.example.votekt.R
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.DotsProgressIndicator
 import com.example.votekt.ui.components.PrimaryButton
@@ -59,9 +60,18 @@ fun ReviewTransactionDialog(
             onIntent(ReviewTransactionIntent.DismissDialog)
         }, sheetState = dialogState, containerColor = MaterialTheme.colorScheme.background
     ) {
-        ConfirmTransactionDialog_Ui(state = state, onConfirmTransaction = {
-            onIntent(ReviewTransactionIntent.SubmitTransaction)
-        })
+        ConfirmTransactionDialog_Ui(
+            state = state,
+            onConfirmTransaction = {
+                onIntent(ReviewTransactionIntent.SubmitTransaction)
+            },
+            onExplorerClick = { payload, exploreType ->
+                onIntent(ReviewTransactionIntent.ExplorerUrlClick(
+                    payload = payload,
+                    exploreType = exploreType
+                ))
+            }
+        )
     }
 }
 
@@ -69,6 +79,7 @@ fun ReviewTransactionDialog(
 fun ConfirmTransactionDialog_Ui(
     state: ReviewTransactionDataUi,
     onConfirmTransaction: () -> Unit,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -80,7 +91,10 @@ fun ConfirmTransactionDialog_Ui(
             text = stringResource(R.string.confirm_transaction), style = MaterialTheme.typography.titleLarge
         )
 
-        AmountComponent(state)
+        AmountComponent(
+            txReview = state,
+            onExplorerClick = onExplorerClick
+        )
 
         TransactionFeeComponent(txReview = state)
 
@@ -156,53 +170,10 @@ private fun TransactionFeeComponent(txReview: ReviewTransactionDataUi) {
 }
 
 @Composable
-private fun ContractInputComponent(txReview: ReviewTransactionDataUi.ContractInteraction) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .background(
-                color = Color(0xFFE0E0E0), shape = RoundedCornerShape(16.dp)
-            )
-            .padding(horizontal = 12.dp, vertical = 8.dp)
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = when (txReview.transactionType) {
-                    TransactionType.CREATE_PROPOSAL -> stringResource(id = R.string.create_proposal)
-                    TransactionType.VOTE -> stringResource(id = R.string.vote)
-                    else -> stringResource(R.string.unknown_interaction)
-                }
-            )
-
-            ExplorableText(text = txReview.recipient.hex.prettifyAddress(), explorerUrl = "todo", onClick = {})
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "ABI",
-                fontWeight = FontWeight.Bold,
-                fontSize = 28.sp,
-            )
-
-            Text(
-                text = txReview.contractInput,
-                fontWeight = FontWeight.Light,
-                fontSize = 12.sp,
-                maxLines = 3,
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-    }
-}
-
-@Composable
-private fun AmountComponent(txReview: ReviewTransactionDataUi) {
+private fun AmountComponent(
+    txReview: ReviewTransactionDataUi,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -243,6 +214,9 @@ private fun AmountComponent(txReview: ReviewTransactionDataUi) {
             RecipientBubble(
                 recipient = txReview.recipient,
                 isContract = txReview is ReviewTransactionDataUi.ContractInteraction,
+                onAddressClick = {
+                    onExplorerClick(txReview.recipient.hex, ExploreType.ADDRESS)
+                }
             )
         }
     }
@@ -259,6 +233,7 @@ private fun getTransactionTypeText(txReview: ReviewTransactionDataUi) = when (tx
 fun RecipientBubble(
     recipient: Address,
     isContract: Boolean,
+    onAddressClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
@@ -271,8 +246,7 @@ fun RecipientBubble(
     ) {
         ExplorableText(
             text = recipient.hex.prettifyAddress(),
-            onClick = {},
-            explorerUrl = "",
+            onClick = onAddressClick,
             color = MaterialTheme.colorScheme.onPrimary,
             fontSize = 14.sp,
         )
@@ -313,7 +287,11 @@ fun ConfirmTransactionDialog_Preview(
 ) {
     VoteKtTheme() {
         Surface(color = MaterialTheme.colorScheme.background) {
-            ConfirmTransactionDialog_Ui(state = txReview, onConfirmTransaction = {})
+            ConfirmTransactionDialog_Ui(
+                state = txReview,
+                onConfirmTransaction = {},
+                onExplorerClick = { _, _ -> },
+            )
         }
     }
 }

@@ -51,6 +51,7 @@ import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.preview.ScreenPreview
@@ -73,6 +74,7 @@ fun VotingPostCard(
     proposal: Proposal,
     isExpanded: Boolean = false,
     showVotingBar: Boolean = true,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit = {_, _ -> },
 ) {
     Column(
         modifier = Modifier
@@ -103,7 +105,8 @@ fun VotingPostCard(
 
         Creator(
             address = proposal.creatorAddress.value,
-            isSelf = proposal.isSelfCreated
+            isSelf = proposal.isSelfCreated,
+            onExplorerClick = onExplorerClick,
         )
 
         Text(
@@ -185,7 +188,8 @@ private fun ProposalStatusMark(
 @Composable
 private fun Creator(
     address: String, imageSize: Dp = 24.dp,
-    isSelf: Boolean = true
+    isSelf: Boolean = true,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -216,9 +220,8 @@ private fun Creator(
             } else {
                 address.prettifyAddress()
             },
-            explorerUrl = "todo",
             onClick = {
-
+                onExplorerClick(address, ExploreType.ADDRESS)
             },
             fontSize = 14.sp,
         )

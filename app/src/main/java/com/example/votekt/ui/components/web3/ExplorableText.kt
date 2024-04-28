@@ -24,8 +24,7 @@ import com.example.votekt.ui.theme.VoteKtTheme
 @Composable
 fun ExplorableText(
     text: String,
-    explorerUrl: String?,
-    onClick: (url: String) -> Unit,
+    onClick: () -> Unit,
     color: Color = Color.Gray,
     fontSize: TextUnit = 16.sp
 ) {
@@ -42,7 +41,7 @@ fun ExplorableText(
                 textDecoration = TextDecoration.Underline
             ),
             onClick = {
-                explorerUrl?.let { onClick(it) }
+                onClick()
             },
         )
 
@@ -63,7 +62,6 @@ fun ExplorableText_Preview() {
         Surface(color = MaterialTheme.colorScheme.background) {
             ExplorableText(
                 text = "0x1234....000",
-                explorerUrl = "",
                 onClick = {}
             )
         }

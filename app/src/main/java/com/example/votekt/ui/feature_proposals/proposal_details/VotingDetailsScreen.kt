@@ -52,8 +52,8 @@ import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.RoundedButton
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
+import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
-import com.example.votekt.ui.components.voting_bar.VotingBarCircle
 import com.example.votekt.ui.core.AppBar
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingBarExtended
@@ -68,16 +68,15 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun VotingDetailsScreen(
     proposalId: String,
-    onBack: () -> Unit = {},
+    onNavigationEvent: (ProposalDetailsScreenNavigationEvent) -> Unit,
     viewModel: VotingDetailsViewModel = koinViewModel(),
 ) {
-
     BackHandler() {
-        onBack()
+        viewModel.onIntent(ProposalDetailsScreenIntent.GoBack)
     }
 
     LaunchedEffect(proposalId) {
-        viewModel.loadProposalById(proposalId)
+        viewModel.onIntent(ProposalDetailsScreenIntent.EnterScreen(proposalId))
     }
 
     val screenState = viewModel.state.collectAsStateWithLifecycle().value
@@ -87,23 +86,9 @@ fun VotingDetailsScreen(
 
         screenState.proposal != null -> {
             VotingDetailsScreen_Ui(
-                onBack = onBack,
                 proposal = screenState.proposal,
-                onDeployClick = {
-                    if (screenState.proposal is Proposal.Draft) {
-                        viewModel.deployProposal(Uuid(screenState.proposal.uuid))
-                    }
-                },
-                onVote = { vote ->
-                    if (screenState.proposal is Proposal.Deployed) {
-                        viewModel.makeVote(
-                            proposalNumber = screenState.proposal.proposalNumber,
-                            voteType = vote
-                        )
-                    }
-                },
-                onDeleteDraft = {
-                    viewModel.deleteDraft(Uuid(screenState.proposal.uuid))
+                onIntent = {
+                    viewModel.onIntent(it)
                 }
             )
         }
@@ -116,10 +101,10 @@ fun VotingDetailsScreen(
     }
 
     NavigationEventEffect(
-        event = screenState.draftDeletedEvent,
-        onConsumed = viewModel::consumeDraftDeletedEvent,
+        event = screenState.navigationEvent,
+        onConsumed = viewModel::consumeNavigationEvent,
     ) {
-        onBack()
+        onNavigationEvent(it)
     }
 }
 
@@ -127,10 +112,7 @@ fun VotingDetailsScreen(
 @Composable
 private fun VotingDetailsScreen_Ui(
     proposal: Proposal,
-    onDeployClick: () -> Unit,
-    onVote: (VoteType) -> Unit,
-    onBack: () -> Unit = {},
-    onDeleteDraft: () -> Unit = {},
+    onIntent: (ProposalDetailsScreenIntent) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
         AppBar(
@@ -144,11 +126,13 @@ private fun VotingDetailsScreen_Ui(
                 }
             },
             onBack = {
-                onBack()
+                onIntent(ProposalDetailsScreenIntent.GoBack)
             },
             actions = {
                 if (proposal is Proposal.Draft && proposal.deployStatus is BlockchainActionStatus.NotCompleted) {
-                    IconButton(onClick = onDeleteDraft) {
+                    IconButton(onClick = {
+                        onIntent(ProposalDetailsScreenIntent.DeleteClick(Uuid(proposal.uuid)))
+                    }) {
                         Icon(
                             imageVector = Icons.Outlined.Delete,
                             contentDescription = stringResource(R.string.delete_draft),
@@ -178,6 +162,14 @@ private fun VotingDetailsScreen_Ui(
                     proposal = proposal,
                     isExpanded = true,
                     showVotingBar = false,
+                    onExplorerClick = { payload, exploreType ->
+                        onIntent(
+                            ProposalDetailsScreenIntent.ExplorerUrlClick(
+                                payload = payload,
+                                exploreType = exploreType
+                            )
+                        )
+                    }
                 )
             }
 
@@ -189,7 +181,9 @@ private fun VotingDetailsScreen_Ui(
                     ) {
                         DeployStatusPanel(
                             proposal = proposal,
-                            onDeployClick = onDeployClick,
+                            onDeployClick = {
+                                onIntent(ProposalDetailsScreenIntent.DeployClick(Uuid(proposal.uuid)))
+                            },
                         )
                     }
                 }
@@ -201,7 +195,12 @@ private fun VotingDetailsScreen_Ui(
                         VoteStatusPanel(
                             proposal = proposal,
                             onVote = {
-                                onVote(it)
+                                onIntent(
+                                    ProposalDetailsScreenIntent.MakeVoteClick(
+                                        proposalNumber = proposal.proposalNumber,
+                                        voteType = it
+                                    )
+                                )
                             }
                         )
                     } else {
@@ -443,18 +442,15 @@ private fun VotingButton(
     }
 }
 
-@Preview(widthDp = 360, heightDp = 720)
+@Preview
 @Composable
 fun VotingDetailsScreen_Preview(
     @PreviewParameter(ProposalPreviewProvider::class) proposal: Proposal
 ) {
-    VoteKtTheme() {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            VotingDetailsScreen_Ui(
-                proposal = proposal,
-                onVote = {},
-                onDeployClick = {}
-            )
-        }
+    ScreenPreview {
+        VotingDetailsScreen_Ui(
+            proposal = proposal,
+            onIntent = {},
+        )
     }
 }

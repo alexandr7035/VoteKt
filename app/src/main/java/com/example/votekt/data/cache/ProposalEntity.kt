@@ -9,7 +9,6 @@ data class ProposalEntity(
     @PrimaryKey(autoGenerate = false)
     val uuid: String,
     val isDraft: Boolean,
-    val isSelfCreated: Boolean = false,
     val creatorAddress: String,
     val deployTransactionHash: String?,
     val number: Int? = null,

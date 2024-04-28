@@ -111,4 +111,6 @@
     <string name="contract">Contract</string>
     <string name="send_amount">Send amount</string>
     <string name="finished">Finished</string>
+    <string name="no_explorer_for_network">Can find explorer for current network</string>
+    <string name="address_copied">Address copied</string>
 </resources>

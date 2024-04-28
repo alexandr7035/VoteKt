@@ -11,6 +11,7 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.usecase.account.LogoutUseCase
 import com.example.votekt.domain.usecase.contract.GetContractStateUseCase
 import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent
+import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent.ExplorerUrlClick
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.uiError
@@ -38,6 +39,7 @@ class WalletViewModel(
             is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
             is WalletScreenIntent.LogOut -> reduceLogOut()
             is WalletScreenIntent.ChangeHeaderVisibility -> reduceHeaderVisibility(intent.isVisible)
+            is ExplorerUrlClick -> reduceExplorerClick(intent)
         }
     }
 
@@ -116,6 +118,19 @@ class WalletViewModel(
                 isBalanceLoading = false,
                 balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
                     balance.toEther(), "ETH"
+                )
+            )
+        }
+    }
+
+    private fun reduceExplorerClick(intent: ExplorerUrlClick) {
+        _state.update {
+            it.copy(
+                navigationEvent = triggered(
+                    WalletScreenNavigationEvent.ToExplorer(
+                        exploreType = intent.exploreType,
+                        payload = intent.payload
+                    )
                 )
             )
         }

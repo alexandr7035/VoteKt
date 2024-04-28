@@ -1,4 +1,4 @@
-package com.example.votekt.ui.tx_history
+package com.example.votekt.ui.feature_transaction_history
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -22,23 +21,33 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.R
+import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.TransactionCard
+import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.feature_transaction_history.model.TransactionsScreenIntent
+import com.example.votekt.ui.feature_transaction_history.model.TransactionsScreenNavigationEvent
 import com.example.votekt.ui.theme.Dimensions
-import com.example.votekt.ui.uiError
+import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel()) {
+fun TransactionHistoryScreen(
+    viewModel: TransactionsViewModel = koinViewModel(),
+    onNavigationEvent: (TransactionsScreenNavigationEvent) -> Unit,
+) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
     Scaffold(topBar = {
         AppBar(
             title = stringResource(R.string.transactions),
             actions = {
-                IconButton(onClick = { viewModel.clearTransactions() }) {
+                IconButton(
+                    onClick = {
+                        viewModel.onIntent(TransactionsScreenIntent.ClearClick)
+                    }) {
                     Icon(
                         imageVector = Icons.Outlined.Delete,
                         contentDescription = stringResource(R.string.clear_transactions),
@@ -54,37 +63,44 @@ fun TransactionHistoryScreen(viewModel: TransactionsViewModel = koinViewModel())
                 .padding(top = pv.calculateTopPadding())
         ) {
             when {
-                state.shouldShowData() -> {
-                    if (state.data!!.isNotEmpty()) {
+                state.isLoading -> FullscreenProgressBar()
+                state.error != null -> ErrorFullScreen(
+                    error = state.error,
+                    onRetry = {
+                        // TODO
+                    }
+                )
+
+                else -> {
+                    if (state.transactions.isNotEmpty()) {
                         TransactionsList(
-                            transactions = state.data
+                            transactions = state.transactions,
+                            onExplorerClick = { payload, exploreType ->
+                                viewModel.onIntent(
+                                    TransactionsScreenIntent.ExplorerUrlClick(payload, exploreType)
+                                )
+                            }
                         )
                     } else {
                         NoTransactionsStub()
                     }
                 }
-
-                state.shouldShowFullError() -> {
-                    // FIXME ui state
-                    ErrorFullScreen(error = state.error?.errorType?.uiError!!, onRetry = {
-                        // TODO
-//                        viewModel.loadTransactionList()
-                    })
-                }
-
-                state.shouldShowFullLoading() -> {
-                    Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator()
-                    }
-                }
             }
         }
+    }
+
+    NavigationEventEffect(
+        event = state.navigationEvent,
+        onConsumed = viewModel::consumeNavigationEvent,
+    ) {
+        onNavigationEvent(it)
     }
 }
 
 @Composable
 private fun TransactionsList(
-    transactions: List<TransactionDomain>
+    transactions: List<TransactionDomain>,
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -93,11 +109,13 @@ private fun TransactionsList(
         contentPadding = PaddingValues(
             horizontal = Dimensions.screenPaddingHorizontal,
             vertical = Dimensions.screenPaddingVertical,
-        ))
+        )
+    )
     {
         items(transactions.size) {
             TransactionCard(
-                transaction = transactions[it]
+                transaction = transactions[it],
+                onExplorerClick = onExplorerClick,
             )
         }
     }
