@@ -14,23 +14,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.votekt.domain.account.MnemonicWord
 import com.example.votekt.domain.account.MnemonicWordConfirm
 import com.example.votekt.ui.components.PrimaryButton
 import com.example.votekt.ui.components.SelectorGroup
 import com.example.votekt.ui.components.selector_group.SelectorOption
+import com.example.votekt.ui.core.effects.ComposableLifeCycleEffect
 import com.example.votekt.ui.feature_create_account.model.ConfirmPhraseIntent
 import com.example.votekt.ui.feature_create_account.model.ConfirmPhraseNavigationEvent
 import com.example.votekt.ui.feature_create_account.model.ConfirmPhraseState
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.findActivity
+import com.example.votekt.ui.utils.lockScreenshots
 import com.example.votekt.ui.utils.mock
+import com.example.votekt.ui.utils.unlockScreenshots
 import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
 
@@ -40,13 +46,15 @@ fun ConfirmPhraseScreen(
     viewModel: ConfirmPhraseViewModel = koinViewModel(),
     onConfirm: () -> Unit
 ) {
+    val state = viewModel.state.collectAsStateWithLifecycle().value
+    val activity = LocalContext.current.findActivity()
+
     LaunchedEffect(Unit) {
         viewModel.emitIntent(
             ConfirmPhraseIntent.LoadData(phrase = phraseToConfirm)
         )
     }
 
-    val state = viewModel.state.collectAsStateWithLifecycle().value
     ConfirmPhraseScreen_Ui(
         state = state,
         onIntent = {
@@ -60,6 +68,20 @@ fun ConfirmPhraseScreen(
     ) {
         when (it) {
             ConfirmPhraseNavigationEvent.ToHome -> onConfirm()
+        }
+    }
+
+    ComposableLifeCycleEffect { _, event ->
+        when (event) {
+            Lifecycle.Event.ON_START-> {
+                activity?.lockScreenshots()
+            }
+
+            Lifecycle.Event.ON_PAUSE -> {
+                activity?.unlockScreenshots()
+            }
+
+            else -> {}
         }
     }
 }
