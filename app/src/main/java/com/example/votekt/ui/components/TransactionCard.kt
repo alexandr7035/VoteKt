@@ -34,6 +34,7 @@ import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.preview.TransactionPreviewProvider
 import com.example.votekt.ui.components.web3.ExplorableText
 import com.example.votekt.ui.core.resources.UiText
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
@@ -60,7 +61,10 @@ private fun TransactionCardUi(
         elevation = CardDefaults.cardElevation(4.dp)
     ) {
         Column(
-            Modifier.padding(vertical = 8.dp, horizontal = 12.dp)
+            Modifier.padding(
+                vertical = Dimensions.cardPaddingVertical,
+                horizontal = Dimensions.cardPaddingHorizontal,
+            )
         ) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 val statusUi = remember(transaction.status) {

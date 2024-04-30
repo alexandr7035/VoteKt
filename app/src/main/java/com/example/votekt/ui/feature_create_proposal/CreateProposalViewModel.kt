@@ -6,8 +6,10 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.model.contract.CreateDraftProposal
 import com.example.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import com.example.votekt.domain.usecase.contract.GetContractConfigurationUseCase
+import com.example.votekt.ui.asTextError
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalResult
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenIntent
+import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenNavigationEvent
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenState
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -27,12 +29,40 @@ class CreateProposalViewModel(
 
     fun onIntent(intent: CreateProposalScreenIntent) {
         when (intent) {
-            is CreateProposalScreenIntent.EnterScreen -> reduceEnterScreen()
-            is CreateProposalScreenIntent.SelectProposalDuration -> reduceChooseDuration(intent.duration)
+            is CreateProposalScreenIntent.EnterScreen -> onEnterScreen()
+            is CreateProposalScreenIntent.SelectProposalDuration -> onDurationPickerClick(intent.duration)
+            is CreateProposalScreenIntent.ChangeDescription -> onDescriptionChanged(intent.description)
+            is CreateProposalScreenIntent.ChangeTitle -> onTitleChanged(intent.title)
+            is CreateProposalScreenIntent.SubmitProposal -> onSubmitProposal()
+            is CreateProposalScreenIntent.BackClick -> _state.update {
+                it.copy(navigationEvent = triggered(
+                    CreateProposalScreenNavigationEvent.PopupBack
+                ))
+            }
         }
     }
 
-    private fun reduceEnterScreen() {
+    private fun onTitleChanged(title: String) {
+        _state.update { it.copy(title = title) }
+    }
+
+    private fun onDescriptionChanged(description: String) {
+        _state.update { it.copy(description = description) }
+    }
+
+    private fun onSubmitProposal() {
+        _state.value.let {
+            createProposal(
+                data = CreateDraftProposal(
+                    title = it.title,
+                    desc = it.description,
+                    duration = it.proposalDuration,
+                )
+            )
+        }
+    }
+
+    private fun onEnterScreen() {
         _state.update {
             it.copy(isLoading = true)
         }
@@ -50,13 +80,13 @@ class CreateProposalViewModel(
         }
     }
 
-    private fun reduceChooseDuration(duration: Duration) {
+    private fun onDurationPickerClick(duration: Duration) {
         _state.update {
             it.copy(proposalDuration = duration)
         }
     }
 
-    fun createProposal(data: CreateDraftProposal) {
+    private fun createProposal(data: CreateDraftProposal) {
         viewModelScope.launch {
             _state.update {
                 it.copy(isLoading = true)
@@ -66,13 +96,10 @@ class CreateProposalViewModel(
                 is OperationResult.Success -> {
                     _state.update { prev ->
                         prev.copy(
-                            submitProposalEvent = triggered(
-                                CreateProposalResult(
-                                    error = null,
-                                    proposalUuid = res.data,
-                                )
-                            ),
                             isLoading = false,
+                            navigationEvent = triggered(
+                                CreateProposalScreenNavigationEvent.NavigateToProposal(res.data)
+                            )
                         )
                     }
                 }
@@ -87,6 +114,7 @@ class CreateProposalViewModel(
                                 )
                             ),
                             isLoading = false,
+                            errorEvent = triggered(res.error.errorType.asTextError())
                         )
                     }
                 }

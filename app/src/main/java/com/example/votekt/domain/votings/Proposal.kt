@@ -3,6 +3,7 @@ package com.example.votekt.domain.votings
 import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.transactions.TransactionDomain
+import kotlin.time.Duration
 
 sealed class Proposal(
     open val uuid: String,
@@ -21,6 +22,7 @@ sealed class Proposal(
        override val isSelfCreated: Boolean,
        val deploymentTransaction: TransactionDomain?,
        val deployStatus: BlockchainActionStatus,
+       val duration: Duration,
    ): Proposal(uuid, title, description, creatorAddress, isSelfCreated)
 
     data class Deployed(

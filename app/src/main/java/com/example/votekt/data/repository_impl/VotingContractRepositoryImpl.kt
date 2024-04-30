@@ -39,6 +39,9 @@ import pm.gnosis.model.safeIntValueExact
 import pm.gnosis.utils.hexToByteArray
 import java.math.BigInteger
 import java.util.UUID
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
+import kotlin.time.toDuration
 
 class VotingContractRepositoryImpl(
     private val web3: EthereumClient,
@@ -307,6 +310,9 @@ class VotingContractRepositoryImpl(
                 isSelfCreated = accountRepository.getSelfAddress().hex == proposal.creatorAddress,
                 deploymentTransaction = deploymentTransaction?.mapToData(),
                 deployStatus = mapDeployStatus(),
+                duration = proposal.durationInHours?.let {
+                    it.toDuration(DurationUnit.HOURS)
+                } ?: run { Duration.ZERO },
             )
         }
     }

@@ -58,6 +58,7 @@ import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
 import com.example.votekt.ui.feature_create_account.welcome_screen.WelcomeScreen
 import com.example.votekt.ui.feature_create_proposal.CreateProposalScreen
+import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenNavigationEvent
 import com.example.votekt.ui.feature_proposals.proposal_details.ProposalDetailsScreenNavigationEvent
 import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
 import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
@@ -357,11 +358,15 @@ private fun AppNavHost(
 
         composable(NavDestinations.NewProposal.route) {
             CreateProposalScreen(
-                onProposalCreated = { proposalId ->
-                    navController.navigate("${NavDestinations.VotingDetails.route}/${proposalId.value}")
-                },
-                onBack = {
-                    navController.popBackStack()
+                onNavigationEvent = {
+                    when (it) {
+                        is CreateProposalScreenNavigationEvent.NavigateToProposal -> {
+                            navController.navigate("${NavDestinations.VotingDetails.route}/${it.proposalId.value}")
+                        }
+                        is CreateProposalScreenNavigationEvent.PopupBack -> {
+                            navController.popBackStack()
+                        }
+                    }
                 }
             )
         }

@@ -113,4 +113,5 @@
     <string name="finished">Finished</string>
     <string name="no_explorer_for_network">Can find explorer for current network</string>
     <string name="address_copied">Address copied</string>
+    <string name="deploy_proposal_explanation_template">You need to deploy this proposal to blockchain. It costs %1$s plus network fees</string>
 </resources>

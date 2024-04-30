@@ -222,7 +222,7 @@ private fun WalletToolBar(
                     onClick = {
                         onIntent(WalletScreenIntent.LogOut)
                     },
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(Dimensions.appBarActionIconSize)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_logout),

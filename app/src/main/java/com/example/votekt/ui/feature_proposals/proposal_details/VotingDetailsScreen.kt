@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -43,6 +42,8 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import by.alexandr7035.ethereum.model.ETHER
+import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.R
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.core.Uuid
@@ -51,15 +52,17 @@ import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.RoundedButton
+import com.example.votekt.ui.components.TipView
 import com.example.votekt.ui.components.preview.ProposalPreviewProvider
 import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.components.progress.FullscreenProgressBar
 import com.example.votekt.ui.core.AppBar
+import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.feature_proposals.components.TransactionStatusCard
 import com.example.votekt.ui.feature_proposals.components.VotingBarExtended
 import com.example.votekt.ui.feature_proposals.components.VotingPostCard
 import com.example.votekt.ui.theme.Dimensions
-import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.ui.utils.getVoteColor
 import de.palm.composestateevents.NavigationEventEffect
 import org.koin.androidx.compose.koinViewModel
@@ -87,6 +90,7 @@ fun VotingDetailsScreen(
         screenState.proposal != null -> {
             VotingDetailsScreen_Ui(
                 proposal = screenState.proposal,
+                deploymentFee = screenState.proposalDeploymentFee,
                 onIntent = {
                     viewModel.onIntent(it)
                 }
@@ -112,6 +116,7 @@ fun VotingDetailsScreen(
 @Composable
 private fun VotingDetailsScreen_Ui(
     proposal: Proposal,
+    deploymentFee: Wei?,
     onIntent: (ProposalDetailsScreenIntent) -> Unit,
 ) {
     Scaffold(modifier = Modifier.fillMaxSize(), topBar = {
@@ -155,6 +160,24 @@ private fun VotingDetailsScreen_Ui(
                 ),
             verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
+
+            if (proposal is Proposal.Draft) {
+                deploymentFee?.let {
+                    TipView(
+                        text = UiText.DynamicString(
+                            stringResource(
+                                id = R.string.deploy_proposal_explanation_template,
+                                BalanceFormatter.formatAmountWithSymbol(
+                                    amount = deploymentFee.toEther(),
+                                    symbol = "ETH",
+                                )
+                            ),
+                        ),
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
+            }
+
             Card(
                 elevation = CardDefaults.cardElevation(Dimensions.defaultCardElevation),
             ) {
@@ -450,6 +473,7 @@ fun VotingDetailsScreen_Preview(
     ScreenPreview {
         VotingDetailsScreen_Ui(
             proposal = proposal,
+            deploymentFee = 0.25.ETHER,
             onIntent = {},
         )
     }

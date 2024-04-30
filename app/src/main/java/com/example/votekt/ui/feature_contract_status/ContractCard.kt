@@ -61,8 +61,8 @@ fun ContractCard(
                     shape = RoundedCornerShape(Dimensions.defaultCardCorners)
                 )
                 .padding(
-                    vertical = 12.dp,
-                    horizontal = 8.dp
+                    vertical = Dimensions.cardPaddingVertical,
+                    horizontal = Dimensions.cardPaddingHorizontal
                 ),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
