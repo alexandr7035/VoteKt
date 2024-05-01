@@ -17,7 +17,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
@@ -29,7 +28,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import by.alexandr7035.ethereum.model.WEI
 import com.example.votekt.R
-import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
 import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.transactions.TransactionDomain
@@ -39,9 +37,9 @@ import com.example.votekt.ui.components.web3.ExplorableText
 import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
+import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
-import com.example.votekt.ui.utils.showToast
 
 private const val TRANSACTION_DATE_FORMAT = "dd MMM yyyy HH:mm:ss"
 
