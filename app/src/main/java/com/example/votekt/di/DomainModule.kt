@@ -19,6 +19,8 @@ import com.example.votekt.domain.usecase.blockchain_explorer.GetBlockchainExplor
 import com.example.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import com.example.votekt.domain.usecase.contract.GetContractConfigurationUseCase
 import com.example.votekt.domain.usecase.contract.GetContractStateUseCase
+import com.example.votekt.domain.usecase.demo_mode.GetDemoProposalUseCase
+import com.example.votekt.domain.usecase.demo_mode.IsDemoModeEnabledUseCase
 import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
 import org.koin.dsl.module
 
@@ -50,4 +52,7 @@ val domainModule = module {
     single { GetContractConfigurationUseCase(get()) }
 
     single { GetBlockchainExplorerUrlUseCase(get()) }
+
+    single { IsDemoModeEnabledUseCase(get()) }
+    single { GetDemoProposalUseCase(get()) }
 }

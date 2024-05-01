@@ -1,22 +1,29 @@
-package com.example.votekt.core.config
+package com.example.votekt.domain.repository
 
 import android.content.Context
+import com.example.votekt.BuildConfig
 import com.example.votekt.R
+import com.example.votekt.domain.model.demo_mode.DemoProposal
 import kotlin.random.Random
 
-object ProposalConfig {
+class DemoModeRepositoryImpl(
+    private val context: Context,
+) : DemoModeRepository {
+    override fun isDemoModeEnabled(): Boolean {
+        return BuildConfig.ENABLE_DEMO_NODE
+    }
 
-    fun getRandomMockProposalText(context: Context): Pair<String, String> {
+    override fun getRandomDemoProposal(): DemoProposal {
         val variants = listOf(
-            Pair(
+            DemoProposal(
                 context.getString(R.string.mock_proposal_title_1),
                 context.getString(R.string.mock_proposal_desc_1)
             ),
-            Pair(
+            DemoProposal(
                 context.getString(R.string.mock_proposal_title_2),
                 context.getString(R.string.mock_proposal_desc_2)
             ),
-            Pair(
+            DemoProposal(
                 context.getString(R.string.mock_proposal_title_3),
                 context.getString(R.string.mock_proposal_desc_3)
             )

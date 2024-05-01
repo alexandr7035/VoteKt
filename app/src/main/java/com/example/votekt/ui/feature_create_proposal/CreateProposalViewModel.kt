@@ -6,6 +6,8 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.model.contract.CreateDraftProposal
 import com.example.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import com.example.votekt.domain.usecase.contract.GetContractConfigurationUseCase
+import com.example.votekt.domain.usecase.demo_mode.GetDemoProposalUseCase
+import com.example.votekt.domain.usecase.demo_mode.IsDemoModeEnabledUseCase
 import com.example.votekt.ui.asTextError
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalResult
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenIntent
@@ -22,6 +24,8 @@ import kotlin.time.Duration
 class CreateProposalViewModel(
     private val createDraftProposalUseCase: CreateDraftProposalUseCase,
     private val getContractConfigurationUseCase: GetContractConfigurationUseCase,
+    private val isDemoModeEnabledUseCase: IsDemoModeEnabledUseCase,
+    private val getDemoProposalUseCase: GetDemoProposalUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(CreateProposalScreenState())
@@ -65,6 +69,16 @@ class CreateProposalViewModel(
     private fun onEnterScreen() {
         _state.update {
             it.copy(isLoading = true)
+        }
+
+        if (isDemoModeEnabledUseCase.invoke()) {
+            val demoProposal = getDemoProposalUseCase.invoke()
+            _state.update {
+                it.copy(
+                    title = demoProposal.title,
+                    description = demoProposal.description,
+                )
+            }
         }
 
         viewModelScope.launch {
