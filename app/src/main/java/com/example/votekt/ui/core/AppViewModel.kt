@@ -95,8 +95,8 @@ class AppViewModel(
             }
 
             val isAccountCreated = accountRepository.isAccountPresent()
-            val isAppLocked = false
-            val shouldSetupAppLock = false && isAccountCreated
+            val isAppLocked = checkAppLockUseCase.invoke()
+            val shouldSetupAppLock = !isAppLocked && isAccountCreated
 
             if (!isAccountCreated) {
                 _appState.update {
