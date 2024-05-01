@@ -1,12 +1,14 @@
 package com.example.votekt.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Text
@@ -25,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import by.alexandr7035.ethereum.model.WEI
 import com.example.votekt.R
 import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.core.extensions.getFormattedDate
@@ -39,6 +42,8 @@ import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
 import com.example.votekt.ui.utils.showToast
+
+private const val TRANSACTION_DATE_FORMAT = "dd MMM yyyy HH:mm:ss"
 
 @Composable
 fun TransactionCard(
@@ -94,9 +99,28 @@ private fun TransactionCardUi(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            transaction.gasFee?.let {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
                 Text(
-                    text = "- ${
+                    text = "- ${BalanceFormatter.formatAmount(
+                        amount = transaction.value?.toEther() ?: 0.WEI.toEther(),
+                    )}",
+                    fontSize = 28.sp,
+                )
+
+                Image(
+                    modifier = Modifier.size(28.dp),
+                    painter = painterResource(id = R.drawable.ic_ethereum),
+                    contentDescription = stringResource(R.string.eth)
+                )
+            }
+
+            transaction.gasFee?.let {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Gas fee: ${
                         BalanceFormatter.formatAmountWithSymbol(
                             amount = it.toEther(),
                             symbol = stringResource(R.string.ticker_eth)
@@ -114,7 +138,7 @@ private fun TransactionCardUi(
 
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = transaction.dateSent.getFormattedDate("dd MMM yyyy HH:mm:ss"),
+                text = transaction.dateSent.getFormattedDate(TRANSACTION_DATE_FORMAT),
                 style = TextStyle(
                     textAlign = TextAlign.End,
                     fontSize = 14.sp,
