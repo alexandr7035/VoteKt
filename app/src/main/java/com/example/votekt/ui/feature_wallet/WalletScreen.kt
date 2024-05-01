@@ -50,7 +50,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import by.alexandr7035.ethereum.model.Address
+import org.kethereum.model.Address
 import com.example.votekt.R
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.feature_contract_status.ContractCard
@@ -248,7 +248,7 @@ private fun WalletAddressComponent(address: Address) {
             )
             .clip(RoundedCornerShape(16.dp))
             .clickable {
-                context.copyToClipboard("Address", address.value)
+                context.copyToClipboard("Address", address.hex)
                 context.showToast(R.string.address_copied)
             }
             .padding(

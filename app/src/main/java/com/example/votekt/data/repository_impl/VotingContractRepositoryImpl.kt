@@ -3,7 +3,6 @@ package com.example.votekt.data.repository_impl
 import android.util.Log
 import by.alexandr7035.contracts.VoteKtContractV1
 import by.alexandr7035.ethereum.core.EthereumClient
-import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
@@ -22,9 +21,9 @@ import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.core.Uuid
 import com.example.votekt.domain.model.contract.ContractConfiguration
 import com.example.votekt.domain.model.contract.ContractState
+import com.example.votekt.domain.model.contract.CreateDraftProposal
 import com.example.votekt.domain.transactions.PrepareTransactionData
 import com.example.votekt.domain.transactions.SendTransactionRepository
-import com.example.votekt.domain.model.contract.CreateDraftProposal
 import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingContractRepository
@@ -34,6 +33,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import org.kethereum.model.Address
 import pm.gnosis.model.Solidity
 import pm.gnosis.model.safeIntValueExact
 import pm.gnosis.utils.hexToByteArray
@@ -80,8 +80,8 @@ class VotingContractRepositoryImpl(
                 }
 
                 ContractState(
-                    address = org.kethereum.model.Address(contractAddress),
-                    owner = org.kethereum.model.Address(ksPrefs.pull(PrefKeys.CONTRACT_CREATOR_ADDRESS)),
+                    address = Address(contractAddress),
+                    owner = Address(ksPrefs.pull(PrefKeys.CONTRACT_CREATOR_ADDRESS)),
                     maxProposals = max,
                     currentProposals = currentCount,
                     fullPercentage = percentage,
@@ -155,7 +155,7 @@ class VotingContractRepositoryImpl(
 
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.CreateProposal(
-                    contractAddress = org.kethereum.model.Address(contractAddress),
+                    contractAddress = Address(contractAddress),
                     contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
                     proposalUuid = proposalUuid.value,
                     value = getContractConfiguration().createProposalFee,
@@ -191,7 +191,7 @@ class VotingContractRepositoryImpl(
 
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.VoteOnProposal(
-                    contractAddress = org.kethereum.model.Address(contractAddress),
+                    contractAddress = Address(contractAddress),
                     contractInput = EthTransactionInput(solidityInput.hexToByteArray()),
                     proposalNumber = proposalNumber,
                     vote = when (vote) {
@@ -208,7 +208,7 @@ class VotingContractRepositoryImpl(
 
         val getProposalsCall = VoteKtContractV1.GetProposalsList.encode()
         val getProposalRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = getProposalsCall,
         )
         val decodedGetProposalRes = VoteKtContractV1.GetProposalsList.decode(getProposalRes).param0.items
@@ -219,35 +219,35 @@ class VotingContractRepositoryImpl(
 
     private suspend fun updateContractConfiguration() {
         val ownerRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = VoteKtContractV1.Owner.encode()
         )
         val ownerDecoded = VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
         ksPrefs.push(PrefKeys.CONTRACT_CREATOR_ADDRESS, ownerDecoded)
 
         val maxProposalRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_COUNT.encode()
         )
         val decodedMaxProposals = VoteKtContractV1.MAX_PROPOSAL_COUNT.decode(maxProposalRes).param0.value.safeIntValueExact()
         ksPrefs.push(PrefKeys.CONTRACT_MAX_PROPOSALS, decodedMaxProposals)
 
         val proposalFeeRes = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = VoteKtContractV1.CREATE_PROPOSAL_FEE.encode()
         )
         val proposalFeeDecoded = VoteKtContractV1.CREATE_PROPOSAL_FEE.decode(proposalFeeRes).param0.value
         ksPrefs.push(PrefKeys.CONTRACT_CREATE_PROPOSAL_FEE, proposalFeeDecoded)
 
         val proposalTitleLimit = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_TITLE_LENGTH.encode()
         )
         val proposalTitleLimitDecoded = VoteKtContractV1.MAX_PROPOSAL_TITLE_LENGTH.decode(proposalTitleLimit).param0.value.toInt()
         ksPrefs.push(PrefKeys.CONTRACT_MAX_PROPOSAL_TITLE_LENGTH, proposalTitleLimitDecoded)
 
         val proposalDescriptionLimit = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_DESCRIPTION_LENGTH.encode()
         )
         val proposalDescriptionLimitDecoded =
@@ -274,7 +274,7 @@ class VotingContractRepositoryImpl(
             }
 
             else -> {
-                println("${TAG} unknown contract event, skip")
+                Log.d(TAG, "unknown contract event, skip")
             }
         }
     }
@@ -328,7 +328,7 @@ class VotingContractRepositoryImpl(
     private suspend fun processProposalCreatedEvent(eventData: VoteKtContractV1.Events.ProposalCreated.Arguments) {
         val input = VoteKtContractV1.GetProposalDetails.encode(eventData.proposalnumber)
         val res = web3.sendEthCall(
-            to = org.kethereum.model.Address(contractAddress),
+            to = Address(contractAddress),
             input = input
         )
 

@@ -1,9 +1,9 @@
 package by.alexandr7035.ethereum_impl.model
 
-import by.alexandr7035.ethereum.model.Address
-import java.math.BigInteger
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import org.kethereum.model.Address
+import java.math.BigInteger
 
 @JsonClass(generateAdapter = true)
 data class JsonRpcRequest(

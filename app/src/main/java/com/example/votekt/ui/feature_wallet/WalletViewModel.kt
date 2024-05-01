@@ -2,9 +2,7 @@ package com.example.votekt.ui.feature_wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.alexandr7035.ethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
-import com.example.votekt.ui.utils.BalanceFormatter
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.ErrorType
 import com.example.votekt.domain.core.OperationResult
@@ -15,6 +13,7 @@ import com.example.votekt.ui.feature_wallet.model.WalletScreenIntent.ExplorerUrl
 import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.feature_wallet.model.WalletScreenState
 import com.example.votekt.ui.uiError
+import com.example.votekt.ui.utils.BalanceFormatter
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -76,7 +75,7 @@ class WalletViewModel(
         viewModelScope.launch {
             val address = accountRepository.getSelfAddress()
             _state.update {
-                it.copy(address = Address(address.hex))
+                it.copy(address = address)
             }
         }
 

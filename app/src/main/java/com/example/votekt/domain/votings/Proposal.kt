@@ -1,6 +1,6 @@
 package com.example.votekt.domain.votings
 
-import by.alexandr7035.ethereum.model.Address
+import org.kethereum.model.Address
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.transactions.TransactionDomain
 import kotlin.time.Duration

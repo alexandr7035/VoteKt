@@ -1,7 +1,7 @@
 package com.example.votekt.ui.utils
 
-import by.alexandr7035.ethereum.model.Address
+import org.kethereum.model.Address
 
 fun Address.prettify(): String {
-    return this.value.prettifyAddress()
+    return this.hex.prettifyAddress()
 }

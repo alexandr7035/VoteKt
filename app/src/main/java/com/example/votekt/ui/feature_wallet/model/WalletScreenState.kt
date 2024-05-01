@@ -1,10 +1,10 @@
 package com.example.votekt.ui.feature_wallet.model
 
-import by.alexandr7035.ethereum.model.Address
 import com.example.votekt.domain.model.contract.ContractState
 import com.example.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
+import org.kethereum.model.Address
 
 data class WalletScreenState(
     val isBalanceLoading: Boolean = true,

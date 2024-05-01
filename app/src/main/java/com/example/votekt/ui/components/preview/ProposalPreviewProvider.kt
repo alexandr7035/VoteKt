@@ -1,7 +1,7 @@
 package com.example.votekt.ui.components.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import by.alexandr7035.ethereum.model.Address
+import org.kethereum.model.Address
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.domain.core.BlockchainActionStatus
 import com.example.votekt.domain.transactions.TransactionDomain

@@ -106,7 +106,7 @@ fun VotingPostCard(
         )
 
         Creator(
-            address = proposal.creatorAddress.value,
+            address = proposal.creatorAddress.hex,
             isSelf = proposal.isSelfCreated,
             onExplorerClick = onExplorerClick,
         )
