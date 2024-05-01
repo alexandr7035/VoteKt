@@ -53,6 +53,12 @@ class VotingDetailsViewModel(
     }
 
     fun loadProposalById(id: String) {
+        val deploymentFee = runCatching {
+            votingContractRepository.getContractConfiguration().createProposalFee
+        }.getOrNull()
+
+        _state.update { it.copy(proposalDeploymentFee = deploymentFee) }
+
         votingContractRepository
             .getProposalById(id)
             .catch { error ->

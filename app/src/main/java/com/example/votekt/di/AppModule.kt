@@ -28,6 +28,8 @@ import com.example.votekt.data.workers.SyncProposalsWorker
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.account.MnemonicRepository
 import com.example.votekt.domain.repository.BlockchainExplorerRepository
+import com.example.votekt.domain.repository.DemoModeRepository
+import com.example.votekt.domain.repository.DemoModeRepositoryImpl
 import com.example.votekt.domain.repository.WebsocketManager
 import com.example.votekt.domain.security.AppLockRepository
 import com.example.votekt.domain.transactions.SendTransactionRepository
@@ -86,7 +88,7 @@ val appModule = module {
     viewModel { VotingDetailsViewModel(get()) }
     viewModel { ProposalsViewModel(get(), get()) }
     viewModel { TransactionsViewModel(get()) }
-    viewModel { CreateProposalViewModel(get(), get()) }
+    viewModel { CreateProposalViewModel(get(), get(), get(), get()) }
     viewModel { WalletViewModel(get(), get(), get()) }
 
     viewModel { LockScreenViewModel(
@@ -242,5 +244,9 @@ val appModule = module {
 
     single<BlockchainExplorerRepository> {
         BlockchainExplorerRepositoryImpl()
+    }
+
+    single<DemoModeRepository> {
+        DemoModeRepositoryImpl(androidApplication().applicationContext)
     }
 }

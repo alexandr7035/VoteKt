@@ -2,6 +2,7 @@ package com.example.votekt.ui.utils
 
 import android.content.Context
 import com.example.votekt.R
+import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
@@ -13,6 +14,20 @@ object DateFormatters {
         }
         val duration = (time - currentTime).toDuration(DurationUnit.MILLISECONDS)
 
+        val days = duration.inWholeDays.toInt()
+        val hours = (duration.inWholeHours % 24).toInt()
+        val minutes = (duration.inWholeMinutes % 60).toInt()
+        val seconds = (duration.inWholeSeconds % 60).toInt()
+
+        return when {
+            days > 0 -> context.resources.getQuantityString(R.plurals.day_plural, days, days)
+            hours > 0 -> context.resources.getQuantityString(R.plurals.hour_plural, hours, hours)
+            minutes > 0 -> context.resources.getQuantityString(R.plurals.minute_plural, minutes, minutes)
+            else -> context.resources.getQuantityString(R.plurals.second_plural, seconds, seconds)
+        }
+    }
+
+    fun formatDurationTime(duration: Duration, context: Context): String {
         val days = duration.inWholeDays.toInt()
         val hours = (duration.inWholeHours % 24).toInt()
         val minutes = (duration.inWholeMinutes % 60).toInt()

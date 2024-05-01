@@ -23,6 +23,8 @@ object Dimensions {
     val tabTextLineHeight= 20.sp
 
     val cardListSpacing = 16.dp
+    val cardPaddingHorizontal = 8.dp
+    val cardPaddingVertical = 12.dp
 
     val seedInputCorners = 20.dp
     val seedInputPaddingHorizontal = 24.dp
@@ -36,4 +38,6 @@ object Dimensions {
 
     val defaultCardElevation = 4.dp
     val defaultCardCorners = 4.dp
+
+    val appBarActionIconSize = 28.dp
 }

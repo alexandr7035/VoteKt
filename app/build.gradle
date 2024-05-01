@@ -32,6 +32,7 @@ android {
             buildConfigField("String", "CONTRACT_ADDRESS", TESTNET_CONTRACT_ADDRESS)
             buildConfigField("String", "TEST_MNEMONIC", TESTNET_TEST_MNEMONIC)
             buildConfigField("int", "CHAIN_ID", TESTNET_CHAIN_ID)
+            buildConfigField("Boolean", "ENABLE_DEMO_NODE", ENABLE_DEMO_NODE)
         }
 
         local {
@@ -43,6 +44,7 @@ android {
             buildConfigField("String", "TEST_MNEMONIC", LOCAL_TEST_MNEMONIC)
             buildConfigField("String", "TEST_ADDRESS", LOCAL_TEST_ADDRESS)
             buildConfigField("int", "CHAIN_ID", LOCAL_CHAIN_ID)
+            buildConfigField("Boolean", "ENABLE_DEMO_NODE", ENABLE_DEMO_NODE)
         }
     }
 

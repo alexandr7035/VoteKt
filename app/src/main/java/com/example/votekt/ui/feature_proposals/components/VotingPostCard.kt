@@ -74,8 +74,10 @@ fun VotingPostCard(
     proposal: Proposal,
     isExpanded: Boolean = false,
     showVotingBar: Boolean = true,
-    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit = {_, _ -> },
+    onExplorerClick: (payload: String, exploreType: ExploreType) -> Unit = { _, _ -> },
 ) {
+    val context = LocalContext.current
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,8 +87,8 @@ fun VotingPostCard(
                 shape = RoundedCornerShape(Dimensions.defaultCardCorners)
             )
             .padding(
-                vertical = 12.dp,
-                horizontal = 8.dp
+                vertical = Dimensions.cardPaddingVertical,
+                horizontal = Dimensions.cardPaddingHorizontal
             ),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
@@ -131,15 +133,30 @@ fun VotingPostCard(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if (proposal is Proposal.Deployed) {
-                if (proposal.isFinished.not()) {
-                    RemainingTimeText(
-                        time = proposal.expirationTime,
-                    )
-                } else {
+            when (proposal) {
+                is Proposal.Deployed -> {
+                    if (proposal.isFinished.not()) {
+                        RemainingTimeText(
+                            time = proposal.expirationTime,
+                        )
+                    } else {
+                        TimeText(
+                            text = stringResource(id = R.string.finished),
+                            showAccent = false,
+                        )
+                    }
+                }
+
+                is Proposal.Draft -> {
                     TimeText(
-                        text = stringResource(id = R.string.finished),
-                        showAccent = false,
+                        text = stringResource(
+                            id = R.string.proposal_duration_template,
+                            DateFormatters . formatDurationTime (
+                                duration = proposal.duration,
+                                context = context,
+                            )
+                        ),
+                        showAccent = false
                     )
                 }
             }

@@ -16,6 +16,7 @@
 
     <string name="mock_proposal_title_3">Community Arts - Unleash Creativity, Enrich Lives!</string>
     <string name="mock_proposal_desc_3">Embrace the arts and support our community\'s creative spirit. This voting campaign seeks to invest in art programs, public installations, and cultural events that inspire and enrich lives. Your vote can spark a colorful revolution in our community. Together, let\'s make art an integral part of our collective experience. Vote now and unlock creativity!</string>
+
     <string name="new_proposal">New proposal</string>
     <string name="try_again">Try Again</string>
     <string name="transactions">Transactions</string>
@@ -113,4 +114,5 @@
     <string name="finished">Finished</string>
     <string name="no_explorer_for_network">Can find explorer for current network</string>
     <string name="address_copied">Address copied</string>
+    <string name="deploy_proposal_explanation_template">You need to deploy this proposal to blockchain. It costs %1$s plus network fees</string>
 </resources>

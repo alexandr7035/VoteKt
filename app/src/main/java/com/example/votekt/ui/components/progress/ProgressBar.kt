@@ -14,6 +14,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.votekt.ui.components.DotsProgressIndicator
 import com.example.votekt.ui.theme.VoteKtTheme
 
 @Composable
@@ -29,11 +30,7 @@ fun FullscreenProgressBar(
             },
         contentAlignment = Alignment.Center
     ) {
-        CircularProgressIndicator(
-            color = MaterialTheme.colorScheme.primary,
-            strokeWidth = 6.dp,
-            modifier = Modifier.then(Modifier.size(56.dp))
-        )
+        DotsProgressIndicator()
     }
 }
 

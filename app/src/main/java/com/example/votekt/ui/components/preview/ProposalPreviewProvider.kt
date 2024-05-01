@@ -11,6 +11,7 @@ import com.example.votekt.domain.votings.Proposal
 import com.example.votekt.domain.votings.VoteType
 import com.example.votekt.domain.votings.VotingData
 import java.math.BigInteger
+import kotlin.time.Duration.Companion.days
 
 class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
     private val mockDeployTransaction = TransactionDomain(
@@ -39,7 +40,8 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            deployStatus = BlockchainActionStatus.NotCompleted.Failed
+            deployStatus = BlockchainActionStatus.NotCompleted.Failed,
+            duration = 1.days,
         ),
         Proposal.Draft(
             uuid = "123",
@@ -48,7 +50,8 @@ class ProposalPreviewProvider: PreviewParameterProvider<Proposal> {
             deploymentTransaction = mockDeployTransaction,
             creatorAddress = Address("0x12345678abcd"),
             isSelfCreated = true,
-            deployStatus = BlockchainActionStatus.Pending
+            deployStatus = BlockchainActionStatus.Pending,
+            duration = 1.days,
         ),
         Proposal.Deployed(
             uuid = "123",

@@ -26,6 +26,7 @@ import com.example.votekt.ui.core.effects.OnResumeEffect
 import com.example.votekt.ui.feature_app_lock.ui.AppLockScreenComponent
 import com.example.votekt.ui.feature_app_lock.ui.BiometricAuthResult
 import com.example.votekt.ui.feature_app_lock.ui.BiometricsHelper
+import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.utils.findActivity
 import com.example.votekt.ui.utils.showToast
 import de.palm.composestateevents.NavigationEventEffect
@@ -59,7 +60,7 @@ fun LockScreen(
                         Icon(
                             painterResource(id = R.drawable.ic_logout),
                             stringResource(id = R.string.log_out),
-                            modifier = Modifier.size(28.dp)
+                            modifier = Modifier.size(Dimensions.appBarActionIconSize)
                         )
                     }
                 },
