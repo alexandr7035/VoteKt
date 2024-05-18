@@ -5,79 +5,37 @@ import com.example.votekt.R
 import com.example.votekt.domain.transactions.ReviewTransactionData
 import com.example.votekt.domain.transactions.TransactionEstimationError
 import com.example.votekt.domain.transactions.TransactionType
-import com.example.votekt.domain.transactions.isContractInteraction
 import com.example.votekt.ui.core.resources.UiText
+import com.example.votekt.ui.feature_app_lock.biometrics.BiometricsPromptUi
+import de.palm.composestateevents.StateEvent
+import de.palm.composestateevents.consumed
 import org.kethereum.model.Address
 
-sealed class ReviewTransactionDataUi(
-    open val transactionType: TransactionType,
-    open val recipient: Address,
-    open val totalEstimatedFee: Wei?,
-    open val minerTipFee: Wei?,
-    open val estimationError: UiText?,
-    open val value: Wei?,
-) {
-    data class SendAmount(
-        override val value: Wei,
-        override val transactionType: TransactionType,
-        override val recipient: Address,
-        override val totalEstimatedFee: Wei?,
-        override val minerTipFee: Wei?,
-        override val estimationError: UiText?,
-    ) : ReviewTransactionDataUi(
-        recipient = recipient,
-        totalEstimatedFee = totalEstimatedFee,
-        minerTipFee = minerTipFee,
-        transactionType = transactionType,
-        estimationError = estimationError,
-        value = value,
-    )
-
-    data class ContractInteraction(
-        val contractInput: String,
-        override val value: Wei?,
-        override val transactionType: TransactionType,
-        override val recipient: Address,
-        override val totalEstimatedFee: Wei?,
-        override val minerTipFee: Wei?,
-        override val estimationError: UiText?,
-    ) : ReviewTransactionDataUi(
-        recipient = recipient,
-        totalEstimatedFee = totalEstimatedFee,
-        minerTipFee = minerTipFee,
-        transactionType = transactionType,
-        estimationError = estimationError,
-        value = value,
-    )
-}
-
-fun ReviewTransactionDataUi.canSendTransaction() = this.totalEstimatedFee != null && this.estimationError == null
+data class ReviewTransactionDataUi(
+    val transactionType: TransactionType,
+    val value: Wei?,
+    val recipient: Address,
+    val totalEstimatedFee: Wei?,
+    val minerTipFee: Wei?,
+    val error: UiText?,
+    val showBiometricConfirmationEvent: StateEvent = consumed,
+    val biometricsPromptState: BiometricsPromptUi = BiometricsPromptUi(
+        title = UiText.StringResource(R.string.unlock_app_biometrics),
+        cancelBtnText = UiText.StringResource(R.string.cancel)
+    ),
+    val isConfirmBtnEnabled: Boolean,
+)
 
 fun ReviewTransactionData.mapToUi(): ReviewTransactionDataUi {
-    return when {
-        this.transactionType.isContractInteraction() -> {
-            ReviewTransactionDataUi.ContractInteraction(
-                recipient = this.to,
-                value = this.value,
-                contractInput = this.input!!,
-                minerTipFee = this.minerTipFee,
-                totalEstimatedFee = this.totalEstimatedFee,
-                transactionType = this.transactionType,
-                estimationError = this.estimationError?.mapToUi(),
-            )
-        }
-
-        else -> {
-            ReviewTransactionDataUi.SendAmount(
-                recipient = this.to,
-                value = this.value!!,
-                minerTipFee = this.minerTipFee,
-                totalEstimatedFee = this.totalEstimatedFee,
-                transactionType = this.transactionType,
-                estimationError = this.estimationError?.mapToUi(),
-            )
-        }
-    }
+    return ReviewTransactionDataUi(
+        recipient = this.to,
+        value = this.value,
+        minerTipFee = this.minerTipFee,
+        totalEstimatedFee = this.totalEstimatedFee,
+        transactionType = this.transactionType,
+        error = this.estimationError?.mapToUi(),
+        isConfirmBtnEnabled = this.estimationError == null && this.totalEstimatedFee != null
+    )
 }
 
 private fun TransactionEstimationError.mapToUi(): UiText {

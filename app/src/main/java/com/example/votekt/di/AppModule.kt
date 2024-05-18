@@ -77,6 +77,7 @@ val appModule = module {
         checkAppLockUseCase = get(),
         connectToNodeUseCase = get(),
         getBlockchainExplorerUrlUseCase = get(),
+        checkAppLockedWithBiometricsUseCase = get(),
     ) }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {

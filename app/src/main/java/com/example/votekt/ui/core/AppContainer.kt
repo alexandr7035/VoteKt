@@ -157,6 +157,7 @@ fun AppContainer(
                                 ReviewTransactionDialog(
                                     onIntent = viewModel::onTransactionIntent,
                                     state = state.txConfirmationState!!,
+                                    onBiometricAuthEventConsumed = viewModel::consumeBiometricTransactionConfirmationEvent
                                 )
                             }
                         }

@@ -5,14 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
+import com.example.votekt.R
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
 import com.example.votekt.domain.model.blockchain_explorer.ExploreType
 import com.example.votekt.domain.security.CheckAppLockUseCase
+import com.example.votekt.domain.security.CheckAppLockedWithBiometricsUseCase
 import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.ReviewTransactionData
 import com.example.votekt.domain.usecase.blockchain_explorer.GetBlockchainExplorerUrlUseCase
 import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
+import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionIntent
 import com.example.votekt.ui.feature_confirm_transaction.mapToUi
 import de.palm.composestateevents.consumed
@@ -30,6 +33,7 @@ class AppViewModel(
     private val sendTransactionRepository: SendTransactionRepository,
     private val web3EventsRepository: EthereumEventListener,
     private val checkAppLockUseCase: CheckAppLockUseCase,
+    private val checkAppLockedWithBiometricsUseCase: CheckAppLockedWithBiometricsUseCase,
     private val getBlockchainExplorerUrlUseCase: GetBlockchainExplorerUrlUseCase,
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(
@@ -64,29 +68,33 @@ class AppViewModel(
 
     fun onTransactionIntent(intent: ReviewTransactionIntent) {
         when (intent) {
-            is ReviewTransactionIntent.SubmitTransaction -> {
-                viewModelScope.launch {
-                    val confirmTx = OperationResult.runWrapped {
-                        sendTransactionRepository.confirmTransaction()
-                    }
+            is ReviewTransactionIntent.SubmitTransactionClick -> {
+                onSubmitTransactionClick()
+            }
 
-                    when (confirmTx) {
-                        is OperationResult.Failure -> {}
-                        is OperationResult.Success -> {}
-                    }
+            is ReviewTransactionIntent.BiometricAuthUnlock -> {
+                if (intent.isSuccessful) {
+                    submitTransaction()
+                } else {
+                    _appState.update { it.copy(txConfirmationState =it.txConfirmationState?.copy(
+                        error = UiText.StringResource(R.string.authentication_is_required)
+                    )) }
                 }
             }
 
             is ReviewTransactionIntent.DismissDialog -> {
-                viewModelScope.launch {
-                    sendTransactionRepository.cancelTransaction()
-                }
+                cancelTransaction()
             }
 
             is ReviewTransactionIntent.ExplorerUrlClick -> onOpenExplorer(intent.payload, intent.exploreType)
         }
     }
 
+    private fun cancelTransaction() {
+        viewModelScope.launch {
+            sendTransactionRepository.cancelTransaction()
+        }
+    }
 
     private fun reduceEnterApp() {
         viewModelScope.launch {
@@ -158,8 +166,41 @@ class AppViewModel(
     }
 
     private fun reduceConfirmTransactionState(reviewTransactionData: ReviewTransactionData?) {
+        val isAppLocked = checkAppLockedWithBiometricsUseCase.invoke()
+
         _appState.update {
-            it.copy(txConfirmationState = reviewTransactionData?.mapToUi())
+            it.copy(
+                txConfirmationState = reviewTransactionData?.mapToUi()
+            )
+        }
+    }
+
+    private fun onSubmitTransactionClick() {
+        val isAppLocked = checkAppLockedWithBiometricsUseCase.invoke()
+
+        if (!isAppLocked) {
+            submitTransaction()
+        } else {
+            _appState.update {
+                it.copy(
+                    txConfirmationState = it.txConfirmationState?.copy(
+                        showBiometricConfirmationEvent = triggered
+                    )
+                )
+            }
+        }
+    }
+
+    private fun submitTransaction() {
+        viewModelScope.launch {
+            val confirmTx = OperationResult.runWrapped {
+                sendTransactionRepository.confirmTransaction()
+            }
+
+            when (confirmTx) {
+                is OperationResult.Failure -> {}
+                is OperationResult.Success -> {}
+            }
         }
     }
 
@@ -194,6 +235,14 @@ class AppViewModel(
 
     fun consumeOpenExplorerEvent() {
         _appState.update { it.copy(openExplorerEvent = consumed()) }
+    }
+
+    fun consumeBiometricTransactionConfirmationEvent() {
+        _appState.update { it.copy(
+            txConfirmationState = it.txConfirmationState?.copy(
+                showBiometricConfirmationEvent = consumed
+            )
+        ) }
     }
 
     private companion object {

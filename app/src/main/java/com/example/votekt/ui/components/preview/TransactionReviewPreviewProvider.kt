@@ -11,27 +11,27 @@ import org.kethereum.model.Address
 class TransactionReviewPreviewProvider : PreviewParameterProvider<ReviewTransactionDataUi> {
     override val values: Sequence<ReviewTransactionDataUi>
         get() = sequenceOf(
-            ReviewTransactionDataUi.SendAmount(
+            ReviewTransactionDataUi(
                 transactionType = TransactionType.PAYMENT,
                 recipient = Address(SAMPLE_ADDRESS),
                 value = 0.24.ETHER,
                 minerTipFee = 1.GWEI,
                 totalEstimatedFee = 30.GWEI,
-                estimationError = UiText.DynamicString("Insufficient balance"),
+                error = UiText.DynamicString("Insufficient balance"),
+                isConfirmBtnEnabled = false,
             ),
-            ReviewTransactionDataUi.ContractInteraction(
+            ReviewTransactionDataUi(
                 transactionType = TransactionType.VOTE,
                 recipient = Address(SAMPLE_ADDRESS),
-                contractInput = SAMPLE_CONTRACT_INPUT,
                 minerTipFee = 1.GWEI,
                 totalEstimatedFee = 30.GWEI,
-                estimationError = null,
+                error = null,
                 value = 0.1.ETHER,
+                isConfirmBtnEnabled = true,
             )
         )
 
     private companion object {
-        const val SAMPLE_CONTRACT_INPUT = "0x67043cae0000000000000000000000005a9dac9315fdd1c3d13ef8af7fdfeb522db08f020000000000000000000000000000000000000000000000000000000058a2023000000000000000000000000"
         const val SAMPLE_ADDRESS = "0xb794f5ea0ba39494ce839613fffba74279579268"
     }
 }
