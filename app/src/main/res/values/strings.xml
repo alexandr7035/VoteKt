@@ -116,4 +116,12 @@
     <string name="address_copied">Address copied</string>
     <string name="deploy_proposal_explanation_template">You need to deploy this proposal to blockchain. It costs %1$s plus network fees</string>
     <string name="authentication_is_required">Authentication is required</string>
+
+    <string name="welcome_title_1">Empower Your Voice</string>
+    <string name="welcome_title_2">Decide with Confidence</string>
+    <string name="welcome_title_3">Innovate Together</string>
+
+    <string name="welcome_desc_1">Take part in shaping the future by securely casting your vote on the blockchain</string>
+    <string name="welcome_desc_2">Experience transparent and tamper-proof voting, ensuring every decision counts</string>
+    <string name="welcome_desc_3">Share your ideas and collaborate with others to drive meaningful change in your community</string>
 </resources>

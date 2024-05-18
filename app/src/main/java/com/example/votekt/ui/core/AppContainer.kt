@@ -56,7 +56,7 @@ import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenNavigationEv
 import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDialog
 import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
 import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
-import com.example.votekt.ui.feature_create_account.welcome_screen.WelcomeScreen
+import com.example.votekt.ui.feature_welcome.WelcomeScreen
 import com.example.votekt.ui.feature_create_proposal.CreateProposalScreen
 import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenNavigationEvent
 import com.example.votekt.ui.feature_proposals.proposal_details.ProposalDetailsScreenNavigationEvent
