@@ -23,8 +23,8 @@ fun DotsIndicator(
     selectedColor: Color,
     unSelectedColor: Color,
     size: Dp,
+    modifier: Modifier = Modifier,
     dotSpace: Dp = 4.dp,
-    modifier: Modifier = Modifier
 ) {
 
     LazyRow(

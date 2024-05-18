@@ -12,7 +12,7 @@ class NumberTypeConvertors {
     }
 
     @TypeConverter
-    fun toWei(number: String?): BigInteger? {
+    fun toBigInteger(number: String?): BigInteger? {
         return number?.parseToBigInteger()
     }
 }

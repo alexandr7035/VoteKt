@@ -278,7 +278,7 @@ private fun BottomNavigationTransition(
 ) {
     val animationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        animationSpec = BottomNavigationAnimationSpec
+        animationSpec = BottomNavigationAnimationSpec, label = ""
     )
 
     val color = lerp(inactiveColor, activeColor, animationProgress)

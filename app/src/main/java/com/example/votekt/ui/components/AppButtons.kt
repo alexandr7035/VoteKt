@@ -28,9 +28,9 @@ import com.example.votekt.ui.theme.VoteKtTheme
 @Composable
 fun PrimaryButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     buttonColor: Color? = null,
     textColor: Color? = null,
     leadingIcon: @Composable () -> Unit = {}
@@ -96,9 +96,9 @@ fun SecondaryButton(
 @Composable
 fun RoundedButton(
     text: String,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit,
     enabled: Boolean = true,
-    modifier: Modifier = Modifier,
     buttonColor: Color? = null,
     textColor: Color? = null,
     leadingIcon: @Composable () -> Unit = {}
