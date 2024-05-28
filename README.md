@@ -101,6 +101,8 @@ Choose localDebug build variant and build
 
 [Exploring the Differences Between Payable and Non-Payable Functions in Solidity: An In-Depth Analysis](https://medium.com/coinmonks/exploring-the-differences-between-payable-and-non-payable-functions-in-solidity-an-in-depth-d031c6ae577b#:~:text=In%20Solidity%2C%20a%20payable%20function,balance%E2%80%9D%20property.)
 
+[Why are Encoders used in Solidity?](https://medium.com/coinmonks/why-are-encoders-used-in-solidity-6930e913ce48)
+
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)  
