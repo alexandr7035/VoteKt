@@ -44,7 +44,7 @@ import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
 class VotingContractRepositoryImpl(
-    private val web3: EthereumClient,
+    private val ethereumClient: EthereumClient,
     private val contractAddress: String,
     private val accountRepository: AccountRepository,
     private val proposalsDao: ProposalsDao,
@@ -153,6 +153,8 @@ class VotingContractRepositoryImpl(
                 }
             )
 
+            Log.d(TAG, "encoded tx ${solidityInput}")
+
             sendTransactionRepository.requirePrepareTransaction(
                 data = PrepareTransactionData.ContractInteraction.CreateProposal(
                     contractAddress = Address(contractAddress),
@@ -207,46 +209,49 @@ class VotingContractRepositoryImpl(
         updateContractConfiguration()
 
         val getProposalsCall = VoteKtContractV1.GetProposalsList.encode()
-        val getProposalRes = web3.sendEthCall(
+        val getProposalRes = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = getProposalsCall,
         )
-        val decodedGetProposalRes = VoteKtContractV1.GetProposalsList.decode(getProposalRes).param0.items
+
+        val decodedGetProposalRes = VoteKtContractV1.GetProposalsList
+            .decode(getProposalRes)
+            .param0.items
 
         decodedGetProposalRes.forEach { raw -> updateProposalInCache(raw) }
         proposalsDao.cleanUpProposals(remainingProposals = decodedGetProposalRes.map { it.uuid.value })
     }
 
     private suspend fun updateContractConfiguration() {
-        val ownerRes = web3.sendEthCall(
+        val ownerRes = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = VoteKtContractV1.Owner.encode()
         )
         val ownerDecoded = VoteKtContractV1.Owner.decode(ownerRes).param0.value.asEthereumAddressString()
         ksPrefs.push(PrefKeys.CONTRACT_CREATOR_ADDRESS, ownerDecoded)
 
-        val maxProposalRes = web3.sendEthCall(
+        val maxProposalRes = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_COUNT.encode()
         )
         val decodedMaxProposals = VoteKtContractV1.MAX_PROPOSAL_COUNT.decode(maxProposalRes).param0.value.safeIntValueExact()
         ksPrefs.push(PrefKeys.CONTRACT_MAX_PROPOSALS, decodedMaxProposals)
 
-        val proposalFeeRes = web3.sendEthCall(
+        val proposalFeeRes = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = VoteKtContractV1.CREATE_PROPOSAL_FEE.encode()
         )
         val proposalFeeDecoded = VoteKtContractV1.CREATE_PROPOSAL_FEE.decode(proposalFeeRes).param0.value
         ksPrefs.push(PrefKeys.CONTRACT_CREATE_PROPOSAL_FEE, proposalFeeDecoded)
 
-        val proposalTitleLimit = web3.sendEthCall(
+        val proposalTitleLimit = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_TITLE_LENGTH.encode()
         )
         val proposalTitleLimitDecoded = VoteKtContractV1.MAX_PROPOSAL_TITLE_LENGTH.decode(proposalTitleLimit).param0.value.toInt()
         ksPrefs.push(PrefKeys.CONTRACT_MAX_PROPOSAL_TITLE_LENGTH, proposalTitleLimitDecoded)
 
-        val proposalDescriptionLimit = web3.sendEthCall(
+        val proposalDescriptionLimit = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = VoteKtContractV1.MAX_PROPOSAL_DESCRIPTION_LENGTH.encode()
         )
@@ -327,7 +332,7 @@ class VotingContractRepositoryImpl(
 
     private suspend fun processProposalCreatedEvent(eventData: VoteKtContractV1.Events.ProposalCreated.Arguments) {
         val input = VoteKtContractV1.GetProposalDetails.encode(eventData.proposalnumber)
-        val res = web3.sendEthCall(
+        val res = ethereumClient.sendEthCall(
             to = Address(contractAddress),
             input = input
         )
@@ -348,7 +353,6 @@ class VotingContractRepositoryImpl(
                     votesAgainst = contractProposal.votesagainst.value.toInt(),
                     createdAt = contractProposal.creationtimemills.value.toLong() * 1000L,
                     expiresAt = contractProposal.expirationtimemills.value.toLong() * 1000L,
-                    // TODO update contract with self vote
                 )
             )
         } ?: run {

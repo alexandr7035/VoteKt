@@ -25,7 +25,7 @@ import java.math.BigInteger
 class EthereumClientImpl(
     private val api: RetrofitEthereumRpcApi
 ): EthereumClient {
-    override suspend fun <R : EthRequest<*>> request(request: R): R {
+    private suspend fun <R : EthRequest<*>> request(request: R): R {
         return request.toRpcRequest().let { rpcRequest ->
             api.post(rpcRequest.request())
                 .let {
@@ -35,7 +35,7 @@ class EthereumClientImpl(
         }
     }
 
-    override suspend fun <R : EthBulkRequest> request(bulk: R): R {
+    private suspend fun <R : EthBulkRequest> request(bulk: R): R {
         return bulk.requests.associate { it.id to it.toRpcRequest() }
             .let { rpcRequests ->
                 api.post(rpcRequests.values.map { it.request() })

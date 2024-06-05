@@ -62,7 +62,7 @@ class EthereumEventListenerImpl(
                 }
                 .filterIsInstance<Frame.Text>()
                 .onEach {
-                    Log.d("WSS_TAG", "raw websocket event $it")
+                    Log.d(LOG_TAG, "raw websocket event ${it.readText()}")
                     emit(parseWssEvent(it.readText()))
                 }
                 .collect()
@@ -107,6 +107,8 @@ class EthereumEventListenerImpl(
                 params = listOf(KEY_LOGS, mapOf(KEY_ADDRESS to contractAddress.hex))
             )
         )
+
+        Log.d(LOG_TAG, "establishing websockets with ${raw}")
 
         return Frame.Text(raw)
     }

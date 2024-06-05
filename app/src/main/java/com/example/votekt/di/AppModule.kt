@@ -189,7 +189,7 @@ val appModule = module {
             proposalsDao = get(),
             dispatcher = Dispatchers.IO,
             sendTransactionRepository = get(),
-            web3 = get(),
+            ethereumClient = get(),
             ksPrefs = get(),
         )
     }
