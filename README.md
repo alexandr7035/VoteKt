@@ -105,6 +105,8 @@ Choose localDebug build variant and build
 
 [Are Ethereum Full Nodes Really Full? An Experiment](https://medium.com/@marcandrdumas/are-ethereum-full-nodes-really-full-an-experiment-b77acd086ca7#:~:text=Truth%20is%2C%20a%20specific%20type,the%20space%2C%20about%20180%20GB.)
 
+[Explaining Ethereum Contract ABI & EVM Bytecode](https://medium.com/@eiki1212/explaining-ethereum-contract-abi-evm-bytecode-6afa6e917c3b)
+
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)  
