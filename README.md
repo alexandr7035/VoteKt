@@ -103,6 +103,8 @@ Choose localDebug build variant and build
 
 [Why are Encoders used in Solidity?](https://medium.com/coinmonks/why-are-encoders-used-in-solidity-6930e913ce48)
 
+[Are Ethereum Full Nodes Really Full? An Experiment](https://medium.com/@marcandrdumas/are-ethereum-full-nodes-really-full-an-experiment-b77acd086ca7#:~:text=Truth%20is%2C%20a%20specific%20type,the%20space%2C%20about%20180%20GB.)
+
 ## Tools
 [Ethereum Raw Transaction Decoder](https://rawtxdecode.in/)  
 [Online Ethereum Abi encoder and decoder](https://adibas03.github.io/online-ethereum-abi-encoder-decoder/#/)  
