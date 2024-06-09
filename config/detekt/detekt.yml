@@ -149,7 +149,7 @@ formatting:
     active: true
     maxLineLength: 120
     ignoreBackTickedIdentifier: false
-    excludes: ["com/example/votekt/ui/components/preview/**"]
+    excludes: ['**/contracts/src/main/**', '**/pm/gnosis/**', '**/ui/components/preview/**']
   ModifierListSpacing:
     active: true
     autoCorrect: true
@@ -216,6 +216,7 @@ formatting:
   NoWildcardImports:
     active: true
     packagesToUseImportOnDemandProperty: 'java.util.*,kotlinx.android.synthetic.**'
+    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
   NullableTypeSpacing:
     active: true
     autoCorrect: true
@@ -223,7 +224,7 @@ formatting:
     active: true
     autoCorrect: true
     packagePattern: '[a-z]+(\.[a-z][A-Za-z0-9]*)*'
-
+    excludes: ['**/contracts/src/main/**']
   ParameterListSpacing:
     active: false
     autoCorrect: true
@@ -371,12 +372,14 @@ complexity:
   ComplexCondition:
     active: true
     threshold: 4
+    excludes: ['**/pm/gnosis/**']
   ComplexInterface:
     active: false
     threshold: 10
     includeStaticDeclarations: false
     includePrivateDeclarations: false
     ignoreOverloaded: false
+    ignoreAnnotated: ['Composable']
   CyclomaticComplexMethod:
     active: true
     threshold: 15
@@ -399,13 +402,14 @@ complexity:
   LargeClass:
     active: true
     threshold: 600
+    excludes: ['**/pm/gnosis/**']
   LongMethod:
     active: true
     threshold: 60
   LongParameterList:
     active: true
     functionThreshold: 10
-    constructorThreshold: 7
+    constructorThreshold: 10
     ignoreDefaultParameters: true
     ignoreDataClasses: true
     ignoreAnnotatedParameter: []
@@ -543,7 +547,7 @@ exceptions:
     active: false
   ThrowingExceptionsWithoutMessageOrCause:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
+    excludes: ['**/pm/gnosis/**','**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**']
     exceptions:
       - 'ArrayIndexOutOfBoundsException'
       - 'Exception'
@@ -576,6 +580,7 @@ exceptions:
       - 'Exception'
       - 'RuntimeException'
       - 'Throwable'
+    excludes: ['**/pm/gnosis/**']
 
 naming:
   active: true
@@ -612,6 +617,7 @@ naming:
     active: true
     parameterPattern: '[a-z][A-Za-z0-9]*'
     excludeClassPattern: '$^'
+    excludes: ['**/contracts/src/main/**']
   InvalidPackageDeclaration:
     active: true
     rootPackage: ''
@@ -883,13 +889,15 @@ style:
     maxJumpCount: 1
   MagicNumber:
     active: true
-    excludes: ['**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
+    excludes: ['**/contracts/src/main/**', '**/pm/gnosis/**' ,'**/test/**', '**/androidTest/**', '**/commonTest/**', '**/jvmTest/**', '**/androidUnitTest/**', '**/androidInstrumentedTest/**', '**/jsTest/**', '**/iosTest/**', '**/*.kts']
     ignoreNumbers:
       - '-1'
       - '0'
       - '1'
       - '2'
+      - '10'
       - '100'
+      - '1000'
     ignoreHashCodeFunction: true
     ignoreLocalVariableDeclaration: false
     ignoreConstantDeclaration: true
@@ -913,8 +921,7 @@ style:
     excludeImportStatements: true
     excludeCommentStatements: false
     excludeRawStrings: true
-    excludes: ["com/example/votekt/ui/components/preview/**",
-    ]
+    excludes: ['**/contracts/src/main/**', '**/pm/gnosis/**', '**/ui/components/preview/**']
   MayBeConst:
     active: true
   ModifierOrder:
@@ -1029,6 +1036,7 @@ style:
     active: true
   UseCheckOrError:
     active: true
+    excludes: ['**/pm/gnosis/**']
   UseDataClass:
     active: false
     allowVars: false
@@ -1047,6 +1055,7 @@ style:
     active: true
   UseRequire:
     active: true
+    excludes: ['**/contracts/src/main/**', '**/pm/gnosis/**']
   UseRequireNotNull:
     active: true
   UseSumOfInsteadOfFlatMapSize:
