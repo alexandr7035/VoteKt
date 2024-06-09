@@ -1,7 +1,7 @@
 package com.example.votekt.ui.core
 
 import com.example.votekt.ui.UiErrorMessage
-import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDataUi
+import com.example.votekt.ui.feature.transactions.review.ReviewTransactionDataUi
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 

@@ -1,7 +1,7 @@
 package by.alexandr7035.ethereum.core
 
-import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
-import by.alexandr7035.ethereum.model.eth_events.EthereumEvent
+import by.alexandr7035.ethereum.model.events.EthEventsSubscriptionState
+import by.alexandr7035.ethereum.model.events.EthereumEvent
 import kotlinx.coroutines.flow.Flow
 
 interface EthereumEventListener {

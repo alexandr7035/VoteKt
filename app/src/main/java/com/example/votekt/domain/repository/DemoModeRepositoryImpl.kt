@@ -3,7 +3,7 @@ package com.example.votekt.domain.repository
 import android.content.Context
 import com.example.votekt.BuildConfig
 import com.example.votekt.R
-import com.example.votekt.domain.model.demo_mode.DemoProposal
+import com.example.votekt.domain.model.demo.DemoProposal
 import kotlin.random.Random
 
 class DemoModeRepositoryImpl(

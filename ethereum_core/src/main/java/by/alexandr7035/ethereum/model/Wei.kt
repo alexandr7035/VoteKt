@@ -1,16 +1,20 @@
+@file:Suppress("MagicNumber")
+
 package by.alexandr7035.ethereum.model
 
 import java.math.BigDecimal
 import java.math.BigInteger
 
 data class Wei(val value: BigInteger) {
-    constructor(value: String): this(BigInteger(value))
+    constructor(value: String) : this(BigInteger(value))
 
-    constructor(value: Long): this(BigInteger.valueOf(value))
+    constructor(value: Long) : this(BigInteger.valueOf(value))
 
     fun toEther(scale: Int = 18): BigDecimal = BigDecimal(value).setScale(scale).div(WEI_TO_ETHER_MULTIPLIER)
 
-    fun toGWei(scale: Int = 18): BigDecimal = BigDecimal(value).setScale(scale).divide(BigDecimal(10).pow(9)).stripTrailingZeros()
+    fun toGWei(scale: Int = 18): BigDecimal = BigDecimal(
+        value
+    ).setScale(scale).divide(BigDecimal(10).pow(9)).stripTrailingZeros()
 
     operator fun compareTo(other: Wei) = this.value.compareTo(other.value)
 

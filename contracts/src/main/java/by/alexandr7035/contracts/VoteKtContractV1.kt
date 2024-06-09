@@ -1,12 +1,12 @@
 package `by`.alexandr7035.contracts
 
+import pm.gnosis.model.Solidity
+import pm.gnosis.model.SolidityBase
+import pm.gnosis.utils.BigIntegerUtils
 import java.math.BigInteger
 import kotlin.Boolean
 import kotlin.String
 import kotlin.collections.List
-import pm.gnosis.model.Solidity
-import pm.gnosis.model.SolidityBase
-import pm.gnosis.utils.BigIntegerUtils
 
 public class VoteKtContractV1 {
     public object CREATE_PROPOSAL_FEE {
@@ -127,7 +127,10 @@ public class VoteKtContractV1 {
         public const val METHOD_ID: String = "4c15676b"
 
         public fun encode(
-            uuid: Solidity.String, title: Solidity.String, description: Solidity.String, durationInHours: Solidity.UInt256
+            uuid: Solidity.String,
+            title: Solidity.String,
+            description: Solidity.String,
+            durationInHours: Solidity.UInt256
         ): String = "0x" + METHOD_ID + pm.gnosis.model.SolidityBase.encodeFunctionArguments(
             uuid, title, description, durationInHours
         )
@@ -259,7 +262,8 @@ public class VoteKtContractV1 {
         )
 
         public data class Arguments(
-            public val param0: Solidity.UInt256, public val param1: Solidity.Address
+            public val param0: Solidity.UInt256,
+            public val param1: Solidity.Address
         )
     }
 
@@ -378,7 +382,8 @@ public class VoteKtContractV1 {
         }
 
         public data class Arguments(
-            public val proposalnumber: Solidity.UInt256, public val infavor: Solidity.Bool
+            public val proposalnumber: Solidity.UInt256,
+            public val infavor: Solidity.Bool
         )
     }
 
@@ -388,7 +393,11 @@ public class VoteKtContractV1 {
 
             public fun decode(topics: List<String>): Arguments {
                 // Decode topics
-                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+                if (topics.first().removePrefix("0x") != EVENT_ID) {
+                    throw IllegalArgumentException(
+                        "topics[0] does not match event id"
+                    )
+                }
                 val source1 = SolidityBase.PartitionData.of(topics[1])
                 val t1 = Solidity.Address.DECODER.decode(source1)
                 val source2 = SolidityBase.PartitionData.of(topics[2])
@@ -397,7 +406,8 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val previousowner: Solidity.Address, public val newowner: Solidity.Address
+                public val previousowner: Solidity.Address,
+                public val newowner: Solidity.Address
             )
         }
 
@@ -406,7 +416,11 @@ public class VoteKtContractV1 {
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
-                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+                if (topics.first().removePrefix("0x") != EVENT_ID) {
+                    throw IllegalArgumentException(
+                        "topics[0] does not match event id"
+                    )
+                }
 
                 // Decode data
                 val source = SolidityBase.PartitionData.of(data)
@@ -417,7 +431,8 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val proposalnumber: Solidity.UInt256, public val title: Solidity.String
+                public val proposalnumber: Solidity.UInt256,
+                public val title: Solidity.String
             )
         }
 
@@ -426,7 +441,11 @@ public class VoteKtContractV1 {
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
-                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+                if (topics.first().removePrefix("0x") != EVENT_ID) {
+                    throw IllegalArgumentException(
+                        "topics[0] does not match event id"
+                    )
+                }
 
                 // Decode data
                 val source = SolidityBase.PartitionData.of(data)
@@ -444,7 +463,11 @@ public class VoteKtContractV1 {
 
             public fun decode(topics: List<String>, `data`: String): Arguments {
                 // Decode topics
-                if (topics.first().removePrefix("0x") != EVENT_ID) throw IllegalArgumentException("topics[0] does not match event id")
+                if (topics.first().removePrefix("0x") != EVENT_ID) {
+                    throw IllegalArgumentException(
+                        "topics[0] does not match event id"
+                    )
+                }
 
                 // Decode data
                 val source = SolidityBase.PartitionData.of(data)
@@ -454,7 +477,8 @@ public class VoteKtContractV1 {
             }
 
             public data class Arguments(
-                public val proposalnumber: Solidity.UInt256, public val infavor: Solidity.Bool
+                public val proposalnumber: Solidity.UInt256,
+                public val infavor: Solidity.Bool
             )
         }
     }
@@ -474,7 +498,9 @@ public class VoteKtContractV1 {
             number, uuid, title, description, votesfor, votesagainst, creatoraddress, creationtimemills, expirationtimemills
         )
 
-        public override fun encodePacked(): String = throw UnsupportedOperationException("Structs are  not supported via encodePacked")
+        public override fun encodePacked(): String = throw UnsupportedOperationException(
+            "Structs are  not supported via encodePacked"
+        )
 
         public class Decoder : SolidityBase.TypeDecoder<TupleA> {
             public override fun isDynamic(): Boolean = true
@@ -501,5 +527,3 @@ public class VoteKtContractV1 {
         }
     }
 }
-
-

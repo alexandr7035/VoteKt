@@ -22,7 +22,6 @@ interface BiometricsManager {
     fun deleteKey()
 }
 
-
 class BiometricsManagerImpl : BiometricsManager {
 
     override fun encryptData(plaintext: String, cipher: Cipher): BiometricEncryptedPinWrapper {
@@ -52,7 +51,6 @@ class BiometricsManagerImpl : BiometricsManager {
         try {
             val publicKey = getOrCreateKey(KeyType.PUBLIC_KEY) as PublicKey
             cipher.init(Cipher.ENCRYPT_MODE, publicKey)
-
         } catch (e: java.lang.ClassCastException) {
             deleteKey()
         }
@@ -67,10 +65,10 @@ class BiometricsManagerImpl : BiometricsManager {
 
         when (keyType) {
             KeyType.PUBLIC_KEY -> {
-                keyStore.getCertificate(KEY_NAME)?.let { return it.publicKey as PublicKey }
+                keyStore.getCertificate(KEY_NAME)?.let { return@let it.publicKey as PublicKey }
             }
             KeyType.PRIVATE_KEY -> {
-                keyStore.getKey(KEY_NAME, null)?.let { return it as PrivateKey }
+                keyStore.getKey(KEY_NAME, null)?.let { return@let it as PrivateKey }
             }
         }
 
@@ -93,7 +91,7 @@ class BiometricsManagerImpl : BiometricsManager {
                 setUserAuthenticationParameters(
                     AUTH_INVALIDATION_TIMEOUT,
                     KeyProperties.AUTH_DEVICE_CREDENTIAL
-                            or KeyProperties.AUTH_BIOMETRIC_STRONG
+                        or KeyProperties.AUTH_BIOMETRIC_STRONG
                 )
             } else {
                 builder.setUserAuthenticationValidityDurationSeconds(AUTH_INVALIDATION_TIMEOUT)
@@ -115,7 +113,8 @@ class BiometricsManagerImpl : BiometricsManager {
     }
 
     private fun getCipher(): Cipher {
-        val transformation = "$ASYMMETRIC_ENCRYPTION_ALGORITHM/$ASYMMETRIC_ENCRYPTION_BLOCK_MODE/$ASYMMETRIC_ENCRYPTION_PADDING"
+        val transformation =
+            "$ASYMMETRIC_ENCRYPTION_ALGORITHM/$ASYMMETRIC_ENCRYPTION_BLOCK_MODE/$ASYMMETRIC_ENCRYPTION_PADDING"
         return Cipher.getInstance(transformation)
     }
 
@@ -142,4 +141,3 @@ class BiometricsManagerImpl : BiometricsManager {
         PRIVATE_KEY,
     }
 }
-

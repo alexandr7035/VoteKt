@@ -94,7 +94,6 @@ object SolidityBase {
                 return factory.invoke(decodeUInt(source.consume()))
             }
         }
-
     }
 
     abstract class IntBase(private val value: BigInteger, private val bitLength: Int) : StaticType {
@@ -114,7 +113,6 @@ object SolidityBase {
             } else {
                 value.toString(16).padStartMultiple(paddingLength, '0')
             }
-
         }
 
         override fun encode(): String = encodeWithPadding(PADDED_HEX_LENGTH)
@@ -149,7 +147,11 @@ object SolidityBase {
 
     abstract class StaticBytes(val byteArray: ByteArray, nBytes: Int) : StaticType {
         init {
-            if (byteArray.size > nBytes) throw IllegalArgumentException("Byte array has ${byteArray.size} bytes. It should have no more than $nBytes bytes.")
+            if (byteArray.size > nBytes) {
+                throw IllegalArgumentException(
+                    "Byte array has ${byteArray.size} bytes. It should have no more than $nBytes bytes."
+                )
+            }
         }
 
         override fun encode(): String {
@@ -220,7 +222,7 @@ object SolidityBase {
         return (0 until capacity).map {
             if (itemDecoder.isDynamic()) {
                 // Get offset
-                println("Getting offset ${it}")
+                println("Getting offset $it")
                 val offset = BigInteger(source.consume(), 16).safeIntValueExact()
                 // Decode dynamic data at offset
                 itemDecoder.decode(source.subData(offset))
@@ -230,7 +232,9 @@ object SolidityBase {
         }
     }
 
-    abstract class Array<out T : Type>(items: List<T>, val capacity: Int) : Collection<T>(checkCapacity(items, capacity)) {
+    abstract class Array<out T : Type>(items: List<T>, val capacity: Int) : Collection<T>(
+        checkCapacity(items, capacity)
+    ) {
         override fun encode(): String {
             if (items.size != capacity) {
                 throw IllegalStateException("Capacity mismatch!")
@@ -253,7 +257,6 @@ object SolidityBase {
                 }
                 return ArrayList(items)
             }
-
         }
     }
 
@@ -339,20 +342,23 @@ object SolidityBase {
         return when (value) {
             BigInteger.ZERO -> false
             BigInteger.ONE -> true
-            else -> throw IllegalArgumentException("${value.toString(10)} is not a valid boolean representation. It should either be 0 (false) or 1 (true)")
+            else -> throw IllegalArgumentException(
+                "${value.toString(10)} is not a valid boolean representation. It should either be 0 (false) or 1 (true)"
+            )
         }
     }
 
     fun decodeInt(data: String): BigInteger {
         val value = BigInteger(data, 16)
         if (data.startsWith("8") ||
-                data.startsWith("9") ||
-                data.startsWith("A", true) ||
-                data.startsWith("B", true) ||
-                data.startsWith("C", true) ||
-                data.startsWith("D", true) ||
-                data.startsWith("E", true) ||
-                data.startsWith("F", true)) {
+            data.startsWith("9") ||
+            data.startsWith("A", true) ||
+            data.startsWith("B", true) ||
+            data.startsWith("C", true) ||
+            data.startsWith("D", true) ||
+            data.startsWith("E", true) ||
+            data.startsWith("F", true)
+        ) {
             val x = value.toString(2).map { if (it == '0') '1' else '0' }.joinToString("")
             return BigInteger(x, 2).add(BigInteger.ONE).multiply(BigInteger("-1"))
         }
@@ -374,7 +380,7 @@ object SolidityBase {
     }
 
     fun decodeString(source: PartitionData) =
-            decodeBytes(source).toString(Charset.forName("UTF-8"))
+        decodeBytes(source).toString(Charset.forName("UTF-8"))
 
     @Deprecated("Deprecated for decodeList")
     fun <T : Any> decodeArray(data: String, itemDecoder: (String) -> T): List<T> {

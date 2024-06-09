@@ -10,7 +10,7 @@ class SyncProposalsWorker(
     appContext: Context,
     params: WorkerParameters,
     private val votingContractRepository: VotingContractRepository,
-): CoroutineWorker(appContext, params) {
+) : CoroutineWorker(appContext, params) {
     override suspend fun doWork(): Result {
         return try {
             votingContractRepository.syncProposalsWithContract()
@@ -23,5 +23,6 @@ class SyncProposalsWorker(
 
     companion object {
         private val TAG = SyncProposalsWorker::class.simpleName
+        const val BACKOFF_DELAY_SEC = 10L
     }
 }

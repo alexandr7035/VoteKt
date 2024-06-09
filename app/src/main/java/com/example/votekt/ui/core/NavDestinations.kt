@@ -8,18 +8,18 @@ sealed class NavDestinations {
     sealed class Primary(
         val label: String,
         @DrawableRes val filledIcon: Int,
-    ): NavDestinations() {
-        object Wallet: Primary(
+    ) : NavDestinations() {
+        object Wallet : Primary(
             filledIcon = R.drawable.ic_wallet,
             label = "Wallet"
         )
 
-        object Proposals: Primary(
+        object Proposals : Primary(
             filledIcon = R.drawable.ic_votings,
             label = "Proposals"
         )
 
-        object Transactions: Primary(
+        object Transactions : Primary(
             filledIcon = R.drawable.ic_transactions,
             label = "History"
         )
@@ -30,25 +30,24 @@ sealed class NavDestinations {
         }
     }
 
-    object AppLock: NavDestinations()
+    object AppLock : NavDestinations()
 
     object SetupAppLockGraph : NavDestinations() {
         object CreatePin : NavDestinations()
         object EnableBiometrics : NavDestinations()
     }
 
-    object Welcome: NavDestinations()
+    object Welcome : NavDestinations()
 
-    object RestoreAccount: NavDestinations()
+    object RestoreAccount : NavDestinations()
 
-    object GeneratePhrase: NavDestinations()
-    object ConfirmPhrase: NavDestinations()
+    object GeneratePhrase : NavDestinations()
+    object ConfirmPhrase : NavDestinations()
 
-    object NewProposal: NavDestinations()
+    object NewProposal : NavDestinations()
 
     object VotingDetails : NavDestinations()
 
     val route: String
         get() = this::class.java.simpleName
 }
-

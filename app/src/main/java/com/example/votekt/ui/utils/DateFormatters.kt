@@ -6,6 +6,7 @@ import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
 
+@Suppress("MagicNumber")
 object DateFormatters {
     fun formatRemainingTime(time: Long, context: Context): String {
         val currentTime = System.currentTimeMillis()
@@ -41,6 +42,3 @@ object DateFormatters {
         }
     }
 }
-
-
-

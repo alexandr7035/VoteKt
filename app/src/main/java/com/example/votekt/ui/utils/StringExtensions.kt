@@ -1,5 +1,6 @@
 package com.example.votekt.ui.utils
 
+@Suppress("MagicNumber")
 fun String.prettifyAddress(): String {
     val prefixLength = 5
     val suffixLength = 4

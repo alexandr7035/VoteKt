@@ -4,8 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.transactions.TransactionStatus
+import com.example.votekt.domain.transactions.TransactionType
 import java.math.BigInteger
 
 @Entity(tableName = "transactions")

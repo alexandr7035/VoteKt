@@ -1,9 +1,9 @@
-package com.example.votekt.ui.components;
+package com.example.votekt.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable;
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.Layout
@@ -73,6 +73,7 @@ private class Row(
     }
 }
 
+@Suppress("MagicNumber")
 @Composable
 private fun Preview(alignment: Alignment.Horizontal) {
     Box(Modifier.width(100.dp)) {

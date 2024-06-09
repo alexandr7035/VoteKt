@@ -44,41 +44,41 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import com.example.votekt.R
 import com.example.votekt.domain.account.MnemonicWord
-import com.example.votekt.domain.model.blockchain_explorer.ExploreType
-import com.example.votekt.ui.app_host.graphs.createAppLockGraph
-import com.example.votekt.ui.app_host.host_utils.LocalScopedSnackbarState
-import com.example.votekt.ui.app_host.host_utils.ScopedSnackBarState
+import com.example.votekt.domain.model.explorer.ExploreType
 import com.example.votekt.ui.components.ErrorFullScreen
 import com.example.votekt.ui.components.loading.LoadingScreen
 import com.example.votekt.ui.components.snackbar.ResultSnackBar
-import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreen
-import com.example.votekt.ui.feature_app_lock.lock_screen.LockScreenNavigationEvent
-import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDialog
-import com.example.votekt.ui.feature_create_account.ConfirmPhraseScreen
-import com.example.votekt.ui.feature_create_account.GeneratePhraseScreen
-import com.example.votekt.ui.feature_welcome.WelcomeScreen
-import com.example.votekt.ui.feature_create_proposal.CreateProposalScreen
-import com.example.votekt.ui.feature_create_proposal.model.CreateProposalScreenNavigationEvent
-import com.example.votekt.ui.feature_proposals.proposal_details.ProposalDetailsScreenNavigationEvent
-import com.example.votekt.ui.feature_proposals.proposal_details.VotingDetailsScreen
-import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreen
-import com.example.votekt.ui.feature_proposals.proposals_list.ProposalsScreenNavigationEvent
-import com.example.votekt.ui.feature_restore_account.RestoreAccountScreen
-import com.example.votekt.ui.feature_restore_account.model.RestoreAccountNavigationEvent
-import com.example.votekt.ui.feature_wallet.WalletScreen
-import com.example.votekt.ui.feature_wallet.model.WalletScreenNavigationEvent
-import com.example.votekt.ui.feature_welcome.model.WelcomeScreenNavigationEvent
+import com.example.votekt.ui.core.graphs.createAppLockGraph
+import com.example.votekt.ui.feature.account.create.ConfirmPhraseScreen
+import com.example.votekt.ui.feature.account.create.GeneratePhraseScreen
+import com.example.votekt.ui.feature.account.restore.RestoreAccountScreen
+import com.example.votekt.ui.feature.account.restore.model.RestoreAccountNavigationEvent
+import com.example.votekt.ui.feature.applock.lockscreen.LockScreen
+import com.example.votekt.ui.feature.applock.lockscreen.LockScreenNavigationEvent
+import com.example.votekt.ui.feature.onboarding.WelcomeScreen
+import com.example.votekt.ui.feature.onboarding.model.WelcomeScreenNavigationEvent
+import com.example.votekt.ui.feature.proposals.create.CreateProposalScreen
+import com.example.votekt.ui.feature.proposals.create.model.CreateProposalScreenNavigationEvent
+import com.example.votekt.ui.feature.proposals.details.ProposalDetailsScreen
+import com.example.votekt.ui.feature.proposals.details.ProposalDetailsScreenNavigationEvent
+import com.example.votekt.ui.feature.proposals.feed.ProposalsScreen
+import com.example.votekt.ui.feature.proposals.feed.ProposalsScreenNavigationEvent
+import com.example.votekt.ui.feature.transactions.history.TransactionHistoryScreen
+import com.example.votekt.ui.feature.transactions.history.model.TransactionsScreenNavigationEvent
+import com.example.votekt.ui.feature.transactions.review.ReviewTransactionDialog
+import com.example.votekt.ui.feature.wallet.WalletScreen
+import com.example.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
 import com.example.votekt.ui.theme.Dimensions
-import com.example.votekt.ui.feature_transaction_history.TransactionHistoryScreen
-import com.example.votekt.ui.feature_transaction_history.model.TransactionsScreenNavigationEvent
+import com.example.votekt.ui.utils.compositionlocal.LocalScopedSnackbarState
+import com.example.votekt.ui.utils.compositionlocal.ScopedSnackBarState
 import de.palm.composestateevents.EventEffect
 import org.koin.androidx.compose.koinViewModel
-
 
 // TODO refactoring of this screen
 @Composable
 fun AppContainer(
-    viewModel: AppViewModel = koinViewModel(), navController: NavHostController
+    viewModel: AppViewModel = koinViewModel(),
+    navController: NavHostController
 ) {
     val snackBarHostState = remember { SnackbarHostState() }
     val hostCoroutineScope = rememberCoroutineScope()
@@ -100,7 +100,7 @@ fun AppContainer(
                 }
             },
             snackbarHost = {
-                SnackbarHost(hostState = snackBarHostState) { ResultSnackBar(snackbarData = it) }
+                SnackbarHost(hostState = snackBarHostState) { ResultSnackBar(snackBarData = it) }
             }
         ) { pv ->
             Box(
@@ -120,47 +120,7 @@ fun AppContainer(
                     }
 
                     else -> {
-                        Column() {
-                            Box(Modifier.weight(1f)) {
-                                AppNavHost(
-                                    navController = navController, conditionalNav = state.conditionalNavigation, onAppUnlocked = {
-                                        viewModel.onAppIntent(AppIntent.ConsumeAppUnlocked)
-                                    },
-                                    modifier = Modifier.fillMaxSize(),
-                                    onOpenExplorer = { payload, exploreType ->
-                                        viewModel.onAppIntent(
-                                            AppIntent.OpenBlockExplorer(
-                                                payload = payload,
-                                                exploreType = exploreType,
-                                            )
-                                        )
-                                    }
-                                )
-                            }
-
-                            AnimatedVisibility(
-                                visible = state.isAppLocked().not() && state.isOffline() && state.isLoggedIn(),
-                                enter = slideInVertically(initialOffsetY = { it * 2 }),
-                                exit = slideOutVertically(targetOffsetY = { it * 2 }),
-                            ) {
-                                NoConnectionStub(
-                                    onClick = {
-                                        viewModel.onAppIntent(
-                                            AppIntent.ReconnectToNode
-                                        )
-                                    },
-                                    appConnectionState = state.appConnectionState
-                                )
-                            }
-
-                            if (state.requiresTxConfirmation()) {
-                                ReviewTransactionDialog(
-                                    onIntent = viewModel::onTransactionIntent,
-                                    state = state.txConfirmationState!!,
-                                    onBiometricAuthEventConsumed = viewModel::consumeBiometricTransactionConfirmationEvent
-                                )
-                            }
-                        }
+                        ScreenContent(navController, state, viewModel)
                     }
                 }
             }
@@ -168,10 +128,62 @@ fun AppContainer(
 
         EventEffect(
             event = state.openExplorerEvent,
-            onConsumed = viewModel::consumeOpenExplorerEvent) { url ->
+            onConsumed = viewModel::consumeOpenExplorerEvent
+        ) { url ->
             val intent: CustomTabsIntent = CustomTabsIntent.Builder()
                 .build()
             intent.launchUrl(context, Uri.parse(url))
+        }
+    }
+}
+
+@Composable
+private fun ScreenContent(
+    navController: NavHostController,
+    state: AppState,
+    viewModel: AppViewModel
+) {
+    Column {
+        Box(Modifier.weight(1f)) {
+            AppNavHost(
+                navController = navController,
+                conditionalNav = state.conditionalNavigation,
+                onAppUnlocked = {
+                    viewModel.onAppIntent(AppIntent.ConsumeAppUnlocked)
+                },
+                modifier = Modifier.fillMaxSize(),
+                onOpenExplorer = { payload, exploreType ->
+                    viewModel.onAppIntent(
+                        AppIntent.OpenBlockExplorer(
+                            payload = payload,
+                            exploreType = exploreType,
+                        )
+                    )
+                }
+            )
+        }
+
+        AnimatedVisibility(
+            visible = state.isAppLocked().not() && state.isOffline() && state.isLoggedIn(),
+            enter = slideInVertically(initialOffsetY = { it * 2 }),
+            exit = slideOutVertically(targetOffsetY = { it * 2 }),
+        ) {
+            NoConnectionStub(
+                onClick = {
+                    viewModel.onAppIntent(
+                        AppIntent.ReconnectToNode
+                    )
+                },
+                appConnectionState = state.appConnectionState
+            )
+        }
+
+        if (state.requiresTxConfirmation()) {
+            ReviewTransactionDialog(
+                onIntent = viewModel::onTransactionIntent,
+                state = state.txConfirmationState!!,
+                onBiometricAuthEventConsumed = viewModel::consumeBiometricTransactionConfirmationEvent
+            )
         }
     }
 }
@@ -214,6 +226,7 @@ private fun NoConnectionStub(
     }
 }
 
+@Suppress("LongMethod", "CyclomaticComplexMethod")
 @Composable
 private fun AppNavHost(
     navController: NavHostController,
@@ -302,9 +315,12 @@ private fun AppNavHost(
 
         // TODO move logic out
         composable(
-            route = "${NavDestinations.ConfirmPhrase.route}/{seedPhrase}", arguments = listOf(navArgument("seedPhrase") {
-                type = NavType.StringType
-            })
+            route = "${NavDestinations.ConfirmPhrase.route}/{seedPhrase}",
+            arguments = listOf(
+                navArgument("seedPhrase") {
+                    type = NavType.StringType
+                }
+            )
         ) {
             val phrase = it.arguments?.getString("seedPhrase")?.split(" ")?.mapIndexed { index, word ->
                 MnemonicWord(index, word)
@@ -388,7 +404,7 @@ private fun AppNavHost(
             route = "${NavDestinations.VotingDetails.route}/{proposalId}",
             arguments = listOf(navArgument("proposalId") { type = NavType.StringType })
         ) {
-            VotingDetailsScreen(
+            ProposalDetailsScreen(
                 proposalId = it.arguments?.getString("proposalId")!!,
                 onNavigationEvent = {
                     when (it) {

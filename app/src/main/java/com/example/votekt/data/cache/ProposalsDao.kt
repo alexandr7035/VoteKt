@@ -39,14 +39,25 @@ interface ProposalsDao {
     @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE uuid = :proposalId")
     fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
 
-    @Query("UPDATE proposals SET selfVote = :supported, selfVoteTransactionHash = :voteTransactionHash WHERE number = :proposalNumber")
+    @Query(
+        """
+        UPDATE proposals SET selfVote = :supported, selfVoteTransactionHash = :voteTransactionHash 
+        WHERE number = :proposalNumber
+        """
+    )
     fun updateSelfVote(
         proposalNumber: Int,
         supported: Boolean,
         voteTransactionHash: String,
     )
 
-    @Query("UPDATE proposals SET votesFor = votesFor + CASE WHEN :inFavor THEN 1 ELSE 0 END, votesAgainst = votesAgainst + CASE WHEN :inFavor THEN 0 ELSE 1 END WHERE number = :proposalNumber")
+    @Query(
+        """
+        UPDATE proposals SET votesFor = votesFor + CASE 
+        WHEN :inFavor THEN 1 ELSE 0 END, votesAgainst = votesAgainst + CASE WHEN :inFavor THEN 0 ELSE 1 END 
+        WHERE number = :proposalNumber
+        """
+    )
     suspend fun addVoteToProposal(proposalNumber: Int, inFavor: Boolean)
 
     @Query("DELETE FROM proposals WHERE isDraft AND uuid = (:proposalUuid)")

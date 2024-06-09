@@ -14,11 +14,14 @@ fun SkeletonShape(
     modifier: Modifier,
     shape: RoundedCornerShape = RoundedCornerShape(10.dp)
 ) {
-    Box(modifier = modifier.then(
-        Modifier
-            .shimmer()
-            .background(
-                color = Color.LightGray,
-                shape = shape
-            )))
+    Box(
+        modifier = modifier.then(
+            Modifier
+                .shimmer()
+                .background(
+                    color = Color.LightGray,
+                    shape = shape
+                )
+        )
+    )
 }

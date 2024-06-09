@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import com.example.votekt.R
 import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.theme.Dimensions
+import com.example.votekt.ui.theme.Gray20
 import com.example.votekt.ui.theme.PrimaryFontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -60,7 +61,7 @@ fun PrimaryTextField(
         focusedContainerColor = Color.Transparent,
         unfocusedContainerColor = Color.Transparent,
         focusedIndicatorColor = MaterialTheme.colorScheme.primary,
-        unfocusedIndicatorColor = Color(0xFFCFCFD3),
+        unfocusedIndicatorColor = Gray20,
         errorContainerColor = Color.Transparent,
     ),
     shape: Shape = RoundedCornerShape(4.dp),
@@ -103,7 +104,9 @@ fun PrimaryTextField(
                         text = error,
                         color = MaterialTheme.colorScheme.error
                     )
-                } else supportingText?.invoke()
+                } else {
+                    supportingText?.invoke()
+                }
             },
             label = label,
             container = {

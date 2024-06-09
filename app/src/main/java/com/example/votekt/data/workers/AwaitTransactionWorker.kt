@@ -26,10 +26,10 @@ class AwaitTransactionWorker(
             Log.d(TAG, "Completed for $transactionHash")
             Result.success()
         } catch (e: TransactionReceiptNotFound) {
-            Log.d(TAG, "Receipt not found for ${transactionHash}, retry")
+            Log.d(TAG, "Receipt not found for $transactionHash, retry")
             Result.retry()
         } catch (e: Exception) {
-            Log.e(TAG, "failed to update ${transactionHash}: ${e.localizedMessage}")
+            Log.e(TAG, "failed to update $transactionHash: ${e.localizedMessage}")
             Result.failure()
         }
     }
@@ -37,5 +37,7 @@ class AwaitTransactionWorker(
     companion object {
         private val TAG = "${AwaitTransactionWorker::class.simpleName}"
         const val TRANSACTION_HASH = "transactionHash"
+        const val INITIAL_DELAY = 5L
+        const val BACKOFF_DELAY_SEC = 10L
     }
 }

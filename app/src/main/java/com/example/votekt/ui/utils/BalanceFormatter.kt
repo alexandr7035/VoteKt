@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package com.example.votekt.ui.utils
 
 import java.math.BigDecimal
@@ -109,7 +111,7 @@ object BalanceFormatter {
         amount: BigDecimal,
         symbol: String
     ): String {
-        return "${formatAmount(amount)} ${symbol}"
+        return "${formatAmount(amount)} $symbol"
     }
 
     private val LOWEST_LIMIT = BigDecimal.ONE.divide(BigDecimal.TEN.pow(5))

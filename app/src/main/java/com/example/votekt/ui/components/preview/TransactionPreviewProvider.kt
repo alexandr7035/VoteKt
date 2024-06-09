@@ -4,11 +4,11 @@ import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.ETHER
 import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.domain.transactions.TransactionDomain
-import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.domain.transactions.TransactionStatus
+import com.example.votekt.domain.transactions.TransactionType
 import java.math.BigInteger
 
-class TransactionPreviewProvider: PreviewParameterProvider<TransactionDomain> {
+class TransactionPreviewProvider : PreviewParameterProvider<TransactionDomain> {
     override val values: Sequence<TransactionDomain>
         get() = sequenceOf(
             TransactionDomain(

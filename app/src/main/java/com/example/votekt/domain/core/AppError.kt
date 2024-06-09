@@ -4,7 +4,7 @@ import android.util.Log
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 
-data class AppError(val errorType: ErrorType): Exception() {
+data class AppError(val errorType: ErrorType) : Exception() {
     companion object {
         fun fromThrowable(e: Throwable) = AppError(ErrorType.fromThrowable(e))
     }
@@ -25,7 +25,7 @@ enum class ErrorType {
         private val TAG = AppError::class.java.simpleName
 
         fun fromThrowable(e: Throwable): ErrorType {
-            Log.d(TAG, "wrapping error ${e}: ${e.message}")
+            Log.d(TAG, "wrapping error $e: ${e.message}")
             // Here may be additional mapping depending on exception type
             return when (e) {
                 is AppError -> e.errorType

@@ -20,7 +20,7 @@ object Dimensions {
     val tabCorners = 20.dp
     val tabPaddingVertical = 10.dp
     val tabTextSize = 14.sp
-    val tabTextLineHeight= 20.sp
+    val tabTextLineHeight = 20.sp
 
     val cardListSpacing = 16.dp
     val cardPaddingHorizontal = 8.dp
@@ -28,7 +28,7 @@ object Dimensions {
 
     val seedInputCorners = 20.dp
     val seedInputPaddingHorizontal = 24.dp
-    val seedInputPaddingVertical= 24.dp
+    val seedInputPaddingVertical = 24.dp
 
     val tipPaddingHorizontal = 12.dp
     val tipPaddingVertical = 8.dp

@@ -156,7 +156,7 @@ fun PrimaryButton_Preview() {
                 PrimaryButton(text = "Click Me", onClick = {})
                 SecondaryButton(text = "Click Me", onClick = {})
                 RoundedButton(text = "Click Me", onClick = {})
-                TextBtn(onClick = { /*TODO*/ }, modifier = Modifier, text = "Click Me" )
+                TextBtn(onClick = { /*TODO*/ }, modifier = Modifier, text = "Click Me")
             }
         }
     }

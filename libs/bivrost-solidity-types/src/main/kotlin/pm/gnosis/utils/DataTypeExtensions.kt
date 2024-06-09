@@ -9,7 +9,6 @@ fun String.padStartMultiple(multiple: Int, padChar: Char = ' ') =
 fun String.padEndMultiple(multiple: Int, padChar: Char = ' ') =
     this.padEnd(if (this.length % multiple != 0) this.length + multiple - this.length % multiple else 0, padChar)
 
-
 private val hexArray = "0123456789abcdef".toCharArray()
 
 fun ByteArray.toHex(): String {
@@ -37,6 +36,9 @@ fun String.hexToByteArray(): ByteArray {
 // Compatibility method for pre Java8
 object BigIntegerUtils {
     fun exact(bigInteger: BigInteger): Int =
-        if (bigInteger.bitLength() <= 31) bigInteger.toInt()
-        else throw ArithmeticException("BigInteger out of int range ${bigInteger.bitLength()} ${bigInteger}")
+        if (bigInteger.bitLength() <= 31) {
+            bigInteger.toInt()
+        } else {
+            throw ArithmeticException("BigInteger out of int range ${bigInteger.bitLength()} $bigInteger")
+        }
 }

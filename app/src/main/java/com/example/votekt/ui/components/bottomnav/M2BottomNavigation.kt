@@ -1,3 +1,5 @@
+@file:Suppress("MaxLineLength")
+
 package com.example.votekt.ui.components.bottomnav
 
 import androidx.annotation.FloatRange
@@ -278,7 +280,8 @@ private fun BottomNavigationTransition(
 ) {
     val animationProgress by animateFloatAsState(
         targetValue = if (selected) 1f else 0f,
-        animationSpec = BottomNavigationAnimationSpec, label = ""
+        animationSpec = BottomNavigationAnimationSpec,
+        label = ""
     )
 
     val color = lerp(inactiveColor, activeColor, animationProgress)

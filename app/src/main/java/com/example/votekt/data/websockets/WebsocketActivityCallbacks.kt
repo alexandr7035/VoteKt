@@ -8,7 +8,7 @@ import com.example.votekt.domain.repository.WebsocketManager
 
 class WebsocketActivityCallbacks(
     private val websocketManager: WebsocketManager,
-): ActivityLifecycleCallbacks {
+) : ActivityLifecycleCallbacks {
 
     override fun onActivityStarted(activity: Activity) {
         Log.d(TAG, "app is going in foreground")

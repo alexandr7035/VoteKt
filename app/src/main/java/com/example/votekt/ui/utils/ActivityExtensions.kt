@@ -5,7 +5,8 @@ import android.view.WindowManager
 
 fun Activity.lockScreenshots() {
     window.setFlags(
-        WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE
+        WindowManager.LayoutParams.FLAG_SECURE,
+        WindowManager.LayoutParams.FLAG_SECURE
     )
 }
 

@@ -8,6 +8,6 @@ class GetContractStateUseCase(
     private val votingContractRepository: VotingContractRepository,
 ) {
     fun invoke(): Flow<ContractState> {
-        return votingContractRepository.getContractState()
+        return votingContractRepository.observeContractState()
     }
 }

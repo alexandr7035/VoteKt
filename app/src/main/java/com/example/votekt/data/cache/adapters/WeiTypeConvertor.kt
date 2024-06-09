@@ -5,7 +5,7 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.utils.parseToBigInteger
 import by.alexandr7035.utils.toHexString
 
-class WeiTypeConvertors {
+class WeiTypeConvertor {
     @TypeConverter
     fun fromWei(wei: Wei?): String? {
         return wei?.value?.toHexString()

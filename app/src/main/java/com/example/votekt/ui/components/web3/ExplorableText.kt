@@ -51,14 +51,12 @@ fun ExplorableText(
             tint = color,
         )
     }
-
-
 }
 
 @Composable
 @Preview
 fun ExplorableText_Preview() {
-    VoteKtTheme() {
+    VoteKtTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             ExplorableText(
                 text = "0x1234....000",
