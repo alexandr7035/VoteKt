@@ -1,4 +1,4 @@
-package com.example.votekt
+package by.alexandr7035.votekt
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("com.example.votekt", appContext.packageName)
+        assertEquals("by.alexandr7035.votekt", appContext.packageName)
     }
 }

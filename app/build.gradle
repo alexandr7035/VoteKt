@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace 'com.example.votekt'
+    namespace 'by.alexandr7035.votekt'
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.example.votekt"
+        applicationId "by.alexandr7035.votekt"
         minSdk 23
         targetSdk 34
         versionCode 1

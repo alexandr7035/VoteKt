@@ -1,4 +1,4 @@
-package com.example.votekt
+package by.alexandr7035.votekt
 
 import org.junit.Assert.*
 import org.junit.Test
