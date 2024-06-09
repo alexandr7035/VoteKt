@@ -1,7 +1,7 @@
 package by.alexandr7035.ethereum.model
 
-import java.math.BigInteger
 import org.kethereum.model.Address
+import java.math.BigInteger
 
 data class EthereumBlock(
     val number: BigInteger?,

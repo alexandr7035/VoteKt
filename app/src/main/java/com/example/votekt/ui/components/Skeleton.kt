@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.votekt.ui.theme.VoteKtTheme
 
-
 @Composable
 fun SkeletonShape(modifier: Modifier) {
     val startColor = Color.LightGray
@@ -65,22 +64,25 @@ fun SkeletonCircle(size: Dp) {
 private fun SkeletonColorAnimation(color: Animatable<Color, AnimationVector4D>, endColor: Color) {
     LaunchedEffect(Unit) {
         color.animateTo(
-            endColor, animationSpec = infiniteRepeatable(
+            endColor,
+            animationSpec = infiniteRepeatable(
                 animation = tween(
-                    durationMillis = 1000, delayMillis = 250
-                ), repeatMode = RepeatMode.Reverse
+                    durationMillis = 1000,
+                    delayMillis = 250
+                ),
+                repeatMode = RepeatMode.Reverse
             )
         )
     }
 }
 
-
 @Composable
 @Preview(widthDp = 300, heightDp = 56)
 fun SkeletonContainer_Preview() {
-    VoteKtTheme() {
+    VoteKtTheme {
         Row(
-            horizontalArrangement = Arrangement.spacedBy(16.dp), verticalAlignment = Alignment.CenterVertically
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             SkeletonCircle(56.dp)
 
@@ -90,6 +92,5 @@ fun SkeletonContainer_Preview() {
                     .height(24.dp)
             )
         }
-
     }
 }

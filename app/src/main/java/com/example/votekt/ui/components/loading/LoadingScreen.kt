@@ -1,14 +1,11 @@
 package com.example.votekt.ui.components.loading
 
-
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
@@ -73,11 +70,10 @@ fun LoadingScreen(
     }
 }
 
-
 @Preview
 @Composable
 fun LoadingScreen_Preview() {
-    VoteKtTheme() {
+    VoteKtTheme {
         Surface(color = MaterialTheme.colorScheme.background) {
             LoadingScreen(
                 title = UiText.DynamicString("Syncing with contract")

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 
-
+@Suppress("MagicNumber")
 @Composable
 fun DotsProgressIndicator(
     modifier: Modifier = Modifier,

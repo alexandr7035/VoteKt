@@ -7,7 +7,7 @@ import org.kethereum.model.Credentials
 
 class CryptoHelperImpl : CryptoHelper {
     override suspend fun generateCredentialsFromMnemonic(mnemonic: String): Credentials {
-       return MnemonicWords(mnemonic).toKey(BIP44_PATH_ETHEREUM).keyPair.toCredentials()
+        return MnemonicWords(mnemonic).toKey(BIP44_PATH_ETHEREUM).keyPair.toCredentials()
     }
 
     private companion object {

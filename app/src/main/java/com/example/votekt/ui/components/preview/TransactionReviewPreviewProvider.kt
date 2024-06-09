@@ -5,7 +5,7 @@ import by.alexandr7035.ethereum.model.ETHER
 import by.alexandr7035.ethereum.model.GWEI
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.core.resources.UiText
-import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionDataUi
+import com.example.votekt.ui.feature.transactions.review.ReviewTransactionDataUi
 import org.kethereum.model.Address
 
 class TransactionReviewPreviewProvider : PreviewParameterProvider<ReviewTransactionDataUi> {

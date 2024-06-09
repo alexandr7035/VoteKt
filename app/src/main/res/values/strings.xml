@@ -23,6 +23,8 @@
     <string name="no_transactions_yet">No Transactions yet</string>
     <string name="creator">Creator:</string>
     <string name="cd_user_avatar">user avatar</string>
+    <string name="draft">Draft</string>
+    <string name="on_vote">On Vote</string>
     <string name="draft_proposal">Draft proposal</string>
     <string name="proposals">Proposals</string>
     <string name="no_proposals_yet">No Proposals yet</string>
@@ -107,4 +109,5 @@
     <string name="welcome_desc_1">Take part in shaping the future by securely casting your vote on the blockchain</string>
     <string name="welcome_desc_2">Experience transparent and tamper-proof voting, ensuring every decision counts</string>
     <string name="welcome_desc_3">Share your ideas and collaborate with others to drive meaningful change in your community</string>
+    <string name="confirm_phrase">Confirm phrase</string>
 </resources>

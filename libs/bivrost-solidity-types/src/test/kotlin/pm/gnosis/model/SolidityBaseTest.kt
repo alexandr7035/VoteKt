@@ -1,6 +1,7 @@
+@file:Suppress("MaxLineLength")
+
 package pm.gnosis.model
 
-import org.junit.Assert
 import org.junit.Assert.*
 import org.junit.Test
 import pm.gnosis.exceptions.InvalidBitLengthException
@@ -20,10 +21,12 @@ class SolidityBaseTest {
             Solidity.UInt256(BigInteger.ONE).encode()
         )
 
-        //Max unsigned integer
+        // Max unsigned integer
         assertEquals(
             "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-            Solidity.UInt256(BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")).encode()
+            Solidity.UInt256(
+                BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+            ).encode()
         )
     }
 
@@ -39,10 +42,12 @@ class SolidityBaseTest {
             Solidity.UInt256(BigInteger.ONE).encodePacked()
         )
 
-        //Max unsigned integer
+        // Max unsigned integer
         assertEquals(
             "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
-            Solidity.UInt256(BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")).encodePacked()
+            Solidity.UInt256(
+                BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+            ).encodePacked()
         )
 
         assertEquals(
@@ -55,7 +60,7 @@ class SolidityBaseTest {
             Solidity.UInt8(BigInteger.ONE).encodePacked()
         )
 
-        //Max unsigned integer
+        // Max unsigned integer
         assertEquals(
             "ff",
             Solidity.UInt8(BigInteger("255")).encodePacked()
@@ -104,17 +109,25 @@ class SolidityBaseTest {
     fun testUIntDecodingWithPartitionData() {
         assertEquals(
             Solidity.UInt32(BigInteger.ZERO),
-            Solidity.UInt32.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000"))
+            Solidity.UInt32.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.UInt8(BigInteger.ONE),
-            Solidity.UInt8.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001"))
+            Solidity.UInt8.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001")
+            )
         )
 
         assertEquals(
-            Solidity.UInt256(BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")),
-            Solidity.UInt256.DECODER.decode(SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"))
+            Solidity.UInt256(
+                BigInteger("115792089237316195423570985008687907853269984665640564039457584007913129639935")
+            ),
+            Solidity.UInt256.DECODER.decode(
+                SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+            )
         )
     }
 
@@ -144,7 +157,6 @@ class SolidityBaseTest {
         )
     }
 
-
     @Test
     fun testBoolDecoding() {
         assertEquals(
@@ -162,12 +174,16 @@ class SolidityBaseTest {
     fun testBoolDecodingWithPartitionData() {
         assertEquals(
             Solidity.Bool(false),
-            Solidity.Bool.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000"))
+            Solidity.Bool.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.Bool(true),
-            Solidity.Bool.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001"))
+            Solidity.Bool.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001")
+            )
         )
     }
 
@@ -283,27 +299,37 @@ class SolidityBaseTest {
     fun testIntDecodingWithPartitionData() {
         assertEquals(
             Solidity.Int32(BigInteger.ZERO),
-            Solidity.Int32.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000"))
+            Solidity.Int32.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.Int8(BigInteger.ONE),
-            Solidity.Int8.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001"))
+            Solidity.Int8.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000001")
+            )
         )
 
         assertEquals(
             Solidity.Int256(BigInteger.valueOf(-1)),
-            Solidity.Int256.DECODER.decode(SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"))
+            Solidity.Int256.DECODER.decode(
+                SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff")
+            )
         )
 
         assertEquals(
             Solidity.Int256(BigInteger.valueOf(127)),
-            Solidity.Int256.DECODER.decode(SolidityBase.PartitionData.of("000000000000000000000000000000000000000000000000000000000000007f"))
+            Solidity.Int256.DECODER.decode(
+                SolidityBase.PartitionData.of("000000000000000000000000000000000000000000000000000000000000007f")
+            )
         )
 
         assertEquals(
             Solidity.Int256(BigInteger.valueOf(-128)),
-            Solidity.Int256.DECODER.decode(SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80"))
+            Solidity.Int256.DECODER.decode(
+                SolidityBase.PartitionData.of("ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff80")
+            )
         )
     }
 
@@ -355,35 +381,55 @@ class SolidityBaseTest {
 
     @Test
     fun testStaticBytesDecoding() {
-        assertArrayEquals(byteArrayOf(0), SolidityBase.decodeStaticBytes("0000000000000000000000000000000000000000000000000000000000000000", 1))
+        assertArrayEquals(
+            byteArrayOf(0),
+            SolidityBase.decodeStaticBytes("0000000000000000000000000000000000000000000000000000000000000000", 1)
+        )
 
-        assertArrayEquals(byteArrayOf(0, 1), SolidityBase.decodeStaticBytes("0001000000000000000000000000000000000000000000000000000000000000", 2))
+        assertArrayEquals(
+            byteArrayOf(0, 1),
+            SolidityBase.decodeStaticBytes("0001000000000000000000000000000000000000000000000000000000000000", 2)
+        )
 
-        assertArrayEquals(byteArrayOf(0, 1, 2), SolidityBase.decodeStaticBytes("0001020000000000000000000000000000000000000000000000000000000000", 3))
+        assertArrayEquals(
+            byteArrayOf(0, 1, 2),
+            SolidityBase.decodeStaticBytes("0001020000000000000000000000000000000000000000000000000000000000", 3)
+        )
 
-        assertArrayEquals("dave".toByteArray(), SolidityBase.decodeStaticBytes("6461766500000000000000000000000000000000000000000000000000000000", 4))
+        assertArrayEquals(
+            "dave".toByteArray(),
+            SolidityBase.decodeStaticBytes("6461766500000000000000000000000000000000000000000000000000000000", 4)
+        )
     }
 
     @Test
     fun testStaticBytesDecodingWithPartitionData() {
         assertEquals(
             Solidity.Bytes1(byteArrayOf(0)),
-            Solidity.Bytes1.DECODER.decode(SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000"))
+            Solidity.Bytes1.DECODER.decode(
+                SolidityBase.PartitionData.of("0000000000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.Bytes2(byteArrayOf(0, 1)),
-            Solidity.Bytes2.DECODER.decode(SolidityBase.PartitionData.of("0001000000000000000000000000000000000000000000000000000000000000"))
+            Solidity.Bytes2.DECODER.decode(
+                SolidityBase.PartitionData.of("0001000000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.Bytes3(byteArrayOf(0, 1, 2)),
-            Solidity.Bytes3.DECODER.decode(SolidityBase.PartitionData.of("0001020000000000000000000000000000000000000000000000000000000000"))
+            Solidity.Bytes3.DECODER.decode(
+                SolidityBase.PartitionData.of("0001020000000000000000000000000000000000000000000000000000000000")
+            )
         )
 
         assertEquals(
             Solidity.Bytes4("dave".toByteArray()),
-            Solidity.Bytes4.DECODER.decode(SolidityBase.PartitionData.of("6461766500000000000000000000000000000000000000000000000000000000"))
+            Solidity.Bytes4.DECODER.decode(
+                SolidityBase.PartitionData.of("6461766500000000000000000000000000000000000000000000000000000000")
+            )
         )
     }
 
@@ -407,7 +453,9 @@ class SolidityBaseTest {
     fun testVectorEncoding() {
         assertEquals(
             "000000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789",
-            SolidityBase.Vector(listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16)))).encode()
+            SolidityBase.Vector(
+                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16)))
+            ).encode()
         )
 
         assertEquals(
@@ -425,7 +473,9 @@ class SolidityBaseTest {
     fun testVectorPackedEncoding() {
         assertEquals(
             "00000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789",
-            SolidityBase.Vector(listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16)))).encodePacked()
+            SolidityBase.Vector(
+                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16)))
+            ).encodePacked()
         )
 
         assertEquals(
@@ -460,7 +510,7 @@ class SolidityBaseTest {
         )
 
         testData =
-                "0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000032100000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789"
+            "0000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000032100000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789"
         val source = SolidityBase.PartitionData.of(testData)
         val expected = SolidityBase.Vector(
             listOf(
@@ -469,14 +519,20 @@ class SolidityBaseTest {
                 TestArray(listOf(Solidity.UInt256(BigInteger("789", 16))), 1)
             )
         )
-        assertEquals(expected, SolidityBase.Vector.Decoder(TestArray.Decoder(Solidity.UInt256.DECODER, 1)).decode(source))
+        assertEquals(
+            expected,
+            SolidityBase.Vector.Decoder(TestArray.Decoder(Solidity.UInt256.DECODER, 1)).decode(source)
+        )
     }
 
     @Test
     fun testFixedArrayEncoding() {
         assertEquals(
             "00000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789",
-            TestArray(listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))), 2).encode()
+            TestArray(
+                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))),
+                2
+            ).encode()
         )
 
         assertEquals(
@@ -494,7 +550,10 @@ class SolidityBaseTest {
     fun testFixedArrayPackedEncoding() {
         assertEquals(
             "00000000000000000000000000000000000000000000000000000000000004560000000000000000000000000000000000000000000000000000000000000789",
-            TestArray(listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))), 2).encodePacked()
+            TestArray(
+                listOf(Solidity.UInt32(BigInteger("456", 16)), Solidity.UInt32(BigInteger("789", 16))),
+                2
+            ).encodePacked()
         )
 
         assertEquals(
@@ -553,7 +612,10 @@ class SolidityBaseTest {
 
         assertEquals(
             emptyList<SolidityBase.StaticType>(),
-            SolidityBase.decodeArray("0000000000000000000000000000000000000000000000000000000000000000", SolidityBase::decodeBool)
+            SolidityBase.decodeArray(
+                "0000000000000000000000000000000000000000000000000000000000000000",
+                SolidityBase::decodeBool
+            )
         )
     }
 
@@ -617,27 +679,47 @@ class SolidityBaseTest {
     fun testDynamicBytesDecoding() {
         assertArrayEquals(
             "Hello, world!".toByteArray(),
-            SolidityBase.decodeBytes(SolidityBase.PartitionData.of("000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000"))
+            SolidityBase.decodeBytes(
+                SolidityBase.PartitionData.of(
+                    "000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
+                )
+            )
         )
 
         assertArrayEquals(
             byteArrayOf(0),
-            SolidityBase.decodeBytes(SolidityBase.PartitionData.of("00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"))
+            SolidityBase.decodeBytes(
+                SolidityBase.PartitionData.of(
+                    "00000000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000000"
+                )
+            )
         )
 
         assertArrayEquals(
             byteArrayOf(0, 1),
-            SolidityBase.decodeBytes(SolidityBase.PartitionData.of("00000000000000000000000000000000000000000000000000000000000000020001000000000000000000000000000000000000000000000000000000000000"))
+            SolidityBase.decodeBytes(
+                SolidityBase.PartitionData.of(
+                    "00000000000000000000000000000000000000000000000000000000000000020001000000000000000000000000000000000000000000000000000000000000"
+                )
+            )
         )
 
         assertArrayEquals(
             byteArrayOf(0, 1, 2),
-            SolidityBase.decodeBytes(SolidityBase.PartitionData.of("00000000000000000000000000000000000000000000000000000000000000030001020000000000000000000000000000000000000000000000000000000000"))
+            SolidityBase.decodeBytes(
+                SolidityBase.PartitionData.of(
+                    "00000000000000000000000000000000000000000000000000000000000000030001020000000000000000000000000000000000000000000000000000000000"
+                )
+            )
         )
 
         assertArrayEquals(
             "dave".toByteArray(),
-            SolidityBase.decodeBytes(SolidityBase.PartitionData.of("00000000000000000000000000000000000000000000000000000000000000046461766500000000000000000000000000000000000000000000000000000000"))
+            SolidityBase.decodeBytes(
+                SolidityBase.PartitionData.of(
+                    "00000000000000000000000000000000000000000000000000000000000000046461766500000000000000000000000000000000000000000000000000000000"
+                )
+            )
         )
     }
 
@@ -645,19 +727,29 @@ class SolidityBaseTest {
     fun testStringDecoding() {
         assertEquals(
             "Hello, world!",
-            SolidityBase.decodeString(SolidityBase.PartitionData.of("000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000"))
+            SolidityBase.decodeString(
+                SolidityBase.PartitionData.of(
+                    "000000000000000000000000000000000000000000000000000000000000000d48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
+                )
+            )
         )
     }
 
     @Test
     fun testDecodeEncodeDynamicStringArray() {
         val items = listOf(
-            Solidity.String("Hi"), Solidity.String("I"), Solidity.String("want"),
-            Solidity.String("to"), Solidity.String("learn"), Solidity.String("Solidity")
+            Solidity.String("Hi"),
+            Solidity.String("I"),
+            Solidity.String("want"),
+            Solidity.String("to"),
+            Solidity.String("learn"),
+            Solidity.String("Solidity")
         )
         val encoded = SolidityBase.Vector(items).encode()
         assertEquals("Encoded string not correct!", ENCODED_DYNAMIC_STRING_ARRAY, encoded)
-        val decoded = SolidityBase.Vector.Decoder(Solidity.String.DECODER).decode(SolidityBase.PartitionData.of(encoded))
+        val decoded = SolidityBase.Vector.Decoder(
+            Solidity.String.DECODER
+        ).decode(SolidityBase.PartitionData.of(encoded))
         assertEquals(items.size, decoded.items.size)
         for (i in 0 until items.size) {
             assertEquals(items[i].value, decoded.items[i].value)
@@ -682,10 +774,16 @@ class SolidityBaseTest {
         val source = SolidityBase.PartitionData.of(encoded)
         assertEquals(Solidity.UInt256.DECODER.decode(source), items[0])
         val offsetUint32s = BigInteger(source.consume(), 16).intValueExact()
-        assertEquals(SolidityBase.Vector.Decoder(Solidity.UInt32.DECODER).decode(source.subData(offsetUint32s)), items[1])
+        assertEquals(
+            SolidityBase.Vector.Decoder(Solidity.UInt32.DECODER).decode(source.subData(offsetUint32s)),
+            items[1]
+        )
         assertEquals(Solidity.Bytes10.DECODER.decode(source), items[2])
         val offsetBytes = BigInteger(source.consume(), 16).intValueExact()
-        assertArrayEquals(Solidity.Bytes.DECODER.decode(source.subData(offsetBytes)).items, (items[3] as Solidity.Bytes).items)
+        assertArrayEquals(
+            Solidity.Bytes.DECODER.decode(source.subData(offsetBytes)).items,
+            (items[3] as Solidity.Bytes).items
+        )
     }
 
     @Test
@@ -712,21 +810,27 @@ class SolidityBaseTest {
         val offsetUints = BigInteger(source.consume(), 16).intValueExact()
         assertEquals(
             SolidityBase.Vector.Decoder(SolidityBase.Vector.Decoder(Solidity.UInt256.DECODER))
-                .decode(source.subData(offsetUints)), items[0]
+                .decode(source.subData(offsetUints)),
+            items[0]
         )
 
         val offsetStrings = BigInteger(source.consume(), 16).intValueExact()
         assertEquals(
             SolidityBase.Vector.Decoder(Solidity.String.DECODER)
-                .decode(source.subData(offsetStrings)), items[1]
+                .decode(source.subData(offsetStrings)),
+            items[1]
         )
     }
 
     @Test
     fun testDecodeEncodeStaticStringArray() {
         val items = listOf(
-            Solidity.String("Hi"), Solidity.String("I"), Solidity.String("want"),
-            Solidity.String("to"), Solidity.String("learn"), Solidity.String("Solidity")
+            Solidity.String("Hi"),
+            Solidity.String("I"),
+            Solidity.String("want"),
+            Solidity.String("to"),
+            Solidity.String("learn"),
+            Solidity.String("Solidity")
         )
         val encoded = TestArray(items, 6).encode()
         assertEquals("Encoded string not correct!", ENCODED_STATIC_STRING_ARRAY, encoded)
@@ -740,8 +844,12 @@ class SolidityBaseTest {
     @Test(expected = IllegalArgumentException::class)
     fun testDynamicVectorPackedEncoding() {
         val items = listOf(
-            Solidity.String("Hi"), Solidity.String("I"), Solidity.String("want"),
-            Solidity.String("to"), Solidity.String("learn"), Solidity.String("Solidity")
+            Solidity.String("Hi"),
+            Solidity.String("I"),
+            Solidity.String("want"),
+            Solidity.String("to"),
+            Solidity.String("learn"),
+            Solidity.String("Solidity")
         )
         SolidityBase.Vector(items).encodePacked()
     }
@@ -749,8 +857,12 @@ class SolidityBaseTest {
     @Test(expected = IllegalArgumentException::class)
     fun testDynamicArrayPackedEncoding() {
         val items = listOf(
-            Solidity.String("Hi"), Solidity.String("I"), Solidity.String("want"),
-            Solidity.String("to"), Solidity.String("learn"), Solidity.String("Solidity")
+            Solidity.String("Hi"),
+            Solidity.String("I"),
+            Solidity.String("want"),
+            Solidity.String("to"),
+            Solidity.String("learn"),
+            Solidity.String("Solidity")
         )
         TestArray(items, 6).encodePacked()
     }
@@ -804,7 +916,10 @@ class SolidityBaseTest {
         return clazz.replaceRange(index, index + 1, "$")
     }
 
-    private class TestArray<out T : SolidityBase.Type>(items: List<T>, capacity: Int) : SolidityBase.Array<T>(items, capacity) {
+    private class TestArray<out T : SolidityBase.Type>(items: List<T>, capacity: Int) : SolidityBase.Array<T>(
+        items,
+        capacity
+    ) {
 
         class Decoder<out T : SolidityBase.Type>(val itemDecoder: SolidityBase.TypeDecoder<T>, val capacity: Int) :
             SolidityBase.TypeDecoder<TestArray<T>> {
@@ -817,103 +932,102 @@ class SolidityBaseTest {
     companion object {
 
         const val ENCODED_MALFORMED_BYTES_TUPLE = "" +
-                // Location of first empty bytes
-                "0000000000000000000000000000000000000000000000000000000000000040" +
-                // Location of String "Broken"
-                "0000000000000000000000000000000000000000000000000000000000000080" +
+            // Location of first empty bytes
+            "0000000000000000000000000000000000000000000000000000000000000040" +
+            // Location of String "Broken"
+            "0000000000000000000000000000000000000000000000000000000000000080" +
 
-                // Length of empty bytes
-                "0000000000000000000000000000000000000000000000000000000000000000" +
-                // Empty body of empty bytes
-                "0000000000000000000000000000000000000000000000000000000000000000" +
+            // Length of empty bytes
+            "0000000000000000000000000000000000000000000000000000000000000000" +
+            // Empty body of empty bytes
+            "0000000000000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "Broken"
-                "0000000000000000000000000000000000000000000000000000000000000006" +
-                // Byte string of "Broken"
-                "42726f6b656e0000000000000000000000000000000000000000000000000000"
+            // Length of "Broken"
+            "0000000000000000000000000000000000000000000000000000000000000006" +
+            // Byte string of "Broken"
+            "42726f6b656e0000000000000000000000000000000000000000000000000000"
 
         // Encoded string of ["Hi", "I", "want", "to", "learn", "Solidity"]
         const val ENCODED_STATIC_STRING_ARRAY = "" +
-                // Location of String "Hi"
-                "00000000000000000000000000000000000000000000000000000000000000c0" +
-                // Location of String "I"
-                "0000000000000000000000000000000000000000000000000000000000000100" +
-                // Location of String "want"
-                "0000000000000000000000000000000000000000000000000000000000000140" +
-                // Location of String "to"
-                "0000000000000000000000000000000000000000000000000000000000000180" +
-                // Location of String "learn"
-                "00000000000000000000000000000000000000000000000000000000000001c0" +
-                // Location of String "Solidity"
-                "0000000000000000000000000000000000000000000000000000000000000200" +
+            // Location of String "Hi"
+            "00000000000000000000000000000000000000000000000000000000000000c0" +
+            // Location of String "I"
+            "0000000000000000000000000000000000000000000000000000000000000100" +
+            // Location of String "want"
+            "0000000000000000000000000000000000000000000000000000000000000140" +
+            // Location of String "to"
+            "0000000000000000000000000000000000000000000000000000000000000180" +
+            // Location of String "learn"
+            "00000000000000000000000000000000000000000000000000000000000001c0" +
+            // Location of String "Solidity"
+            "0000000000000000000000000000000000000000000000000000000000000200" +
 
-                // Length of "Hi"
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                // Byte string of "Hi"
-                "4869000000000000000000000000000000000000000000000000000000000000" +
+            // Length of "Hi"
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            // Byte string of "Hi"
+            "4869000000000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "I"
-                "0000000000000000000000000000000000000000000000000000000000000001" +
-                // Byte string of "I"
-                "4900000000000000000000000000000000000000000000000000000000000000" +
+            // Length of "I"
+            "0000000000000000000000000000000000000000000000000000000000000001" +
+            // Byte string of "I"
+            "4900000000000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "want"
-                "0000000000000000000000000000000000000000000000000000000000000004" +
-                // Byte string of "Want"
-                "77616e7400000000000000000000000000000000000000000000000000000000" +
+            // Length of "want"
+            "0000000000000000000000000000000000000000000000000000000000000004" +
+            // Byte string of "Want"
+            "77616e7400000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "to"
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                // Byte string of "to"
-                "746f000000000000000000000000000000000000000000000000000000000000" +
+            // Length of "to"
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            // Byte string of "to"
+            "746f000000000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "learn"
-                "0000000000000000000000000000000000000000000000000000000000000005" +
-                // Byte string of "learn"
-                "6c6561726e000000000000000000000000000000000000000000000000000000" +
+            // Length of "learn"
+            "0000000000000000000000000000000000000000000000000000000000000005" +
+            // Byte string of "learn"
+            "6c6561726e000000000000000000000000000000000000000000000000000000" +
 
-                // Length of "Solidity"
-                "0000000000000000000000000000000000000000000000000000000000000008" +
-                // Byte string of "Solidity"
-                "536f6c6964697479000000000000000000000000000000000000000000000000"
+            // Length of "Solidity"
+            "0000000000000000000000000000000000000000000000000000000000000008" +
+            // Byte string of "Solidity"
+            "536f6c6964697479000000000000000000000000000000000000000000000000"
 
         const val ENCODED_DYNAMIC_STRING_ARRAY = "" +
-                // Array length
-                "0000000000000000000000000000000000000000000000000000000000000006" +
-                ENCODED_STATIC_STRING_ARRAY
+            // Array length
+            "0000000000000000000000000000000000000000000000000000000000000006" +
+            ENCODED_STATIC_STRING_ARRAY
 
         const val ENCODED_SOLIDITY_EXAMPLE_TUPLE = "" +
-                "0000000000000000000000000000000000000000000000000000000000000123" +
-                "0000000000000000000000000000000000000000000000000000000000000080" +
-                "3132333435363738393000000000000000000000000000000000000000000000" +
-                "00000000000000000000000000000000000000000000000000000000000000e0" +
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                "0000000000000000000000000000000000000000000000000000000000000456" +
-                "0000000000000000000000000000000000000000000000000000000000000789" +
-                "000000000000000000000000000000000000000000000000000000000000000d" +
-                "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
+            "0000000000000000000000000000000000000000000000000000000000000123" +
+            "0000000000000000000000000000000000000000000000000000000000000080" +
+            "3132333435363738393000000000000000000000000000000000000000000000" +
+            "00000000000000000000000000000000000000000000000000000000000000e0" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "0000000000000000000000000000000000000000000000000000000000000456" +
+            "0000000000000000000000000000000000000000000000000000000000000789" +
+            "000000000000000000000000000000000000000000000000000000000000000d" +
+            "48656c6c6f2c20776f726c642100000000000000000000000000000000000000"
 
         const val ENCODED_SOLIDITY_EXAMPLE_TUPLE_NESTED = "" +
-                "0000000000000000000000000000000000000000000000000000000000000040" +
-                "0000000000000000000000000000000000000000000000000000000000000140" +
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                "0000000000000000000000000000000000000000000000000000000000000040" +
-                "00000000000000000000000000000000000000000000000000000000000000a0" +
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                "0000000000000000000000000000000000000000000000000000000000000001" +
-                "0000000000000000000000000000000000000000000000000000000000000002" +
-                "0000000000000000000000000000000000000000000000000000000000000001" +
-                "0000000000000000000000000000000000000000000000000000000000000003" +
-                "0000000000000000000000000000000000000000000000000000000000000003" +
-                "0000000000000000000000000000000000000000000000000000000000000060" +
-                "00000000000000000000000000000000000000000000000000000000000000a0" +
-                "00000000000000000000000000000000000000000000000000000000000000e0" +
-                "0000000000000000000000000000000000000000000000000000000000000003" +
-                "6f6e650000000000000000000000000000000000000000000000000000000000" +
-                "0000000000000000000000000000000000000000000000000000000000000003" +
-                "74776f0000000000000000000000000000000000000000000000000000000000" +
-                "0000000000000000000000000000000000000000000000000000000000000005" +
-                "7468726565000000000000000000000000000000000000000000000000000000"
-
+            "0000000000000000000000000000000000000000000000000000000000000040" +
+            "0000000000000000000000000000000000000000000000000000000000000140" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "0000000000000000000000000000000000000000000000000000000000000040" +
+            "00000000000000000000000000000000000000000000000000000000000000a0" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "0000000000000000000000000000000000000000000000000000000000000001" +
+            "0000000000000000000000000000000000000000000000000000000000000002" +
+            "0000000000000000000000000000000000000000000000000000000000000001" +
+            "0000000000000000000000000000000000000000000000000000000000000003" +
+            "0000000000000000000000000000000000000000000000000000000000000003" +
+            "0000000000000000000000000000000000000000000000000000000000000060" +
+            "00000000000000000000000000000000000000000000000000000000000000a0" +
+            "00000000000000000000000000000000000000000000000000000000000000e0" +
+            "0000000000000000000000000000000000000000000000000000000000000003" +
+            "6f6e650000000000000000000000000000000000000000000000000000000000" +
+            "0000000000000000000000000000000000000000000000000000000000000003" +
+            "74776f0000000000000000000000000000000000000000000000000000000000" +
+            "0000000000000000000000000000000000000000000000000000000000000005" +
+            "7468726565000000000000000000000000000000000000000000000000000000"
     }
 }

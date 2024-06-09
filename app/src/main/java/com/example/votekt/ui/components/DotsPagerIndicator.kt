@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -30,14 +29,12 @@ fun DotsPagerIndicator(
     dotSize: Dp = 8.dp,
     dotSpace: Dp = 24.dp,
 ) {
-
     LazyRow(
         modifier = Modifier
             .wrapContentWidth()
             .wrapContentHeight()
             .then(modifier),
     ) {
-
         items(totalDots) { index ->
             if (index == selectedIndex) {
                 Box(
@@ -60,7 +57,6 @@ fun DotsPagerIndicator(
         }
     }
 }
-
 
 @Preview
 @Composable

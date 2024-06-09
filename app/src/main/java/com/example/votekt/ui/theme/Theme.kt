@@ -2,7 +2,6 @@ package com.example.votekt.ui.theme
 
 import android.app.Activity
 import android.os.Build
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
@@ -26,10 +25,9 @@ private val LightColorScheme = lightColorScheme(
     primary = AppBlack,
     secondary = AppBlackSecond,
     background = AppGreyBg,
-    tertiary = Gray50,
+    tertiary = Gray30,
     surfaceVariant = Color.White,
     onPrimary = Color.White
-
 
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
@@ -38,7 +36,7 @@ private val LightColorScheme = lightColorScheme(
     onTertiary = Color.White,
     onBackground = Color(0xFF1C1B1F),
     onSurface = Color(0xFF1C1B1F),
-    */
+     */
 )
 
 @Composable

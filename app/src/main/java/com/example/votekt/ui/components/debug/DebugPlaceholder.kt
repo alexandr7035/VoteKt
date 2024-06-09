@@ -1,4 +1,4 @@
-package by.alexandr7035.space.ui.components.debug
+package com.example.votekt.ui.components.debug
 
 import androidx.annotation.DrawableRes
 import androidx.compose.runtime.Composable

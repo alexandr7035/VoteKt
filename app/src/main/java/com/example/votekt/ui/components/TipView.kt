@@ -26,9 +26,12 @@ import com.example.votekt.ui.components.preview.ScreenPreview
 import com.example.votekt.ui.core.resources.UiText
 import com.example.votekt.ui.theme.Dimensions
 
-enum class TipType {
-    NORMAL,
-    WARMING
+private const val TIP_COLOR_INFO = 0xC063B3D7
+private const val TIP_COLOR_WARNING = 0xC0FF9462
+
+enum class TipType(val color: Long) {
+    NORMAL(TIP_COLOR_INFO),
+    WARMING(TIP_COLOR_WARNING)
 }
 
 private val tipShape = RoundedCornerShape(16.dp)
@@ -43,10 +46,7 @@ fun TipView(
         modifier = modifier.then(
             Modifier
                 .background(
-                    color = when (tipType) {
-                        TipType.NORMAL -> Color(0xC063B3D7)
-                        TipType.WARMING -> Color(0xC0FF9462)
-                    },
+                    color = Color(tipType.color),
                     shape = tipShape,
                 )
                 .clip(tipShape)
@@ -79,7 +79,7 @@ fun TipView(
 @Composable
 @Preview
 private fun Tip_Preview() {
-    ScreenPreview() {
+    ScreenPreview {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {

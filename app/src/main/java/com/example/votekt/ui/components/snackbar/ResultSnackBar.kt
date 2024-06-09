@@ -22,7 +22,8 @@ import androidx.compose.ui.unit.sp
 import com.example.votekt.ui.components.preview.ScreenPreview
 
 suspend fun SnackbarHostState.showResultSnackBar(
-    message: String, snackBarMode: SnackBarMode = SnackBarMode.Neutral
+    message: String,
+    snackBarMode: SnackBarMode = SnackBarMode.Neutral
 ) {
     showSnackbar(
         ResultSnackBarVisuals(
@@ -34,22 +35,21 @@ suspend fun SnackbarHostState.showResultSnackBar(
 
 @Composable
 fun ResultSnackBar(
-    snackbarData: SnackbarData,
+    snackBarData: SnackbarData,
     cornerRadius: Dp = 16.dp,
     fontSize: TextUnit = 18.sp
 ) {
-
-    val customVisuals = snackbarData.visuals as? ResultSnackBarVisuals
-    if (customVisuals != null) {
-        ResultSnackBar_UI(
-            message = snackbarData.visuals.message,
-            fontSize = fontSize,
-            cornerRadius = cornerRadius,
-            snackBarMode = customVisuals.snackBarMode
-        )
-    } else {
-        throw IllegalStateException("Unexpected visuals in ResultSnackBar")
+    val customVisuals = snackBarData.visuals as? ResultSnackBarVisuals
+    require(customVisuals != null) {
+        "Unexpected visuals in ResultSnackBar"
     }
+
+    ResultSnackBar_UI(
+        message = snackBarData.visuals.message,
+        fontSize = fontSize,
+        cornerRadius = cornerRadius,
+        snackBarMode = customVisuals.snackBarMode
+    )
 }
 
 @Composable
@@ -74,7 +74,9 @@ private fun ResultSnackBar_UI(
                 .fillMaxWidth()
         ) {
             Text(
-                text = message, fontSize = fontSize, color = Color.White
+                text = message,
+                fontSize = fontSize,
+                color = Color.White
             )
         }
     }
@@ -86,15 +88,18 @@ fun ResultSnackBar_Preview() {
     ScreenPreview {
         Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
             ResultSnackBar_UI(
-                message = "Test message", snackBarMode = SnackBarMode.Neutral
+                message = "Test message",
+                snackBarMode = SnackBarMode.Neutral
             )
 
             ResultSnackBar_UI(
-                message = "Test message", snackBarMode = SnackBarMode.Positive
+                message = "Test message",
+                snackBarMode = SnackBarMode.Positive
             )
 
             ResultSnackBar_UI(
-                message = "Test message", snackBarMode = SnackBarMode.Negative
+                message = "Test message",
+                snackBarMode = SnackBarMode.Negative
             )
         }
     }

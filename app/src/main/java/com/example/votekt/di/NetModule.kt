@@ -1,14 +1,14 @@
 package com.example.votekt.di
 
-import by.alexandr7035.ethereum_impl.adapters.AddressAdapter
-import by.alexandr7035.ethereum_impl.adapters.BigDecimalNumberAdapter
-import by.alexandr7035.ethereum_impl.adapters.DecimalNumberAdapter
-import by.alexandr7035.ethereum_impl.adapters.DefaultNumberAdapter
-import by.alexandr7035.ethereum_impl.adapters.HexNumberAdapter
-import by.alexandr7035.ethereum_impl.adapters.WeiAdapter
-import by.alexandr7035.ethereum_impl.api.RetrofitEthereumRpcApi
+import by.alexandr7035.ethereumimpl.adapters.AddressAdapter
+import by.alexandr7035.ethereumimpl.adapters.BigDecimalNumberAdapter
+import by.alexandr7035.ethereumimpl.adapters.DecimalNumberAdapter
+import by.alexandr7035.ethereumimpl.adapters.DefaultNumberAdapter
+import by.alexandr7035.ethereumimpl.adapters.HexNumberAdapter
+import by.alexandr7035.ethereumimpl.adapters.WeiAdapter
+import by.alexandr7035.ethereumimpl.api.RetrofitEthereumRpcApi
 import com.example.votekt.BuildConfig
-import com.example.votekt.data.InfuraAuthInterceptor
+import com.example.votekt.data.network.InfuraAuthInterceptor
 import com.squareup.moshi.Moshi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -65,5 +65,4 @@ val netModule = module {
             .build()
             .create(RetrofitEthereumRpcApi::class.java)
     }
-    
 }

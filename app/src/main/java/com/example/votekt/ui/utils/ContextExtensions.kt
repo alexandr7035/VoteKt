@@ -48,9 +48,10 @@ fun Context.openBiometricsSettings() {
     startActivity(intent)
 }
 fun Context.openAppSystemSettings() {
-    startActivity(Intent().apply {
-        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        data = Uri.fromParts("package", packageName, null)
-    })
+    startActivity(
+        Intent().apply {
+            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.fromParts("package", packageName, null)
+        }
+    )
 }
-

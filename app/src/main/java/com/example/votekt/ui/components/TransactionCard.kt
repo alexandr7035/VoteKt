@@ -27,18 +27,19 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import by.alexandr7035.ethereum.model.WEI
+import by.alexandr7035.ethereum.model.Wei
 import com.example.votekt.R
 import com.example.votekt.core.extensions.getFormattedDate
-import com.example.votekt.domain.model.blockchain_explorer.ExploreType
+import com.example.votekt.domain.model.explorer.ExploreType
 import com.example.votekt.domain.transactions.TransactionDomain
 import com.example.votekt.domain.transactions.TransactionType
 import com.example.votekt.ui.components.preview.TransactionPreviewProvider
 import com.example.votekt.ui.components.web3.ExplorableText
 import com.example.votekt.ui.core.resources.UiText
+import com.example.votekt.ui.feature.transactions.history.model.getTransactionStatusUi
 import com.example.votekt.ui.theme.Dimensions
 import com.example.votekt.ui.theme.VoteKtTheme
 import com.example.votekt.ui.utils.BalanceFormatter
-import com.example.votekt.ui.utils.getTransactionStatusUi
 import com.example.votekt.ui.utils.prettifyAddress
 
 private const val TRANSACTION_DATE_FORMAT = "dd MMM yyyy HH:mm:ss"
@@ -97,39 +98,10 @@ private fun TransactionCardUi(
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.End
-            ) {
-                Text(
-                    text = "- ${BalanceFormatter.formatAmount(
-                        amount = transaction.value?.toEther() ?: 0.WEI.toEther(),
-                    )}",
-                    fontSize = 28.sp,
-                )
-
-                Image(
-                    modifier = Modifier.size(28.dp),
-                    painter = painterResource(id = R.drawable.ic_ethereum),
-                    contentDescription = stringResource(R.string.eth)
-                )
-            }
+            ValueComponent(transaction)
 
             transaction.gasFee?.let {
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Gas fee: ${
-                        BalanceFormatter.formatAmountWithSymbol(
-                            amount = it.toEther(),
-                            symbol = stringResource(R.string.ticker_eth)
-                        )
-                    }",
-                    style = TextStyle(
-                        textAlign = TextAlign.End,
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    modifier = Modifier.fillMaxWidth()
-                )
+                GasFeeComponent(it)
             }
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -146,6 +118,48 @@ private fun TransactionCardUi(
             )
         }
     }
+}
+
+@Composable
+private fun ValueComponent(transaction: TransactionDomain) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.End
+    ) {
+        Text(
+            text = "- ${
+                BalanceFormatter.formatAmount(
+                    amount = transaction.value?.toEther() ?: 0.WEI.toEther(),
+                )
+            }",
+            fontSize = 28.sp,
+        )
+
+        Image(
+            modifier = Modifier.size(28.dp),
+            painter = painterResource(id = R.drawable.ic_ethereum),
+            contentDescription = stringResource(R.string.eth)
+        )
+    }
+}
+
+@Composable
+private fun GasFeeComponent(it: Wei) {
+    Spacer(modifier = Modifier.height(8.dp))
+    Text(
+        text = stringResource(
+            R.string.gas_fee_template,
+            BalanceFormatter.formatAmountWithSymbol(
+                amount = it.toEther(),
+                symbol = stringResource(R.string.ticker_eth)
+            )
+        ),
+        style = TextStyle(
+            textAlign = TextAlign.End,
+            fontWeight = FontWeight.SemiBold
+        ),
+        modifier = Modifier.fillMaxWidth()
+    )
 }
 
 private fun TransactionType.getTransactionUiType(): UiText {

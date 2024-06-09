@@ -8,4 +8,7 @@
     <string name="percentage_template">%1$s%%</string>
     <string name="field_length_template">%1$s / %2$s</string>
     <string name="mnemonic_word_indexed_template">%1$d. %2$s</string>
+
+    <string name="gas_fee_template">Gas fee: </string>
+    <string name="word_template">Word #</string>
 </resources>

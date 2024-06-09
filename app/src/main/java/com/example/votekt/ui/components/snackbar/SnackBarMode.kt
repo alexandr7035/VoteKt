@@ -9,9 +9,9 @@ sealed class SnackBarMode {
 
     fun getSurfaceColor(): Color {
         return when (this) {
-            is Positive -> SnackbarColors.positiveColor
-            is Negative -> SnackbarColors.negativeColor
-            is Neutral -> SnackbarColors.neutralColor
+            is Positive -> SnackBarColors.positiveColor
+            is Negative -> SnackBarColors.negativeColor
+            is Neutral -> SnackBarColors.neutralColor
         }
     }
 }

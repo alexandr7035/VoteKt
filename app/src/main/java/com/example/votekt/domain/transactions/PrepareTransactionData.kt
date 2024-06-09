@@ -4,7 +4,6 @@ import by.alexandr7035.ethereum.model.EthTransactionInput
 import by.alexandr7035.ethereum.model.WEI
 import by.alexandr7035.ethereum.model.Wei
 import org.kethereum.model.Address
-import java.math.BigInteger
 
 sealed class PrepareTransactionData(
     open val value: Wei
@@ -12,19 +11,19 @@ sealed class PrepareTransactionData(
     data class SendValue(
         override val value: Wei,
         val receiver: Address,
-    ): PrepareTransactionData(value)
+    ) : PrepareTransactionData(value)
 
     sealed class ContractInteraction(
         open val contractAddress: Address,
         open val contractInput: EthTransactionInput,
         override val value: Wei,
-    ): PrepareTransactionData(value) {
+    ) : PrepareTransactionData(value) {
         data class CreateProposal(
             override val contractAddress: Address,
             override val contractInput: EthTransactionInput,
             override val value: Wei,
             val proposalUuid: String,
-        ): ContractInteraction(contractAddress, contractInput, value)
+        ) : ContractInteraction(contractAddress, contractInput, value)
 
         data class VoteOnProposal(
             override val contractAddress: Address,
@@ -32,7 +31,7 @@ sealed class PrepareTransactionData(
             override val value: Wei = 0.WEI,
             val proposalNumber: Int,
             val vote: Boolean,
-        ): ContractInteraction(contractAddress, contractInput, value)
+        ) : ContractInteraction(contractAddress, contractInput, value)
     }
 
     val to: Address

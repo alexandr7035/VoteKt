@@ -1,6 +1,6 @@
 package com.example.votekt.ui.core
 
-import com.example.votekt.domain.model.blockchain_explorer.ExploreType
+import com.example.votekt.domain.model.explorer.ExploreType
 
 sealed class AppIntent {
     object EnterApp : AppIntent()

@@ -4,20 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.core.EthereumEventListener
-import by.alexandr7035.ethereum.model.eth_events.EthEventsSubscriptionState
+import by.alexandr7035.ethereum.model.events.EthEventsSubscriptionState
 import com.example.votekt.R
 import com.example.votekt.domain.account.AccountRepository
 import com.example.votekt.domain.core.OperationResult
-import com.example.votekt.domain.model.blockchain_explorer.ExploreType
+import com.example.votekt.domain.model.explorer.ExploreType
 import com.example.votekt.domain.security.CheckAppLockUseCase
 import com.example.votekt.domain.security.CheckAppLockedWithBiometricsUseCase
-import com.example.votekt.domain.transactions.SendTransactionRepository
 import com.example.votekt.domain.transactions.ReviewTransactionData
-import com.example.votekt.domain.usecase.blockchain_explorer.GetBlockchainExplorerUrlUseCase
-import com.example.votekt.domain.usecase.node_connection.ConnectToNodeUseCase
+import com.example.votekt.domain.transactions.SendTransactionRepository
+import com.example.votekt.domain.usecase.explorer.GetBlockchainExplorerUrlUseCase
+import com.example.votekt.domain.usecase.node.ConnectToNodeUseCase
 import com.example.votekt.ui.core.resources.UiText
-import com.example.votekt.ui.feature_confirm_transaction.ReviewTransactionIntent
-import com.example.votekt.ui.feature_confirm_transaction.mapToUi
+import com.example.votekt.ui.feature.transactions.review.ReviewTransactionIntent
+import com.example.votekt.ui.feature.transactions.review.mapToUi
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,6 +27,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+// TODO fix suppress
+@Suppress("TooManyFunctions")
 class AppViewModel(
     private val accountRepository: AccountRepository,
     private val connectToNodeUseCase: ConnectToNodeUseCase,
@@ -76,9 +78,13 @@ class AppViewModel(
                 if (intent.isSuccessful) {
                     submitTransaction()
                 } else {
-                    _appState.update { it.copy(txConfirmationState =it.txConfirmationState?.copy(
-                        error = UiText.StringResource(R.string.authentication_is_required)
-                    )) }
+                    _appState.update {
+                        it.copy(
+                            txConfirmationState = it.txConfirmationState?.copy(
+                                error = UiText.StringResource(R.string.authentication_is_required)
+                            )
+                        )
+                    }
                 }
             }
 
@@ -221,7 +227,7 @@ class AppViewModel(
                 value = payload,
                 exploreType = exploreType,
             )
-            println("EXPLORER_TAG open ${res}")
+            println("EXPLORER_TAG open $res")
 
             res?.let { url ->
                 _appState.update {
@@ -238,11 +244,13 @@ class AppViewModel(
     }
 
     fun consumeBiometricTransactionConfirmationEvent() {
-        _appState.update { it.copy(
-            txConfirmationState = it.txConfirmationState?.copy(
-                showBiometricConfirmationEvent = consumed
+        _appState.update {
+            it.copy(
+                txConfirmationState = it.txConfirmationState?.copy(
+                    showBiometricConfirmationEvent = consumed
+                )
             )
-        ) }
+        }
     }
 
     private companion object {

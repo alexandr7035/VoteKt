@@ -3,7 +3,7 @@ package by.alexandr7035.ethereum.model
 enum class EthBlock {
     EARLIEST,
     LATEST,
-    PENDING,;
+    PENDING,
 }
 
 fun EthBlock.asString(): String {

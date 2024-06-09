@@ -13,6 +13,4 @@ data class MnemonicWordConfirm(
             addAll(incorrectWords)
         }.shuffled()
     }
-
-    companion object {}
 }

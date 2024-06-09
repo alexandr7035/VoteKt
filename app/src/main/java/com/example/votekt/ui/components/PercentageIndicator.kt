@@ -37,6 +37,7 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.milliseconds
 
 private const val MAX_ANGLE = 360f
+private const val DEFAULT_EMPTY_COLOR = 0xFFF2F2F2
 
 @Composable
 fun PercentageIndicator(
@@ -44,7 +45,7 @@ fun PercentageIndicator(
     percentage: Float,
     thickness: Dp = 5.dp,
     accentColor: Color = MaterialTheme.colorScheme.primary,
-    emptyColor: Color = Color(0xFFF2F2F2),
+    emptyColor: Color = Color(DEFAULT_EMPTY_COLOR),
     textSize: TextUnit = 18.sp,
     animationDuration: Duration = 750.milliseconds
 ) {
@@ -57,6 +58,7 @@ fun PercentageIndicator(
         )
     }
 
+    @Suppress("MagicNumber")
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -116,7 +118,7 @@ fun PercentageIndicator(
 @Preview
 @Composable
 fun PercentageIndicator_Preview() {
-    VoteKtTheme() {
+    VoteKtTheme {
         Surface(
             Modifier
                 .background(MaterialTheme.colorScheme.background)

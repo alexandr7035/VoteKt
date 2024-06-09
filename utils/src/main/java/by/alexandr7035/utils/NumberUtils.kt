@@ -1,3 +1,5 @@
+@file:Suppress("MagicNumber")
+
 package by.alexandr7035.utils
 
 import java.math.BigInteger
