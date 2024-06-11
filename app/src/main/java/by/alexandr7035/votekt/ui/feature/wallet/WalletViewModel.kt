@@ -3,10 +3,11 @@ package by.alexandr7035.votekt.ui.feature.wallet
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.model.Wei
-import by.alexandr7035.votekt.domain.account.AccountRepository
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
+import by.alexandr7035.votekt.domain.usecase.account.GetSelfAccountUseCase
 import by.alexandr7035.votekt.domain.usecase.account.LogoutUseCase
+import by.alexandr7035.votekt.domain.usecase.account.ObserveBalanceUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractStateUseCase
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenIntent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
@@ -24,7 +25,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class WalletViewModel(
-    private val accountRepository: AccountRepository,
+    private val getSelfAccountUseCase: GetSelfAccountUseCase,
+    private val observeBalanceUseCase: ObserveBalanceUseCase,
     private val contractStateUseCase: GetContractStateUseCase,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
@@ -72,14 +74,13 @@ class WalletViewModel(
     // Without full-screen errors
     private fun reduceLoadData() {
         viewModelScope.launch {
-            val address = accountRepository.getSelfAddress()
+            val address = getSelfAccountUseCase.invoke()
             _state.update {
                 it.copy(address = address)
             }
         }
 
-        accountRepository
-            .getAccountBalance()
+        observeBalanceUseCase.invoke()
             .catch { error ->
                 reduceError(ErrorType.fromThrowable(error))
             }

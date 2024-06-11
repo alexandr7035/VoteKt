@@ -40,7 +40,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.votings.Proposal
+import by.alexandr7035.votekt.domain.model.proposal.Proposal
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
 import by.alexandr7035.votekt.ui.components.pager.Page
 import by.alexandr7035.votekt.ui.components.pager.PagerTabRow
@@ -67,7 +67,10 @@ fun ProposalsScreen(
             AppBar(title = stringResource(R.string.proposals))
         },
         floatingActionButton = {
-            CreateProposalFab(state)
+            CreateProposalFab(
+                state = state,
+                onClick = { viewModel.onIntent(ProposalsScreenIntent.AddProposalClick) }
+            )
         }
     ) { pv ->
 
@@ -253,7 +256,7 @@ private fun proposalListScrollConnection(viewModel: ProposalsViewModel) = rememb
 @Composable
 private fun CreateProposalFab(
     state: ProposalsScreenState,
-    onIntent: (ProposalsScreenIntent) -> Unit = {},
+    onClick: () -> Unit = {},
 ) {
     AnimatedVisibility(
         visible = state.controlsAreVisible,
@@ -261,9 +264,7 @@ private fun CreateProposalFab(
         exit = slideOutVertically(targetOffsetY = { it * 2 }),
     ) {
         FloatingActionButton(
-            onClick = {
-                onIntent(ProposalsScreenIntent.AddProposalClick)
-            },
+            onClick = onClick,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary,
         ) {

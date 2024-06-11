@@ -1,6 +1,6 @@
 package by.alexandr7035.votekt.domain.usecase.account
 
-import by.alexandr7035.votekt.domain.account.MnemonicRepository
+import by.alexandr7035.votekt.domain.repository.MnemonicRepository
 
 class VerifyMnemonicPhraseUseCase(
     private val mnemonicRepository: MnemonicRepository

@@ -1,6 +1,6 @@
 package by.alexandr7035.votekt.ui.feature.transactions.history
 
-import by.alexandr7035.votekt.domain.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
 import by.alexandr7035.votekt.ui.UiErrorMessage
 import by.alexandr7035.votekt.ui.feature.transactions.history.model.TransactionsScreenNavigationEvent
 import de.palm.composestateevents.StateEventWithContent

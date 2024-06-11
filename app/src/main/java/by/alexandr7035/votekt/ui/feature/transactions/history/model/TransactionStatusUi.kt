@@ -2,7 +2,7 @@ package by.alexandr7035.votekt.ui.feature.transactions.history.model
 
 import androidx.annotation.DrawableRes
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.transactions.TransactionStatus
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 
 data class TransactionStatusUi(
     val status: String,

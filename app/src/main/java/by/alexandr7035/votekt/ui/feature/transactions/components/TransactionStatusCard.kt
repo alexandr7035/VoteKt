@@ -17,7 +17,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import by.alexandr7035.votekt.domain.transactions.TransactionStatus
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 import by.alexandr7035.votekt.ui.components.preview.TransactionStatusPreviewProvider
 import by.alexandr7035.votekt.ui.feature.transactions.history.model.getTransactionStatusUi
 import by.alexandr7035.votekt.ui.theme.VoteKtTheme

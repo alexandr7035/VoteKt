@@ -31,8 +31,8 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.core.extensions.getFormattedDate
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.transactions.TransactionDomain
-import by.alexandr7035.votekt.domain.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import by.alexandr7035.votekt.ui.components.preview.TransactionPreviewProvider
 import by.alexandr7035.votekt.ui.components.web3.ExplorableText
 import by.alexandr7035.votekt.ui.core.resources.UiText

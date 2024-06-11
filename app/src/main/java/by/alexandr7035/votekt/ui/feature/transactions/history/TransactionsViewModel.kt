@@ -3,7 +3,9 @@ package by.alexandr7035.votekt.ui.feature.transactions.history
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.domain.core.ErrorType
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
+import by.alexandr7035.votekt.domain.core.OperationResult
+import by.alexandr7035.votekt.domain.usecase.transactions.ClearTransactionsUseCase
+import by.alexandr7035.votekt.domain.usecase.transactions.ObserveTransactionsUseCase
 import by.alexandr7035.votekt.ui.feature.transactions.history.model.TransactionsScreenIntent
 import by.alexandr7035.votekt.ui.feature.transactions.history.model.TransactionsScreenNavigationEvent
 import by.alexandr7035.votekt.ui.uiError
@@ -18,7 +20,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class TransactionsViewModel(
-    private val transactionRepository: TransactionRepository
+    private val observeTransactionsUseCase: ObserveTransactionsUseCase,
+    private val clearTransactionsUseCase: ClearTransactionsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(TransactionsScreenState())
 
@@ -29,8 +32,7 @@ class TransactionsViewModel(
     }
 
     private fun subscribeToTransactions() {
-        transactionRepository
-            .getTransactions()
+        observeTransactionsUseCase.invoke()
             .onEach { transactions ->
                 _state.update {
                     it.copy(
@@ -68,7 +70,9 @@ class TransactionsViewModel(
 
     private fun onClearTransactions() {
         viewModelScope.launch {
-            transactionRepository.clearTransactions()
+            OperationResult.runWrapped {
+                clearTransactionsUseCase.invoke()
+            }
         }
     }
 

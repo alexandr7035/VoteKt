@@ -51,8 +51,8 @@ fun <T> SelectorGroup(
         horizontalArrangement = Arrangement.spacedBy(itemsSpaceBy)
     ) {
         LaunchedEffect(initialSelect, options) {
-            require(initialSelect < 0 || initialSelect > options.size - 1) {
-                "Selector: invalid initial position: $initialSelect. Check your options size"
+            require(initialSelect > 0 || initialSelect < options.size - 1) {
+                "Selector: invalid initial position: $initialSelect (options: ${options.size}. Check your options size"
             }
             onSelectedChanged.invoke(options.elementAt(initialSelect))
         }

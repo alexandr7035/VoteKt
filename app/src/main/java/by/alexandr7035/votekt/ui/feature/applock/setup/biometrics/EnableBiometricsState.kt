@@ -1,6 +1,6 @@
 package by.alexandr7035.votekt.ui.feature.applock.setup.biometrics
 
-import by.alexandr7035.votekt.domain.security.model.BiometricsAvailability
+import by.alexandr7035.votekt.domain.model.security.BiometricsAvailability
 import by.alexandr7035.votekt.ui.feature.applock.core.BiometricAuthResult
 import by.alexandr7035.votekt.ui.feature.applock.core.BiometricsPromptUi
 import de.palm.composestateevents.StateEventWithContent

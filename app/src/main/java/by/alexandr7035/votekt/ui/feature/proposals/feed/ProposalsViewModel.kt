@@ -4,8 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
-import by.alexandr7035.votekt.domain.datasync.SyncWithContractUseCase
-import by.alexandr7035.votekt.domain.votings.VotingContractRepository
+import by.alexandr7035.votekt.domain.usecase.contract.SyncWithContractUseCase
+import by.alexandr7035.votekt.domain.usecase.proposal.ObserveProposalsUseCase
 import by.alexandr7035.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ProposalsViewModel(
-    private val votingContractRepository: VotingContractRepository,
+    private val observeProposalsUseCase: ObserveProposalsUseCase,
     private val syncWithContractUseCase: SyncWithContractUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(ProposalsScreenState())
@@ -87,8 +87,8 @@ class ProposalsViewModel(
     }
 
     fun subscribeToProposals() {
-        votingContractRepository
-            .observeProposals()
+        observeProposalsUseCase
+            .invoke()
             .onEach { proposals ->
                 _state.update {
                     it.copy(

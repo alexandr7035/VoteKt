@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
 import by.alexandr7035.votekt.ui.components.TransactionCard
 import by.alexandr7035.votekt.ui.components.progress.FullscreenProgressBar

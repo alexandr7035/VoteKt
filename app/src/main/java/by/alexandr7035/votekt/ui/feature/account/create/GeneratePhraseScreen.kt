@@ -28,7 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import by.alexandr7035.votekt.ui.components.FlowRow
 import by.alexandr7035.votekt.ui.components.PrimaryButton
 import by.alexandr7035.votekt.ui.components.TipType

@@ -22,13 +22,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.ui.components.debug.debugPlaceholder
 import by.alexandr7035.votekt.ui.utils.getVoteColor
 import by.alexandr7035.votekt.ui.utils.prettifyAddress
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 
 @Composable
 fun VotedAddress(address: String, votedFor: Boolean) {

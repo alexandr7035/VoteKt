@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import by.alexandr7035.votekt.domain.votings.VotingData
+import by.alexandr7035.votekt.domain.model.proposal.VotingData
 import by.alexandr7035.votekt.ui.theme.VoteKtTheme
 import by.alexandr7035.votekt.ui.utils.getVoteColor
 

@@ -8,18 +8,18 @@ import by.alexandr7035.ethereum.errors.RequestNotExecutedException
 import by.alexandr7035.ethereum.model.EthTransactionEstimation
 import by.alexandr7035.ethereum.model.GWEI
 import by.alexandr7035.ethereum.model.Wei
-import com.cioccarellia.ksprefs.KsPrefs
 import by.alexandr7035.votekt.BuildConfig
 import by.alexandr7035.votekt.data.cache.PrefKeys
 import by.alexandr7035.votekt.data.cache.ProposalsDao
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.transactions.PrepareTransactionData
-import by.alexandr7035.votekt.domain.transactions.ReviewTransactionData
-import by.alexandr7035.votekt.domain.transactions.SendTransactionRepository
-import by.alexandr7035.votekt.domain.transactions.TransactionEstimationError
-import by.alexandr7035.votekt.domain.transactions.TransactionHash
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
-import by.alexandr7035.votekt.domain.transactions.TransactionType
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.model.transactions.PrepareTransactionData
+import by.alexandr7035.votekt.domain.model.transactions.ReviewTransactionData
+import by.alexandr7035.votekt.domain.repository.SendTransactionRepository
+import by.alexandr7035.votekt.domain.model.transactions.TransactionEstimationError
+import by.alexandr7035.votekt.domain.model.transactions.TransactionHash
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
+import com.cioccarellia.ksprefs.KsPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -114,7 +114,7 @@ class SendTransactionRepositoryImpl(
         }
     }
 
-    override suspend fun confirmTransaction() = withContext(Dispatchers.IO) {
+    override suspend fun confirmCurrentTransaction() = withContext(Dispatchers.IO) {
         try {
             val currentState = _state.value ?: return@withContext
 
@@ -130,7 +130,7 @@ class SendTransactionRepositoryImpl(
         }
     }
 
-    override suspend fun cancelTransaction() {
+    override suspend fun cancelCurrentTransaction() {
         transaction = createEmptyTransaction()
         state.update { null }
     }

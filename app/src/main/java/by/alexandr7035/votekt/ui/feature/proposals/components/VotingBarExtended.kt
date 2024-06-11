@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.votings.VotingData
+import by.alexandr7035.votekt.domain.model.proposal.VotingData
 import by.alexandr7035.votekt.ui.components.preview.ScreenPreview
 import by.alexandr7035.votekt.ui.theme.Dimensions
 import by.alexandr7035.votekt.ui.utils.getVoteColor

@@ -3,7 +3,7 @@ package by.alexandr7035.votekt.ui.feature.proposals.model
 import androidx.annotation.StringRes
 import androidx.compose.ui.graphics.Color
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.votings.Proposal
+import by.alexandr7035.votekt.domain.model.proposal.Proposal
 import by.alexandr7035.votekt.ui.theme.Gray50
 import by.alexandr7035.votekt.ui.theme.SemanticColors
 

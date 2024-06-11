@@ -6,10 +6,6 @@ import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.crypto.CryptoHelperImpl
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereumimpl.impl.EthereumEventListenerImpl
-import com.cioccarellia.ksprefs.KsPrefs
-import com.cioccarellia.ksprefs.config.EncryptionType
-import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
-import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import by.alexandr7035.votekt.BuildConfig
 import by.alexandr7035.votekt.data.cache.TransactionsDatabase
 import by.alexandr7035.votekt.data.repository.AccountRepositoryImpl
@@ -25,16 +21,16 @@ import by.alexandr7035.votekt.data.websockets.WebsocketActivityCallbacks
 import by.alexandr7035.votekt.data.websockets.WebsocketManagerImpl
 import by.alexandr7035.votekt.data.workers.AwaitTransactionWorker
 import by.alexandr7035.votekt.data.workers.SyncProposalsWorker
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.account.MnemonicRepository
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.repository.MnemonicRepository
 import by.alexandr7035.votekt.domain.repository.BlockchainExplorerRepository
 import by.alexandr7035.votekt.domain.repository.DemoModeRepository
-import by.alexandr7035.votekt.domain.repository.DemoModeRepositoryImpl
+import by.alexandr7035.votekt.data.repository.DemoModeRepositoryImpl
 import by.alexandr7035.votekt.domain.repository.WebsocketManager
-import by.alexandr7035.votekt.domain.security.AppLockRepository
-import by.alexandr7035.votekt.domain.transactions.SendTransactionRepository
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
-import by.alexandr7035.votekt.domain.votings.VotingContractRepository
+import by.alexandr7035.votekt.domain.repository.AppLockRepository
+import by.alexandr7035.votekt.domain.repository.SendTransactionRepository
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
+import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 import by.alexandr7035.votekt.ui.core.AppViewModel
 import by.alexandr7035.votekt.ui.feature.account.create.ConfirmPhraseViewModel
 import by.alexandr7035.votekt.ui.feature.account.create.GeneratePhraseViewModel
@@ -48,6 +44,10 @@ import by.alexandr7035.votekt.ui.feature.proposals.details.VotingDetailsViewMode
 import by.alexandr7035.votekt.ui.feature.proposals.feed.ProposalsViewModel
 import by.alexandr7035.votekt.ui.feature.transactions.history.TransactionsViewModel
 import by.alexandr7035.votekt.ui.feature.wallet.WalletViewModel
+import com.cioccarellia.ksprefs.KsPrefs
+import com.cioccarellia.ksprefs.config.EncryptionType
+import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
+import com.cioccarellia.ksprefs.config.model.CommitStrategy
 import kotlinx.coroutines.Dispatchers
 import org.kethereum.model.Address
 import org.koin.android.ext.koin.androidApplication
@@ -73,27 +73,46 @@ val appModule = module {
     }
     viewModel {
         AppViewModel(
-            accountRepository = get(),
-            sendTransactionRepository = get(),
             web3EventsRepository = get(),
             checkAppLockUseCase = get(),
             connectToNodeUseCase = get(),
             getBlockchainExplorerUrlUseCase = get(),
             checkAppLockedWithBiometricsUseCase = get(),
+            checkAccountCreatedUseCase = get(),
+            observeOutgoingTransactionUseCase = get(),
+            confirmOutgoingTransactionUseCase = get(),
+            cancelCurrentTransactionUseCase = get(),
         )
     }
     viewModel { GeneratePhraseViewModel(get()) }
     viewModel {
         ConfirmPhraseViewModel(
-            mnemonicRepository = get(),
-            accountRepository = get()
+            addAccountUseCase = get(),
+            confirmNewAccountUseCase = get(),
+            getAccountConfirmationData = get(),
         )
     }
-    viewModel { VotingDetailsViewModel(get()) }
+    viewModel {
+        VotingDetailsViewModel(
+            getContractConfigurationUseCase = get(),
+            observeProposalByIdUseCase = get(),
+            voteOnProposalUseCase = get(),
+            deleteDraftProposalUseCase = get(),
+            deployDraftProposalUseCase = get(),
+        )
+    }
     viewModel { ProposalsViewModel(get(), get()) }
-    viewModel { TransactionsViewModel(get()) }
+    viewModel { TransactionsViewModel(
+        observeTransactionsUseCase = get(),
+        clearTransactionsUseCase = get(),
+    ) }
     viewModel { CreateProposalViewModel(get(), get(), get(), get()) }
-    viewModel { WalletViewModel(get(), get(), get()) }
+    viewModel { WalletViewModel(
+        getSelfAccountUseCase = get(),
+        observeBalanceUseCase = get(),
+        contractStateUseCase = get(),
+        logoutUseCase = get(),
+    ) }
 
     viewModel {
         LockScreenViewModel(
@@ -108,7 +127,10 @@ val appModule = module {
     }
 
     viewModel {
-        CreatePinViewModel(setupAppLockUseCase = get(), checkIfBiometricsAvailableUseCase = get())
+        CreatePinViewModel(
+            setupAppLockUseCase = get(),
+            checkIfBiometricsAvailableUseCase = get()
+        )
     }
 
     viewModel {

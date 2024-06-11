@@ -6,7 +6,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
 
 class AwaitTransactionWorker(
     appContext: Context,

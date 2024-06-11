@@ -1,8 +1,8 @@
 package by.alexandr7035.votekt.ui.components.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
-import by.alexandr7035.votekt.domain.account.MnemonicWord
-import by.alexandr7035.votekt.domain.account.MnemonicWordConfirm
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWordConfirm
 
 class WordsToConfirmPreviewProvider : PreviewParameterProvider<MnemonicWordConfirm> {
     override val values: Sequence<MnemonicWordConfirm>

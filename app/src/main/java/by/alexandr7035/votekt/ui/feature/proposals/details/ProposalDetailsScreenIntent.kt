@@ -2,7 +2,7 @@ package by.alexandr7035.votekt.ui.feature.proposals.details
 
 import by.alexandr7035.votekt.domain.core.Uuid
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.votings.VoteType
+import by.alexandr7035.votekt.domain.model.proposal.VoteType
 
 sealed class ProposalDetailsScreenIntent {
     data class EnterScreen(val proposalUuid: String) : ProposalDetailsScreenIntent()

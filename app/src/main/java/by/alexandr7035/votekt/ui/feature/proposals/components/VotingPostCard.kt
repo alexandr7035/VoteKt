@@ -44,13 +44,10 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.decode.SvgDecoder
-import coil.request.ImageRequest
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.core.BlockchainActionStatus
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.votings.Proposal
+import by.alexandr7035.votekt.domain.model.proposal.Proposal
 import by.alexandr7035.votekt.ui.components.debug.debugPlaceholder
 import by.alexandr7035.votekt.ui.components.preview.ProposalPreviewProvider
 import by.alexandr7035.votekt.ui.components.preview.ScreenPreview
@@ -62,6 +59,9 @@ import by.alexandr7035.votekt.ui.theme.Dimensions
 import by.alexandr7035.votekt.ui.utils.AvatarHelper
 import by.alexandr7035.votekt.ui.utils.DateFormatters
 import by.alexandr7035.votekt.ui.utils.prettifyAddress
+import coil.compose.AsyncImage
+import coil.decode.SvgDecoder
+import coil.request.ImageRequest
 import kotlinx.coroutines.delay
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours

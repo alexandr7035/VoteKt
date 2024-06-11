@@ -4,11 +4,11 @@ import android.util.Log
 import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Wei
+import by.alexandr7035.votekt.data.cache.PrefKeys
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import cash.z.ecc.android.bip39.Mnemonics
 import com.cioccarellia.ksprefs.KsPrefs
-import by.alexandr7035.votekt.data.cache.PrefKeys
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.account.MnemonicWord
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -31,7 +31,7 @@ class AccountRepositoryImpl(
         return ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY, "").isNotBlank()
     }
 
-    override fun getAccountBalance(): Flow<Wei> = flow {
+    override fun observeAccountBalance(): Flow<Wei> = flow {
         val recentBalance = ksPrefs.pull(PrefKeys.RECENT_BALANCE, "")
         if (recentBalance.isNotBlank()) {
             emit(Wei(recentBalance))

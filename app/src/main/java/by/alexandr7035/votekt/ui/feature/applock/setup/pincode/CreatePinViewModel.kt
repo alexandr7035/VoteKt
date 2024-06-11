@@ -3,10 +3,10 @@ package by.alexandr7035.votekt.ui.feature.applock.setup.pincode
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.security.CheckIfBiometricsAvailableUseCase
-import by.alexandr7035.votekt.domain.security.SetupAppLockUseCase
-import by.alexandr7035.votekt.domain.security.model.BiometricsAvailability
-import by.alexandr7035.votekt.domain.security.model.PinCode
+import by.alexandr7035.votekt.domain.usecase.applock.CheckIfBiometricsAvailableUseCase
+import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockUseCase
+import by.alexandr7035.votekt.domain.model.security.BiometricsAvailability
+import by.alexandr7035.votekt.domain.model.security.PinCode
 import by.alexandr7035.votekt.ui.core.resources.UiText
 import by.alexandr7035.votekt.ui.feature.applock.core.AppLockUiState
 import de.palm.composestateevents.consumed

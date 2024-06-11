@@ -16,12 +16,12 @@ import by.alexandr7035.votekt.data.workers.SyncProposalsWorker
 import by.alexandr7035.votekt.domain.core.AppError
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
-import by.alexandr7035.votekt.domain.transactions.TransactionDomain
-import by.alexandr7035.votekt.domain.transactions.TransactionHash
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
-import by.alexandr7035.votekt.domain.transactions.TransactionStatus
-import by.alexandr7035.votekt.domain.transactions.TransactionType
-import by.alexandr7035.votekt.domain.transactions.isContractInteraction
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionHash
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.isContractInteraction
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -33,7 +33,7 @@ class TransactionRepositoryImpl(
     private val dispatcher: CoroutineDispatcher,
     private val workManager: WorkManager,
 ) : TransactionRepository {
-    override fun getTransactions(): Flow<List<TransactionDomain>> {
+    override fun observeTransactions(): Flow<List<TransactionDomain>> {
         return transactionDao.getTransactions().map { list ->
             list.map { it.mapToData() }
         }.flowOn(dispatcher)
@@ -130,12 +130,7 @@ class TransactionRepositoryImpl(
         return transactionDao.getTransactionType(transactionHash.value)
     }
 
-    override suspend fun clearTransactions(): OperationResult<Unit> {
-        return try {
-            transactionDao.clearTransactionHistory()
-            OperationResult.Success(Unit)
-        } catch (e: Exception) {
-            OperationResult.Failure(AppError(ErrorType.UNKNOWN_ERROR))
-        }
+    override suspend fun clearTransactions() {
+        transactionDao.clearTransactionHistory()
     }
 }

@@ -1,7 +1,7 @@
 package by.alexandr7035.votekt.domain.usecase.account
 
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.account.MnemonicWord
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 
 class AddAccountUseCase(
     private val accountRepository: AccountRepository

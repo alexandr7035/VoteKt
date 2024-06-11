@@ -3,16 +3,16 @@ package by.alexandr7035.votekt.data.repository
 import android.content.Context
 import android.util.Base64
 import androidx.biometric.BiometricManager
-import com.cioccarellia.ksprefs.KsPrefs
 import by.alexandr7035.votekt.data.cache.PrefKeys
 import by.alexandr7035.votekt.data.security.BiometricsManager
 import by.alexandr7035.votekt.data.security.CryptoUtils
 import by.alexandr7035.votekt.data.security.model.BiometricEncryptedPinWrapper
-import by.alexandr7035.votekt.domain.security.AppLockRepository
-import by.alexandr7035.votekt.domain.security.model.AuthenticationResult
-import by.alexandr7035.votekt.domain.security.model.BiometricsAvailability
-import by.alexandr7035.votekt.domain.security.model.EncryptedPinCode
-import by.alexandr7035.votekt.domain.security.model.PinCode
+import by.alexandr7035.votekt.domain.repository.AppLockRepository
+import by.alexandr7035.votekt.domain.model.security.AuthenticationResult
+import by.alexandr7035.votekt.domain.model.security.BiometricsAvailability
+import by.alexandr7035.votekt.domain.model.security.EncryptedPinCode
+import by.alexandr7035.votekt.domain.model.security.PinCode
+import com.cioccarellia.ksprefs.KsPrefs
 import com.squareup.moshi.Moshi
 import javax.crypto.Cipher
 

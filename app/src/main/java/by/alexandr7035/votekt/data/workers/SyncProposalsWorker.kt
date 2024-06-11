@@ -4,7 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import by.alexandr7035.votekt.domain.votings.VotingContractRepository
+import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 
 class SyncProposalsWorker(
     appContext: Context,

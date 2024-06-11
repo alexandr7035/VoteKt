@@ -5,8 +5,12 @@ import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.core.Uuid
-import by.alexandr7035.votekt.domain.votings.VoteType
-import by.alexandr7035.votekt.domain.votings.VotingContractRepository
+import by.alexandr7035.votekt.domain.usecase.contract.GetContractConfigurationUseCase
+import by.alexandr7035.votekt.domain.usecase.proposal.DeleteDraftProposalUseCase
+import by.alexandr7035.votekt.domain.usecase.proposal.ObserveProposalUseCase
+import by.alexandr7035.votekt.domain.usecase.proposal.VoteOnProposalUseCase
+import by.alexandr7035.votekt.domain.model.proposal.VoteType
+import by.alexandr7035.votekt.domain.usecase.proposal.DeployDraftProposalUseCase
 import by.alexandr7035.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered
@@ -19,7 +23,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class VotingDetailsViewModel(
-    private val votingContractRepository: VotingContractRepository
+    private val getContractConfigurationUseCase: GetContractConfigurationUseCase,
+    private val observeProposalByIdUseCase: ObserveProposalUseCase,
+    private val voteOnProposalUseCase: VoteOnProposalUseCase,
+    private val deleteDraftProposalUseCase: DeleteDraftProposalUseCase,
+    private val deployDraftProposalUseCase: DeployDraftProposalUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
@@ -58,13 +66,13 @@ class VotingDetailsViewModel(
 
     fun loadProposalById(id: String) {
         val deploymentFee = runCatching {
-            votingContractRepository.getContractConfiguration().createProposalFee
+            getContractConfigurationUseCase.invoke().createProposalFee
         }.getOrNull()
 
         _state.update { it.copy(proposalDeploymentFee = deploymentFee) }
 
-        votingContractRepository
-            .observeProposalById(id)
+        observeProposalByIdUseCase
+            .invoke(id)
             .catch { error ->
                 _state.update { curr ->
                     curr.copy(
@@ -87,7 +95,7 @@ class VotingDetailsViewModel(
 
     private fun onMakeVoteClick(proposalNumber: Int, voteType: VoteType) {
         viewModelScope.launch {
-            when (val res = votingContractRepository.voteOnProposal(proposalNumber, voteType)) {
+            when (val res = voteOnProposalUseCase.invoke(proposalNumber, voteType)) {
                 is OperationResult.Success -> {}
                 is OperationResult.Failure -> {
                     _state.update {
@@ -100,7 +108,7 @@ class VotingDetailsViewModel(
 
     private fun onDeployClick(proposalUuid: Uuid) {
         viewModelScope.launch {
-            when (val res = votingContractRepository.deployDraftProposal(proposalUuid)) {
+            when (val res = deployDraftProposalUseCase.invoke(proposalUuid)) {
                 is OperationResult.Success -> {}
                 is OperationResult.Failure -> {
                     _state.update {
@@ -113,7 +121,7 @@ class VotingDetailsViewModel(
 
     private fun onDeleteDraftClick(proposalUuid: Uuid) {
         viewModelScope.launch {
-            when (val res = votingContractRepository.deleteDraftProposal(proposalUuid)) {
+            when (val res = deleteDraftProposalUseCase.invoke(proposalUuid)) {
                 is OperationResult.Success -> {
                     _state.update {
                         it.copy(

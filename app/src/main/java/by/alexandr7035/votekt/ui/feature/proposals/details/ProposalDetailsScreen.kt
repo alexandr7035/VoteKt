@@ -47,9 +47,9 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.core.BlockchainActionStatus
 import by.alexandr7035.votekt.domain.core.Uuid
-import by.alexandr7035.votekt.domain.votings.Proposal
-import by.alexandr7035.votekt.domain.votings.VoteType
-import by.alexandr7035.votekt.domain.votings.VotingData
+import by.alexandr7035.votekt.domain.model.proposal.Proposal
+import by.alexandr7035.votekt.domain.model.proposal.VoteType
+import by.alexandr7035.votekt.domain.model.proposal.VotingData
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
 import by.alexandr7035.votekt.ui.components.RoundedButton
 import by.alexandr7035.votekt.ui.components.TipView

@@ -1,13 +1,13 @@
 package by.alexandr7035.votekt.data.repository
 
 import android.util.Log
-import cash.z.ecc.android.bip39.Mnemonics
 import by.alexandr7035.votekt.BuildConfig
-import by.alexandr7035.votekt.domain.account.MnemonicRepository
-import by.alexandr7035.votekt.domain.account.MnemonicWord
-import by.alexandr7035.votekt.domain.account.MnemonicWordConfirm
+import by.alexandr7035.votekt.domain.repository.MnemonicRepository
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWordConfirm
 import by.alexandr7035.votekt.domain.core.AppError
 import by.alexandr7035.votekt.domain.core.ErrorType
+import cash.z.ecc.android.bip39.Mnemonics
 import java.security.SecureRandom
 import java.util.Random
 

@@ -3,11 +3,12 @@ package by.alexandr7035.votekt.ui.feature.account.create
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.account.MnemonicRepository
-import by.alexandr7035.votekt.domain.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
+import by.alexandr7035.votekt.domain.usecase.account.AddAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.ConfirmNewAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.GetAccountConfirmationData
 import by.alexandr7035.votekt.ui.feature.account.create.model.ConfirmPhraseIntent
 import by.alexandr7035.votekt.ui.feature.account.create.model.ConfirmPhraseNavigationEvent
 import by.alexandr7035.votekt.ui.feature.account.create.model.ConfirmPhraseState
@@ -20,8 +21,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class ConfirmPhraseViewModel(
-    private val mnemonicRepository: MnemonicRepository,
-    private val accountRepository: AccountRepository,
+    private val addAccountUseCase: AddAccountUseCase,
+    private val confirmNewAccountUseCase: ConfirmNewAccountUseCase,
+    private val getAccountConfirmationData: GetAccountConfirmationData,
 ) : ViewModel() {
     private val _state = MutableStateFlow(
         ConfirmPhraseState(
@@ -45,7 +47,7 @@ class ConfirmPhraseViewModel(
     }
 
     private fun reduceLoadData(intent: ConfirmPhraseIntent.LoadData) {
-        val confirmationData = mnemonicRepository.getRandomMnemonicWords(
+        val confirmationData = getAccountConfirmationData.invoke(
             mnemonic = intent.phrase
         )
 
@@ -68,7 +70,7 @@ class ConfirmPhraseViewModel(
     private fun reduceConfirmPhrase() {
         viewModelScope.launch {
             val res = OperationResult.runWrapped {
-                mnemonicRepository.confirmPhrase(
+                confirmNewAccountUseCase.invoke(
                     mnemonic = _state.value.phrase,
                     proposedWordsToConfirm = _state.value.confirmData,
                     confirmationData = confirmationSelection
@@ -83,7 +85,7 @@ class ConfirmPhraseViewModel(
                         )
                     }
 
-                    accountRepository.createAndSaveAccount(
+                    addAccountUseCase.invoke(
                         _state.value.phrase
                     )
                 }

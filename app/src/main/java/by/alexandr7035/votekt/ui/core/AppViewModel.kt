@@ -6,15 +6,16 @@ import androidx.lifecycle.viewModelScope
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.events.EthEventsSubscriptionState
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.account.AccountRepository
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.security.CheckAppLockUseCase
-import by.alexandr7035.votekt.domain.security.CheckAppLockedWithBiometricsUseCase
-import by.alexandr7035.votekt.domain.transactions.ReviewTransactionData
-import by.alexandr7035.votekt.domain.transactions.SendTransactionRepository
+import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockUseCase
+import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockedWithBiometricsUseCase
+import by.alexandr7035.votekt.domain.model.transactions.ReviewTransactionData
+import by.alexandr7035.votekt.domain.usecase.account.CheckAccountCreatedUseCase
 import by.alexandr7035.votekt.domain.usecase.explorer.GetBlockchainExplorerUrlUseCase
 import by.alexandr7035.votekt.domain.usecase.node.ConnectToNodeUseCase
+import by.alexandr7035.votekt.domain.usecase.transactions.ConfirmOutgoingTransactionUseCase
+import by.alexandr7035.votekt.domain.usecase.transactions.ObserveOutgoingTransactionUseCase
 import by.alexandr7035.votekt.ui.core.resources.UiText
 import by.alexandr7035.votekt.ui.feature.transactions.review.ReviewTransactionIntent
 import by.alexandr7035.votekt.ui.feature.transactions.review.mapToUi
@@ -30,13 +31,15 @@ import kotlinx.coroutines.launch
 // TODO fix suppress
 @Suppress("TooManyFunctions")
 class AppViewModel(
-    private val accountRepository: AccountRepository,
+    private val checkAccountCreatedUseCase: CheckAccountCreatedUseCase,
     private val connectToNodeUseCase: ConnectToNodeUseCase,
-    private val sendTransactionRepository: SendTransactionRepository,
     private val web3EventsRepository: EthereumEventListener,
     private val checkAppLockUseCase: CheckAppLockUseCase,
     private val checkAppLockedWithBiometricsUseCase: CheckAppLockedWithBiometricsUseCase,
     private val getBlockchainExplorerUrlUseCase: GetBlockchainExplorerUrlUseCase,
+    private val observeOutgoingTransactionUseCase: ObserveOutgoingTransactionUseCase,
+    private val cancelCurrentTransactionUseCase: ObserveOutgoingTransactionUseCase,
+    private val confirmOutgoingTransactionUseCase: ConfirmOutgoingTransactionUseCase,
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(
         AppState()
@@ -98,7 +101,7 @@ class AppViewModel(
 
     private fun cancelTransaction() {
         viewModelScope.launch {
-            sendTransactionRepository.cancelTransaction()
+            cancelCurrentTransactionUseCase.invoke()
         }
     }
 
@@ -108,7 +111,7 @@ class AppViewModel(
                 it.copy(isLoading = true)
             }
 
-            val isAccountCreated = accountRepository.isAccountPresent()
+            val isAccountCreated = checkAccountCreatedUseCase.invoke()
             val isAppLocked = checkAppLockUseCase.invoke()
             val shouldSetupAppLock = !isAppLocked && isAccountCreated
 
@@ -163,8 +166,8 @@ class AppViewModel(
     }
 
     private fun subscribeToTransactionConfirmationRequests() {
-        sendTransactionRepository
-            .state
+        observeOutgoingTransactionUseCase
+            .invoke()
             .onEach {
                 reduceConfirmTransactionState(it)
             }
@@ -172,8 +175,6 @@ class AppViewModel(
     }
 
     private fun reduceConfirmTransactionState(reviewTransactionData: ReviewTransactionData?) {
-        val isAppLocked = checkAppLockedWithBiometricsUseCase.invoke()
-
         _appState.update {
             it.copy(
                 txConfirmationState = reviewTransactionData?.mapToUi()
@@ -200,7 +201,7 @@ class AppViewModel(
     private fun submitTransaction() {
         viewModelScope.launch {
             val confirmTx = OperationResult.runWrapped {
-                sendTransactionRepository.confirmTransaction()
+                confirmOutgoingTransactionUseCase.invoke()
             }
 
             when (confirmTx) {

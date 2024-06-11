@@ -35,8 +35,8 @@ import by.alexandr7035.ethereum.model.WEI
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.transactions.TransactionType
-import by.alexandr7035.votekt.domain.transactions.isContractInteraction
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.isContractInteraction
 import by.alexandr7035.votekt.ui.components.DotsProgressIndicator
 import by.alexandr7035.votekt.ui.components.PrimaryButton
 import by.alexandr7035.votekt.ui.components.preview.TransactionReviewPreviewProvider

@@ -33,7 +33,7 @@ import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.security.model.BiometricsAvailability
+import by.alexandr7035.votekt.domain.model.security.BiometricsAvailability
 import by.alexandr7035.votekt.ui.components.DotsProgressIndicator
 import by.alexandr7035.votekt.ui.components.PrimaryButton
 import by.alexandr7035.votekt.ui.components.TextBtn

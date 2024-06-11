@@ -1,9 +1,9 @@
 package by.alexandr7035.votekt.domain.usecase.account
 
-import by.alexandr7035.votekt.domain.account.AccountRepository
-import by.alexandr7035.votekt.domain.security.AppLockRepository
-import by.alexandr7035.votekt.domain.transactions.TransactionRepository
-import by.alexandr7035.votekt.domain.votings.VotingContractRepository
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.repository.AppLockRepository
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
+import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 
 class LogoutUseCase(
     private val accountRepository: AccountRepository,

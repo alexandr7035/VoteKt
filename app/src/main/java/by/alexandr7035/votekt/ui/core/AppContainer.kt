@@ -43,7 +43,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
 import by.alexandr7035.votekt.ui.components.loading.LoadingScreen

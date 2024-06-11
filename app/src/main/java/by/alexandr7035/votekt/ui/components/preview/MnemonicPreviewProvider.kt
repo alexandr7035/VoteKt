@@ -2,7 +2,7 @@ package by.alexandr7035.votekt.ui.components.preview
 
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.votekt.BuildConfig
-import by.alexandr7035.votekt.domain.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 
 class MnemonicPreviewProvider : PreviewParameterProvider<List<MnemonicWord>> {
     override val values: Sequence<List<MnemonicWord>>

@@ -3,7 +3,7 @@ package by.alexandr7035.votekt.ui.components.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.ETHER
 import by.alexandr7035.ethereum.model.GWEI
-import by.alexandr7035.votekt.domain.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import by.alexandr7035.votekt.ui.core.resources.UiText
 import by.alexandr7035.votekt.ui.feature.transactions.review.ReviewTransactionDataUi
 import org.kethereum.model.Address

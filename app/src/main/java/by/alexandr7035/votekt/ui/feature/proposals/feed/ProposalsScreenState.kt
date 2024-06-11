@@ -1,6 +1,6 @@
 package by.alexandr7035.votekt.ui.feature.proposals.feed
 
-import by.alexandr7035.votekt.domain.votings.Proposal
+import by.alexandr7035.votekt.domain.model.proposal.Proposal
 import by.alexandr7035.votekt.ui.UiErrorMessage
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed

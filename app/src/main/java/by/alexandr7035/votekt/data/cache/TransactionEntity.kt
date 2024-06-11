@@ -3,9 +3,9 @@ package by.alexandr7035.votekt.data.cache
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import by.alexandr7035.ethereum.model.Wei
-import by.alexandr7035.votekt.domain.transactions.TransactionDomain
-import by.alexandr7035.votekt.domain.transactions.TransactionStatus
-import by.alexandr7035.votekt.domain.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import java.math.BigInteger
 
 @Entity(tableName = "transactions")

@@ -1,7 +1,7 @@
 package by.alexandr7035.votekt.ui.feature.account.create.model
 
-import by.alexandr7035.votekt.domain.account.MnemonicWord
-import by.alexandr7035.votekt.domain.account.MnemonicWordConfirm
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
+import by.alexandr7035.votekt.domain.model.account.MnemonicWordConfirm
 import de.palm.composestateevents.StateEventWithContent
 import de.palm.composestateevents.consumed
 

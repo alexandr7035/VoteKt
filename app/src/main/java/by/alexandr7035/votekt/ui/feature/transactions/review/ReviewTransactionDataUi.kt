@@ -2,9 +2,9 @@ package by.alexandr7035.votekt.ui.feature.transactions.review
 
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.R
-import by.alexandr7035.votekt.domain.transactions.ReviewTransactionData
-import by.alexandr7035.votekt.domain.transactions.TransactionEstimationError
-import by.alexandr7035.votekt.domain.transactions.TransactionType
+import by.alexandr7035.votekt.domain.model.transactions.ReviewTransactionData
+import by.alexandr7035.votekt.domain.model.transactions.TransactionEstimationError
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import by.alexandr7035.votekt.ui.core.resources.UiText
 import by.alexandr7035.votekt.ui.feature.applock.core.BiometricsPromptUi
 import de.palm.composestateevents.StateEvent
