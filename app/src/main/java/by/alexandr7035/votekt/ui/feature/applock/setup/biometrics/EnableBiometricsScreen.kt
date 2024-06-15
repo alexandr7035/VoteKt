@@ -187,7 +187,7 @@ private fun BiometricsActionButton(
 
     when (biometricsAvailability) {
         BiometricsAvailability.Checking -> {
-            DotsProgressIndicator(modifier = Modifier.padding(56.dp))
+            DotsProgressIndicator()
         }
 
         BiometricsAvailability.Available -> {
