@@ -36,6 +36,9 @@ interface ProposalsDao {
     @Update
     suspend fun updateProposal(proposal: ProposalEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun updateProposals(proposals: List<ProposalEntity>)
+
     @Query("UPDATE proposals SET deployTransactionHash = :newDeployTransactionHash WHERE uuid = :proposalId")
     fun updateDeployTransactionHash(proposalId: String, newDeployTransactionHash: String)
 

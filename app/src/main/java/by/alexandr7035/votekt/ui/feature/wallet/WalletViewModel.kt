@@ -8,7 +8,8 @@ import by.alexandr7035.votekt.domain.usecase.account.GetSelfAccountUseCase
 import by.alexandr7035.votekt.domain.usecase.account.LogoutUseCase
 import by.alexandr7035.votekt.domain.usecase.account.ObserveBalanceUseCase
 import by.alexandr7035.votekt.domain.usecase.account.RefreshBalanceUseCase
-import by.alexandr7035.votekt.domain.usecase.contract.GetContractStateUseCase
+import by.alexandr7035.votekt.domain.usecase.contract.ObserveContractStateUseCase
+import by.alexandr7035.votekt.domain.usecase.contract.SyncWithContractUseCase
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenIntent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenState
@@ -28,7 +29,8 @@ class WalletViewModel(
     private val getSelfAccountUseCase: GetSelfAccountUseCase,
     private val refreshBalanceUseCase: RefreshBalanceUseCase,
     private val observeBalanceUseCase: ObserveBalanceUseCase,
-    private val contractStateUseCase: GetContractStateUseCase,
+    private val observeContractStateUseCase: ObserveContractStateUseCase,
+    private val syncWithContractUseCase: SyncWithContractUseCase,
     private val logoutUseCase: LogoutUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(WalletScreenState())
@@ -36,16 +38,55 @@ class WalletViewModel(
 
     fun onWalletIntent(intent: WalletScreenIntent) {
         when (intent) {
-            is WalletScreenIntent.LoadData -> onLoadData()
+            is WalletScreenIntent.EnterScreen -> onEnterScreen()
+            is WalletScreenIntent.ResumeScreen -> onResumeScreen()
             is WalletScreenIntent.WalletAction -> onWalletAction(intent)
             is WalletScreenIntent.LogOut -> onLogOutClick()
-            is WalletScreenIntent.ChangeHeaderVisibility -> onChangeHeaderVisibillity(intent.isVisible)
+            is WalletScreenIntent.ChangeHeaderVisibility -> onChangeHeaderVisibility(intent.isVisible)
             is WalletScreenIntent.ExplorerUrlClick -> onOpenExplorerClick(intent)
             is WalletScreenIntent.RefreshBalance -> refreshBalance()
         }
     }
 
-    private fun onChangeHeaderVisibillity(isVisible: Boolean) {
+    private fun onEnterScreen() {
+        loadSelfAccount()
+        syncWithContract()
+
+        observeBalanceUseCase.invoke()
+            .catch { error ->
+                reduceError(ErrorType.fromThrowable(error))
+            }
+            .onEach { balance ->
+                _state.update {
+                    it.copy(
+                        balanceState = it.balanceState.copy(
+                            balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
+                                balance.toEther(),
+                                "ETH"
+                            ),
+                        ),
+                    )
+                }
+            }
+            .launchIn(viewModelScope)
+
+        observeContractStateUseCase.invoke()
+            .onEach { contractState ->
+                _state.update {
+                    it.copy(contractState = contractState)
+                }
+            }
+            .catch { error ->
+                reduceError(ErrorType.fromThrowable(error))
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun onResumeScreen() {
+        refreshBalance()
+    }
+
+    private fun onChangeHeaderVisibility(isVisible: Boolean) {
         _state.update {
             it.copy(isHeaderVisible = isVisible)
         }
@@ -72,38 +113,19 @@ class WalletViewModel(
         }
     }
 
-    private fun onLoadData() {
-        loadSelfAccount()
-        refreshBalance()
+    private fun syncWithContract() {
+        viewModelScope.launch {
+            val res = OperationResult.runWrapped {
+                syncWithContractUseCase.invoke()
+            }
 
-        observeBalanceUseCase.invoke()
-            .catch { error ->
-                reduceError(ErrorType.fromThrowable(error))
-            }
-            .onEach { balance ->
-                _state.update {
-                    it.copy(
-                        balanceState = it.balanceState.copy(
-                            balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
-                                balance.toEther(),
-                                "ETH"
-                            ),
-                        ),
-                    )
+            when (res) {
+                is OperationResult.Failure -> {
+                    reduceError(errorType = res.error.errorType)
                 }
+                is OperationResult.Success -> {}
             }
-            .launchIn(viewModelScope)
-
-        contractStateUseCase.invoke()
-            .onEach { contractState ->
-                _state.update {
-                    it.copy(contractState = contractState)
-                }
-            }
-            .catch { error ->
-                reduceError(ErrorType.fromThrowable(error))
-            }
-            .launchIn(viewModelScope)
+        }
     }
 
     private fun refreshBalance() {

@@ -4,7 +4,7 @@ import by.alexandr7035.votekt.domain.model.contract.ContractState
 import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 import kotlinx.coroutines.flow.Flow
 
-class GetContractStateUseCase(
+class ObserveContractStateUseCase(
     private val votingContractRepository: VotingContractRepository,
 ) {
     fun invoke(): Flow<ContractState> {

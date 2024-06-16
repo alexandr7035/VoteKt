@@ -29,9 +29,14 @@ import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 import by.alexandr7035.votekt.domain.model.proposal.VotingData
 import com.cioccarellia.ksprefs.KsPrefs
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.kethereum.model.Address
 import pm.gnosis.model.Solidity
@@ -39,6 +44,7 @@ import pm.gnosis.model.safeIntValueExact
 import pm.gnosis.utils.hexToByteArray
 import java.math.BigInteger
 import java.util.UUID
+import kotlin.coroutines.coroutineContext
 import kotlin.time.Duration
 import kotlin.time.DurationUnit
 import kotlin.time.toDuration
@@ -61,37 +67,39 @@ class VotingContractRepositoryImpl(
     }
 
     override fun observeContractState(): Flow<ContractState> {
-        return observeProposals()
-            .map {
-                val filtered = it.filterIsInstance<Proposal.Deployed>()
-                val currentCount = filtered.size
+        return combine(
+            observeProposals(),
+            waitUntilContactStateReady(),
+        ) { proposals, ready ->
+            val filtered = proposals.filterIsInstance<Proposal.Deployed>()
+            val currentCount = filtered.size
 
-                val max = ksPrefs.pull<Int>(PrefKeys.CONTRACT_MAX_PROPOSALS)
-                val percentage = (currentCount / max.toFloat())
+            val max = ksPrefs.pull<Int>(PrefKeys.CONTRACT_MAX_PROPOSALS)
+            val percentage = (currentCount / max.toFloat())
 
-                val pending = filtered.count { proposal ->
-                    proposal.isFinished.not()
-                }
-
-                val supported = filtered.count { proposal ->
-                    proposal.isFinished && proposal.votingData.isSupported
-                }
-
-                val notSupported = filtered.count { proposal ->
-                    proposal.isFinished && proposal.votingData.isSupported.not()
-                }
-
-                ContractState(
-                    address = Address(contractAddress),
-                    owner = Address(ksPrefs.pull(PrefKeys.CONTRACT_CREATOR_ADDRESS)),
-                    maxProposals = max,
-                    currentProposals = currentCount,
-                    fullPercentage = percentage,
-                    supportedProposals = supported,
-                    notSupportedProposals = notSupported,
-                    pendingProposals = pending,
-                )
+            val pending = filtered.count { proposal ->
+                proposal.isFinished.not()
             }
+
+            val supported = filtered.count { proposal ->
+                proposal.isFinished && proposal.votingData.isSupported
+            }
+
+            val notSupported = filtered.count { proposal ->
+                proposal.isFinished && proposal.votingData.isSupported.not()
+            }
+
+            ContractState(
+                address = Address(contractAddress),
+                owner = Address(ksPrefs.pull(PrefKeys.CONTRACT_CREATOR_ADDRESS)),
+                maxProposals = max,
+                currentProposals = currentCount,
+                fullPercentage = percentage,
+                supportedProposals = supported,
+                notSupportedProposals = notSupported,
+                pendingProposals = pending,
+            )
+        }.distinctUntilChanged()
     }
 
     override fun getContractConfiguration(): ContractConfiguration {
@@ -115,6 +123,7 @@ class VotingContractRepositoryImpl(
             .map { list ->
                 list.map { it.mapToDomain() }
             }
+            .distinctUntilChanged()
     }
 
     override suspend fun createDraftProposal(req: CreateDraftProposal): OperationResult<Uuid> = withContext(
@@ -224,7 +233,7 @@ class VotingContractRepositoryImpl(
             .decode(getProposalRes)
             .param0.items
 
-        decodedGetProposalRes.forEach { raw -> updateProposalInCache(raw) }
+        updateMultipleProposalsInCache(decodedGetProposalRes)
         proposalsDao.cleanUpProposals(remainingProposals = decodedGetProposalRes.map { it.uuid.value })
     }
 
@@ -351,43 +360,82 @@ class VotingContractRepositoryImpl(
         updateProposalInCache(contractProposal = raw)
     }
 
+    private fun updateMultipleProposalsInCache(proposals: List<VoteKtContractV1.TupleA>) {
+        val mapped = proposals.map { contractProposal ->
+            val cached = proposalsDao.getProposalByUuid(uuid = contractProposal.uuid.value)
+
+            cached?.let {
+                cached.getUpdatedProposalEntity(contractProposal)
+            } ?: run {
+                getNewProposalEntity(contractProposal)
+            }
+        }
+
+        proposalsDao.updateProposals(mapped)
+    }
+
     private suspend fun updateProposalInCache(contractProposal: VoteKtContractV1.TupleA) = withContext(dispatcher) {
         val cached = proposalsDao.getProposalByUuid(uuid = contractProposal.uuid.value)
         cached?.let {
             proposalsDao.updateProposal(
-                cached.copy(
-                    number = contractProposal.number.value.toInt(),
-                    creatorAddress = contractProposal.creatoraddress.value.asEthereumAddressString(),
-                    votesFor = contractProposal.votesfor.value.toInt(),
-                    isDraft = false,
-                    votesAgainst = contractProposal.votesagainst.value.toInt(),
-                    createdAt = contractProposal.creationtimemills.value.toLong() * 1000L,
-                    expiresAt = contractProposal.expirationtimemills.value.toLong() * 1000L,
-                )
+                cached.getUpdatedProposalEntity(contractProposal)
             )
         } ?: run {
             proposalsDao.cacheProposal(
-                ProposalEntity(
-                    uuid = contractProposal.uuid.value,
-                    number = contractProposal.number.value.toInt(),
-                    creatorAddress = contractProposal.creatoraddress.value.asEthereumAddressString(),
-                    title = contractProposal.title.value,
-                    description = contractProposal.description.value,
-                    isDraft = false,
-                    votesFor = contractProposal.votesfor.value.toInt(),
-                    votesAgainst = contractProposal.votesagainst.value.toInt(),
-                    expiresAt = contractProposal.expirationtimemills.value.toLong() * 1000L,
-                    createdAt = contractProposal.creationtimemills.value.toLong() * 1000L,
-                    deployTransactionHash = null,
-                    // TODO update contract with self vote
-                    selfVote = null,
-                    selfVoteTransactionHash = null,
-                )
+                getNewProposalEntity(contractProposal)
             )
         }
     }
 
+    private fun ProposalEntity.getUpdatedProposalEntity(
+        contractProposal: VoteKtContractV1.TupleA
+    ) = this.copy(
+        number = contractProposal.number.value.toInt(),
+        creatorAddress = contractProposal.creatoraddress.value.asEthereumAddressString(),
+        votesFor = contractProposal.votesfor.value.toInt(),
+        isDraft = false,
+        votesAgainst = contractProposal.votesagainst.value.toInt(),
+        createdAt = contractProposal.creationtimemills.value.toLong() * 1000L,
+        expiresAt = contractProposal.expirationtimemills.value.toLong() * 1000L,
+    )
+
+    private fun getNewProposalEntity(contractProposal: VoteKtContractV1.TupleA) = ProposalEntity(
+        uuid = contractProposal.uuid.value,
+        number = contractProposal.number.value.toInt(),
+        creatorAddress = contractProposal.creatoraddress.value.asEthereumAddressString(),
+        title = contractProposal.title.value,
+        description = contractProposal.description.value,
+        isDraft = false,
+        votesFor = contractProposal.votesfor.value.toInt(),
+        votesAgainst = contractProposal.votesagainst.value.toInt(),
+        expiresAt = contractProposal.expirationtimemills.value.toLong() * 1000L,
+        createdAt = contractProposal.creationtimemills.value.toLong() * 1000L,
+        deployTransactionHash = null,
+        // TODO update contract with self vote
+        selfVote = null,
+        selfVoteTransactionHash = null,
+    )
+
+    private fun waitUntilContactStateReady(): Flow<Unit> {
+        return flow {
+            if (ksPrefs.pull(PrefKeys.CONTRACT_MAX_PROPOSALS, 0) != 0) {
+                emit(Unit)
+                return@flow
+            } else {
+                while (coroutineContext.isActive) {
+                    delay(PREFS_POLLING_DELAY)
+                    val maxProposals = ksPrefs.pull(PrefKeys.CONTRACT_MAX_PROPOSALS, 0)
+                    if (maxProposals > 0) {
+                        emit(Unit)
+                        break
+                    }
+                }
+            }
+        }
+    }
+
     companion object {
-        private const val TAG = "CONTRACT_TAG"
+        private val TAG = this::class.java.simpleName
+        private const val PREFS_POLLING_DELAY = 300L
     }
 }

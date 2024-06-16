@@ -35,7 +35,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -81,8 +80,12 @@ fun WalletScreen(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
+    LaunchedEffect(Unit) {
+        viewModel.onWalletIntent(WalletScreenIntent.EnterScreen)
+    }
+
     OnResumeEffect {
-        viewModel.onWalletIntent(WalletScreenIntent.LoadData)
+        viewModel.onWalletIntent(WalletScreenIntent.ResumeScreen)
     }
 
     WalletScreen_Ui(
@@ -110,7 +113,7 @@ private fun WalletScreen_Ui(
         state.error != null -> ErrorFullScreen(
             error = state.error,
             onRetry = {
-                onIntent(WalletScreenIntent.LoadData)
+                onIntent(WalletScreenIntent.ResumeScreen)
             }
         )
 

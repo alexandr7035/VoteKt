@@ -115,7 +115,8 @@ val appModule = module {
             getSelfAccountUseCase = get(),
             observeBalanceUseCase = get(),
             refreshBalanceUseCase = get(),
-            contractStateUseCase = get(),
+            observeContractStateUseCase = get(),
+            syncWithContractUseCase = get(),
             logoutUseCase = get(),
         )
     }

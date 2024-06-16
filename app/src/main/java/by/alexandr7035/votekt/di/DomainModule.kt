@@ -21,7 +21,7 @@ import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractConfigurationUseCase
-import by.alexandr7035.votekt.domain.usecase.contract.GetContractStateUseCase
+import by.alexandr7035.votekt.domain.usecase.contract.ObserveContractStateUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.SyncWithContractUseCase
 import by.alexandr7035.votekt.domain.usecase.debug.GetTestMnemonicUseCase
 import by.alexandr7035.votekt.domain.usecase.demo.GetDemoProposalUseCase
@@ -73,7 +73,7 @@ val domainModule = module {
     single { CreateDraftProposalUseCase(get()) }
     single { DeleteDraftProposalUseCase(get()) }
     single { DeployDraftProposalUseCase(get()) }
-    single { GetContractStateUseCase(get()) }
+    single { ObserveContractStateUseCase(get()) }
     single { GetContractConfigurationUseCase(get()) }
     single { VoteOnProposalUseCase(get()) }
     single { ObserveProposalsUseCase(get()) }
