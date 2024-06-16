@@ -4,8 +4,8 @@ import android.util.Log
 import by.alexandr7035.ethereum.core.EthereumEventListener
 import by.alexandr7035.ethereum.model.events.EthereumEvent
 import by.alexandr7035.votekt.domain.core.OperationResult
-import by.alexandr7035.votekt.domain.repository.WebsocketManager
 import by.alexandr7035.votekt.domain.repository.VotingContractRepository
+import by.alexandr7035.votekt.domain.repository.WebsocketManager
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

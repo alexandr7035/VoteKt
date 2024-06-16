@@ -11,14 +11,14 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.BuildConfig
 import by.alexandr7035.votekt.data.cache.PrefKeys
 import by.alexandr7035.votekt.data.cache.ProposalsDao
-import by.alexandr7035.votekt.domain.repository.AccountRepository
 import by.alexandr7035.votekt.domain.model.transactions.PrepareTransactionData
 import by.alexandr7035.votekt.domain.model.transactions.ReviewTransactionData
-import by.alexandr7035.votekt.domain.repository.SendTransactionRepository
 import by.alexandr7035.votekt.domain.model.transactions.TransactionEstimationError
 import by.alexandr7035.votekt.domain.model.transactions.TransactionHash
-import by.alexandr7035.votekt.domain.repository.TransactionRepository
 import by.alexandr7035.votekt.domain.model.transactions.TransactionType
+import by.alexandr7035.votekt.domain.repository.AccountRepository
+import by.alexandr7035.votekt.domain.repository.SendTransactionRepository
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
 import com.cioccarellia.ksprefs.KsPrefs
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

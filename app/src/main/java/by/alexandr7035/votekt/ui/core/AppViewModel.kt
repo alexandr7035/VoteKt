@@ -8,10 +8,10 @@ import by.alexandr7035.ethereum.model.events.EthEventsSubscriptionState
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.model.explorer.ExploreType
-import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockUseCase
-import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.domain.model.transactions.ReviewTransactionData
 import by.alexandr7035.votekt.domain.usecase.account.CheckAccountCreatedUseCase
+import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockUseCase
+import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.domain.usecase.explorer.GetBlockchainExplorerUrlUseCase
 import by.alexandr7035.votekt.domain.usecase.node.ConnectToNodeUseCase
 import by.alexandr7035.votekt.domain.usecase.transactions.ConfirmOutgoingTransactionUseCase

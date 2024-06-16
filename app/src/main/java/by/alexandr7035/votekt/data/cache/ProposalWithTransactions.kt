@@ -3,8 +3,8 @@ package by.alexandr7035.votekt.data.cache
 import androidx.room.Embedded
 import androidx.room.Relation
 import by.alexandr7035.votekt.domain.core.BlockchainActionStatus
-import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 import by.alexandr7035.votekt.domain.model.proposal.VoteType
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 
 data class ProposalWithTransactions(
     @Embedded val proposal: ProposalEntity,

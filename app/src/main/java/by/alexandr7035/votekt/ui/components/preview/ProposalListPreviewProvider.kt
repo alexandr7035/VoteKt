@@ -3,12 +3,12 @@ package by.alexandr7035.votekt.ui.components.preview
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.domain.core.BlockchainActionStatus
-import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
-import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
-import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import by.alexandr7035.votekt.domain.model.proposal.Proposal
 import by.alexandr7035.votekt.domain.model.proposal.VoteType
 import by.alexandr7035.votekt.domain.model.proposal.VotingData
+import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
+import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
+import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import org.kethereum.model.Address
 import java.math.BigInteger
 import kotlin.time.Duration.Companion.days

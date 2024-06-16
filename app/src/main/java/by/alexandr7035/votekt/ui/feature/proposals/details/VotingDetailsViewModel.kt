@@ -5,12 +5,12 @@ import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.core.Uuid
+import by.alexandr7035.votekt.domain.model.proposal.VoteType
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractConfigurationUseCase
 import by.alexandr7035.votekt.domain.usecase.proposal.DeleteDraftProposalUseCase
+import by.alexandr7035.votekt.domain.usecase.proposal.DeployDraftProposalUseCase
 import by.alexandr7035.votekt.domain.usecase.proposal.ObserveProposalUseCase
 import by.alexandr7035.votekt.domain.usecase.proposal.VoteOnProposalUseCase
-import by.alexandr7035.votekt.domain.model.proposal.VoteType
-import by.alexandr7035.votekt.domain.usecase.proposal.DeployDraftProposalUseCase
 import by.alexandr7035.votekt.ui.uiError
 import de.palm.composestateevents.consumed
 import de.palm.composestateevents.triggered

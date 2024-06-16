@@ -3,9 +3,9 @@ package by.alexandr7035.votekt.ui.feature.account.create
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
+import by.alexandr7035.votekt.domain.model.account.MnemonicWord
 import by.alexandr7035.votekt.domain.usecase.account.AddAccountUseCase
 import by.alexandr7035.votekt.domain.usecase.account.ConfirmNewAccountUseCase
 import by.alexandr7035.votekt.domain.usecase.account.GetAccountConfirmationData

@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.domain.core.OperationResult
-import by.alexandr7035.votekt.domain.usecase.applock.CheckIfBiometricsAvailableUseCase
-import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.domain.model.security.BiometricsAvailability
 import by.alexandr7035.votekt.domain.model.security.PinCode
+import by.alexandr7035.votekt.domain.usecase.applock.CheckIfBiometricsAvailableUseCase
+import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.ui.core.resources.UiText
 import by.alexandr7035.votekt.ui.feature.applock.core.BiometricAuthResult
 import by.alexandr7035.votekt.ui.feature.applock.core.BiometricsPromptUi
