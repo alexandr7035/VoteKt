@@ -49,7 +49,7 @@ val domainModule = module {
     single { CheckAccountCreatedUseCase(get()) }
     single { GetSelfAccountUseCase(get()) }
     single { VerifyMnemonicPhraseUseCase(get()) }
-    single { LogoutUseCase(get(), get(), get(), get()) }
+    single { LogoutUseCase(get(), get(), get()) }
 
     single { ObserveBalanceUseCase(get()) }
     single { RefreshBalanceUseCase(get()) }

@@ -57,7 +57,11 @@ class AccountRepositoryImpl(
     }
 
     override suspend fun clearAccount() {
-        ksPrefs.clear()
+        try {
+            ksPrefs.clear()
+        } catch (e: Exception) {
+            println("NPE ${e.message}")
+        }
     }
 
     override suspend fun getSelfAddress(): Address {
