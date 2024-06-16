@@ -7,9 +7,9 @@ contract VotingContract is Ownable {
     uint256 public constant MAX_PROPOSAL_DESCRIPTION_LENGTH = 500;
     uint256 public constant NIN_PROPOSAL_DURATION = 1 hours;
     uint256 public constant MAX_PROPOSAL_DURATION = 365 days;
-    uint public constant MAX_PROPOSAL_COUNT = 50;
+    uint public constant MAX_PROPOSAL_COUNT = 1000;
 
-    uint256 public CREATE_PROPOSAL_FEE = 0.025 ether;
+    uint256 public CREATE_PROPOSAL_FEE = 0.0025 ether;
 
     struct ProposalRaw {
         uint number;
@@ -119,4 +119,15 @@ contract VotingContract is Ownable {
     {
         return proposals[proposalNumber];
     }
+
+    function withdrawFunds() public onlyOwner {
+        address payable to = payable(msg.sender);
+        to.transfer(address(this).balance);
+    }
+
+    function setProposalFee(uint256 newFee) public onlyOwner {
+        require(newFee > 0, "Proposal fee must be greater than zero");
+        CREATE_PROPOSAL_FEE = newFee;
+    }
 }
+
