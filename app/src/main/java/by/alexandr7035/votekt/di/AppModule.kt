@@ -57,7 +57,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.androidx.workmanager.dsl.worker
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import kotlin.time.Duration.Companion.seconds
 
 val appModule = module {
     includes(netModule)
@@ -227,7 +226,6 @@ val appModule = module {
             dispatcher = Dispatchers.IO,
             ethereumClient = get(),
             cryptoHelper = get(),
-            balancePollingDelay = 20.seconds,
             ksPrefs = get()
         )
     }
