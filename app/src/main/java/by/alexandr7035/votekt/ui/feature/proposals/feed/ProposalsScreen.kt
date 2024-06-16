@@ -75,7 +75,7 @@ fun ProposalsScreen(
     ) { pv ->
 
         when {
-            state.isLoading -> {
+            state.isLoading && state.proposals.isEmpty() -> {
                 FullscreenProgressBar(backgroundColor = Color.Transparent)
             }
 
