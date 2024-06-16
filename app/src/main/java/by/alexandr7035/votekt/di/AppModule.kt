@@ -11,6 +11,7 @@ import by.alexandr7035.votekt.data.cache.TransactionsDatabase
 import by.alexandr7035.votekt.data.repository.AccountRepositoryImpl
 import by.alexandr7035.votekt.data.repository.AppLockRepositoryImpl
 import by.alexandr7035.votekt.data.repository.BlockchainExplorerRepositoryImpl
+import by.alexandr7035.votekt.data.repository.DemoModeRepositoryImpl
 import by.alexandr7035.votekt.data.repository.MnemonicRepositoryImpl
 import by.alexandr7035.votekt.data.repository.SendTransactionRepositoryImpl
 import by.alexandr7035.votekt.data.repository.TransactionRepositoryImpl
@@ -20,17 +21,17 @@ import by.alexandr7035.votekt.data.security.BiometricsManagerImpl
 import by.alexandr7035.votekt.data.websockets.WebsocketActivityCallbacks
 import by.alexandr7035.votekt.data.websockets.WebsocketManagerImpl
 import by.alexandr7035.votekt.data.workers.AwaitTransactionWorker
+import by.alexandr7035.votekt.data.workers.RefreshSelfBalanceWorker
 import by.alexandr7035.votekt.data.workers.SyncProposalsWorker
 import by.alexandr7035.votekt.domain.repository.AccountRepository
-import by.alexandr7035.votekt.domain.repository.MnemonicRepository
+import by.alexandr7035.votekt.domain.repository.AppLockRepository
 import by.alexandr7035.votekt.domain.repository.BlockchainExplorerRepository
 import by.alexandr7035.votekt.domain.repository.DemoModeRepository
-import by.alexandr7035.votekt.data.repository.DemoModeRepositoryImpl
-import by.alexandr7035.votekt.domain.repository.WebsocketManager
-import by.alexandr7035.votekt.domain.repository.AppLockRepository
+import by.alexandr7035.votekt.domain.repository.MnemonicRepository
 import by.alexandr7035.votekt.domain.repository.SendTransactionRepository
 import by.alexandr7035.votekt.domain.repository.TransactionRepository
 import by.alexandr7035.votekt.domain.repository.VotingContractRepository
+import by.alexandr7035.votekt.domain.repository.WebsocketManager
 import by.alexandr7035.votekt.ui.core.AppViewModel
 import by.alexandr7035.votekt.ui.feature.account.create.ConfirmPhraseViewModel
 import by.alexandr7035.votekt.ui.feature.account.create.GeneratePhraseViewModel
@@ -102,17 +103,22 @@ val appModule = module {
         )
     }
     viewModel { ProposalsViewModel(get(), get()) }
-    viewModel { TransactionsViewModel(
-        observeTransactionsUseCase = get(),
-        clearTransactionsUseCase = get(),
-    ) }
+    viewModel {
+        TransactionsViewModel(
+            observeTransactionsUseCase = get(),
+            clearTransactionsUseCase = get(),
+        )
+    }
     viewModel { CreateProposalViewModel(get(), get(), get(), get()) }
-    viewModel { WalletViewModel(
-        getSelfAccountUseCase = get(),
-        observeBalanceUseCase = get(),
-        contractStateUseCase = get(),
-        logoutUseCase = get(),
-    ) }
+    viewModel {
+        WalletViewModel(
+            getSelfAccountUseCase = get(),
+            observeBalanceUseCase = get(),
+            refreshBalanceUseCase = get(),
+            contractStateUseCase = get(),
+            logoutUseCase = get(),
+        )
+    }
 
     viewModel {
         LockScreenViewModel(
@@ -200,6 +206,14 @@ val appModule = module {
             appContext = get(),
             params = get(),
             votingContractRepository = get(),
+        )
+    }
+
+    worker {
+        RefreshSelfBalanceWorker(
+            appContext = get(),
+            params = get(),
+            accountRepository = get(),
         )
     }
 

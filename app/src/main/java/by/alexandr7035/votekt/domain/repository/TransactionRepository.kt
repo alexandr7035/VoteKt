@@ -5,14 +5,11 @@ import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
 import by.alexandr7035.votekt.domain.model.transactions.TransactionHash
-import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import kotlinx.coroutines.flow.Flow
 
 interface TransactionRepository {
     fun observeTransactions(): Flow<List<TransactionDomain>>
-
-    suspend fun getTransactionStatus(transactionHash: TransactionHash): TransactionStatus?
 
     suspend fun addNewTransaction(
         transactionHash: TransactionHash,

@@ -110,4 +110,6 @@
     <string name="welcome_desc_2">Experience transparent and tamper-proof voting, ensuring every decision counts</string>
     <string name="welcome_desc_3">Share your ideas and collaborate with others to drive meaningful change in your community</string>
     <string name="confirm_phrase">Confirm phrase</string>
+    <string name="empty_balance_placeholder">...</string>
+    <string name="cd_refresh_balance">Refresh balance</string>
 </resources>

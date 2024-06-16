@@ -2,6 +2,11 @@ package by.alexandr7035.votekt.ui.feature.wallet
 
 import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -26,16 +31,18 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -51,12 +58,14 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
+import by.alexandr7035.votekt.ui.components.preview.ScreenPreview
+import by.alexandr7035.votekt.ui.core.effects.OnResumeEffect
 import by.alexandr7035.votekt.ui.feature.contract.ContractCard
+import by.alexandr7035.votekt.ui.feature.wallet.model.SelfBalanceState
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenIntent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenState
 import by.alexandr7035.votekt.ui.theme.Dimensions
-import by.alexandr7035.votekt.ui.theme.VoteKtTheme
 import by.alexandr7035.votekt.ui.theme.WhiteAlpha25
 import by.alexandr7035.votekt.ui.utils.copyToClipboard
 import by.alexandr7035.votekt.ui.utils.prettify
@@ -72,7 +81,7 @@ fun WalletScreen(
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle().value
 
-    LaunchedEffect(Unit) {
+    OnResumeEffect {
         viewModel.onWalletIntent(WalletScreenIntent.LoadData)
     }
 
@@ -135,8 +144,7 @@ private fun WalletScreen_Ui(
                     visible = state.isHeaderVisible,
                 ) {
                     Header(
-                        balance = state.balanceFormatted,
-                        isBalanceLoading = state.isBalanceLoading,
+                        balance = state.balanceState,
                         onIntent = onIntent,
                     )
                 }
@@ -173,8 +181,7 @@ private fun WalletScreen_Ui(
 
 @Composable
 private fun Header(
-    balance: String?,
-    isBalanceLoading: Boolean,
+    balance: SelfBalanceState,
     onIntent: (WalletScreenIntent) -> Unit
 ) {
     Column(
@@ -192,8 +199,10 @@ private fun Header(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Balance(
-            balance = balance,
-            isBalanceLoading = isBalanceLoading
+            balanceState = balance,
+            onRefreshClick = {
+                onIntent(WalletScreenIntent.RefreshBalance)
+            }
         )
         Actions(
             onWalletAction = onIntent
@@ -271,34 +280,56 @@ private fun WalletAddressComponent(address: Address) {
 
 @Composable
 private fun Balance(
-    balance: String?,
-    isBalanceLoading: Boolean,
+    balanceState: SelfBalanceState,
+    onRefreshClick: () -> Unit,
 ) {
-    when {
-        isBalanceLoading -> {
-            // TODO loading
-            Text(
-                style = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                text = "..."
-            )
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(4.dp),
+    ) {
+        val rotation = remember { Animatable(0f) }
+
+        LaunchedEffect(balanceState.isBalanceLoading) {
+            if (balanceState.isBalanceLoading) {
+                rotation.animateTo(
+                    targetValue = 360f,
+                    animationSpec = infiniteRepeatable(
+                        animation = tween(
+                            durationMillis = 500,
+                            easing = FastOutLinearInEasing
+                        ),
+                        repeatMode = RepeatMode.Restart
+                    )
+                )
+            } else {
+                rotation.stop()
+                rotation.snapTo(0f)
+            }
         }
 
-        balance != null -> {
-            Text(
-                style = TextStyle(
-                    color = MaterialTheme.colorScheme.onPrimary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold
+        Text(
+            style = TextStyle(
+                color = MaterialTheme.colorScheme.onPrimary,
+                fontSize = 32.sp,
+                fontWeight = FontWeight.Bold
+            ),
+            text = balanceState.balanceFormatted ?: stringResource(R.string.empty_balance_placeholder)
+        )
+
+        IconButton(
+            modifier = Modifier.rotate(rotation.value),
+            onClick = onRefreshClick,
+            enabled = balanceState.isBalanceLoading.not(),
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(id = R.drawable.ic_refresh),
+                contentDescription = stringResource(R.string.cd_refresh_balance),
+                tint = Color.White.copy(
+                    alpha = if (balanceState.isBalanceLoading) 0.75f else 1f
                 ),
-                text = balance
             )
         }
-
-        else -> error("Balance is null")
     }
 }
 
@@ -359,11 +390,14 @@ private fun ActionBtn(
 @Preview
 @Composable
 private fun WalletScreen_Preview() {
-    VoteKtTheme {
-        Surface(color = MaterialTheme.colorScheme.background) {
-            WalletScreen_Ui(
-                state = WalletScreenState(),
-            )
-        }
+    ScreenPreview {
+        WalletScreen_Ui(
+            state = WalletScreenState(
+                balanceState = SelfBalanceState(
+                    isBalanceLoading = false,
+                    balanceFormatted = "0.25 ETH"
+                )
+            ),
+        )
     }
 }

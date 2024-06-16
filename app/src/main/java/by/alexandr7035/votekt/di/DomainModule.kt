@@ -1,6 +1,15 @@
 package by.alexandr7035.votekt.di
 
-import by.alexandr7035.votekt.domain.usecase.contract.SyncWithContractUseCase
+import by.alexandr7035.votekt.domain.usecase.account.AddAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.CheckAccountCreatedUseCase
+import by.alexandr7035.votekt.domain.usecase.account.ConfirmNewAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.GenerateAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.GetAccountConfirmationData
+import by.alexandr7035.votekt.domain.usecase.account.GetSelfAccountUseCase
+import by.alexandr7035.votekt.domain.usecase.account.LogoutUseCase
+import by.alexandr7035.votekt.domain.usecase.account.ObserveBalanceUseCase
+import by.alexandr7035.votekt.domain.usecase.account.RefreshBalanceUseCase
+import by.alexandr7035.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.AuthenticateWithPinUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockedWithBiometricsUseCase
@@ -10,18 +19,10 @@ import by.alexandr7035.votekt.domain.usecase.applock.GetBiometricDecryptionCiphe
 import by.alexandr7035.votekt.domain.usecase.applock.GetBiometricEncryptedPinUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.SetupAppLockedWithBiometricsUseCase
-import by.alexandr7035.votekt.domain.usecase.account.AddAccountUseCase
-import by.alexandr7035.votekt.domain.usecase.account.CheckAccountCreatedUseCase
-import by.alexandr7035.votekt.domain.usecase.account.ConfirmNewAccountUseCase
-import by.alexandr7035.votekt.domain.usecase.account.GenerateAccountUseCase
-import by.alexandr7035.votekt.domain.usecase.account.GetAccountConfirmationData
-import by.alexandr7035.votekt.domain.usecase.account.GetSelfAccountUseCase
-import by.alexandr7035.votekt.domain.usecase.account.LogoutUseCase
-import by.alexandr7035.votekt.domain.usecase.account.ObserveBalanceUseCase
-import by.alexandr7035.votekt.domain.usecase.account.VerifyMnemonicPhraseUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.CreateDraftProposalUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractConfigurationUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractStateUseCase
+import by.alexandr7035.votekt.domain.usecase.contract.SyncWithContractUseCase
 import by.alexandr7035.votekt.domain.usecase.debug.GetTestMnemonicUseCase
 import by.alexandr7035.votekt.domain.usecase.demo.GetDemoProposalUseCase
 import by.alexandr7035.votekt.domain.usecase.demo.IsDemoModeEnabledUseCase
@@ -51,6 +52,7 @@ val domainModule = module {
     single { LogoutUseCase(get(), get(), get(), get()) }
 
     single { ObserveBalanceUseCase(get()) }
+    single { RefreshBalanceUseCase(get()) }
 
     single { SyncWithContractUseCase(get()) }
 

@@ -2,7 +2,9 @@ package by.alexandr7035.votekt.data.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.NetworkType
 import androidx.work.WorkerParameters
 import by.alexandr7035.votekt.domain.repository.VotingContractRepository
 
@@ -24,5 +26,10 @@ class SyncProposalsWorker(
     companion object {
         private val TAG = SyncProposalsWorker::class.simpleName
         const val BACKOFF_DELAY_SEC = 10L
+
+        val CONSTRAINTS = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(false)
+            .build()
     }
 }

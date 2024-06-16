@@ -2,7 +2,9 @@ package by.alexandr7035.votekt.data.workers
 
 import android.content.Context
 import android.util.Log
+import androidx.work.Constraints
 import androidx.work.CoroutineWorker
+import androidx.work.NetworkType
 import androidx.work.WorkerParameters
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.errors.TransactionReceiptNotFound
@@ -39,5 +41,10 @@ class AwaitTransactionWorker(
         const val TRANSACTION_HASH = "transactionHash"
         const val INITIAL_DELAY = 5L
         const val BACKOFF_DELAY_SEC = 10L
+
+        val CONSTRAINTS = Constraints.Builder()
+            .setRequiredNetworkType(NetworkType.CONNECTED)
+            .setRequiresBatteryNotLow(false)
+            .build()
     }
 }

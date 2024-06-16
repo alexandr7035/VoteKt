@@ -1,9 +1,7 @@
 package by.alexandr7035.votekt.data.repository
 
 import androidx.work.BackoffPolicy
-import androidx.work.Constraints
 import androidx.work.Data
-import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import by.alexandr7035.ethereum.model.EthTransactionReceipt
@@ -12,16 +10,14 @@ import by.alexandr7035.ethereum.model.transactionFee
 import by.alexandr7035.votekt.data.cache.TransactionDao
 import by.alexandr7035.votekt.data.cache.TransactionEntity
 import by.alexandr7035.votekt.data.workers.AwaitTransactionWorker
+import by.alexandr7035.votekt.data.workers.RefreshSelfBalanceWorker
 import by.alexandr7035.votekt.data.workers.SyncProposalsWorker
-import by.alexandr7035.votekt.domain.core.AppError
-import by.alexandr7035.votekt.domain.core.ErrorType
-import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.model.transactions.TransactionDomain
 import by.alexandr7035.votekt.domain.model.transactions.TransactionHash
-import by.alexandr7035.votekt.domain.repository.TransactionRepository
 import by.alexandr7035.votekt.domain.model.transactions.TransactionStatus
 import by.alexandr7035.votekt.domain.model.transactions.TransactionType
 import by.alexandr7035.votekt.domain.model.transactions.isContractInteraction
+import by.alexandr7035.votekt.domain.repository.TransactionRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
@@ -37,11 +33,6 @@ class TransactionRepositoryImpl(
         return transactionDao.getTransactions().map { list ->
             list.map { it.mapToData() }
         }.flowOn(dispatcher)
-    }
-
-    override suspend fun getTransactionStatus(transactionHash: TransactionHash): TransactionStatus? {
-        // TODO
-        return null
     }
 
     override suspend fun addNewTransaction(
@@ -62,12 +53,7 @@ class TransactionRepositoryImpl(
         )
 
         val checkForReceiptWork = OneTimeWorkRequestBuilder<AwaitTransactionWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresBatteryNotLow(false)
-                    .build()
-            )
+            .setConstraints(AwaitTransactionWorker.CONSTRAINTS)
             .setInitialDelay(
                 duration = AwaitTransactionWorker.INITIAL_DELAY,
                 timeUnit = TimeUnit.SECONDS
@@ -85,12 +71,7 @@ class TransactionRepositoryImpl(
             .build()
 
         val postTransactionWork = OneTimeWorkRequestBuilder<SyncProposalsWorker>()
-            .setConstraints(
-                Constraints.Builder()
-                    .setRequiredNetworkType(NetworkType.CONNECTED)
-                    .setRequiresBatteryNotLow(false)
-                    .build()
-            )
+            .setConstraints(SyncProposalsWorker.CONSTRAINTS)
             .setBackoffCriteria(
                 backoffPolicy = BackoffPolicy.LINEAR,
                 backoffDelay = SyncProposalsWorker.BACKOFF_DELAY_SEC,
@@ -98,14 +79,21 @@ class TransactionRepositoryImpl(
             )
             .build()
 
+        val refreshSelfBalanceWork = OneTimeWorkRequestBuilder<RefreshSelfBalanceWorker>()
+            .setConstraints(RefreshSelfBalanceWorker.CONSTRAINTS)
+            .build()
+
         if (transactionType.isContractInteraction()) {
             workManager
                 .beginWith(checkForReceiptWork)
                 .then(postTransactionWork)
+                .then(refreshSelfBalanceWork)
                 .enqueue()
         } else {
             workManager
-                .enqueue(checkForReceiptWork)
+                .beginWith(checkForReceiptWork)
+                .then(refreshSelfBalanceWork)
+                .enqueue()
         }
     }
 

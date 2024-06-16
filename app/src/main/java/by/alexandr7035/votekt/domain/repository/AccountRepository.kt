@@ -12,5 +12,7 @@ interface AccountRepository {
 
     fun observeAccountBalance(): Flow<Wei>
 
+    suspend fun refreshBalance()
+
     suspend fun clearAccount()
 }

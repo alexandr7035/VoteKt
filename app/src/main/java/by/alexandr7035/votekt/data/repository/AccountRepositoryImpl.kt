@@ -5,8 +5,8 @@ import by.alexandr7035.crypto.CryptoHelper
 import by.alexandr7035.ethereum.core.EthereumClient
 import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.data.cache.PrefKeys
-import by.alexandr7035.votekt.domain.repository.AccountRepository
 import by.alexandr7035.votekt.domain.model.account.MnemonicWord
+import by.alexandr7035.votekt.domain.repository.AccountRepository
 import cash.z.ecc.android.bip39.Mnemonics
 import com.cioccarellia.ksprefs.KsPrefs
 import kotlinx.coroutines.CoroutineDispatcher
@@ -32,20 +32,29 @@ class AccountRepositoryImpl(
     }
 
     override fun observeAccountBalance(): Flow<Wei> = flow {
+        while (coroutineContext.isActive) {
+            val recentBalance = ksPrefs.pull(PrefKeys.RECENT_BALANCE, "")
+            if (recentBalance.isNotBlank()) {
+                emit(Wei(recentBalance))
+            }
+            delay(balancePollingDelay)
+        }
+
         val recentBalance = ksPrefs.pull(PrefKeys.RECENT_BALANCE, "")
         if (recentBalance.isNotBlank()) {
             emit(Wei(recentBalance))
         }
-
-        while (coroutineContext.isActive) {
-            val updatedBalance = ethereumClient.getBalance(
-                address = Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY))
-            )
-            ksPrefs.push(PrefKeys.RECENT_BALANCE, updatedBalance.value.toString())
-            emit(updatedBalance)
-            delay(balancePollingDelay)
-        }
     }.flowOn(dispatcher)
+
+    override suspend fun refreshBalance() {
+        val updatedBalance = ethereumClient.getBalance(
+            address = Address(ksPrefs.pull(PrefKeys.ACCOUNT_ADDRESS_KEY))
+        )
+
+        println("refreshed balance $updatedBalance")
+
+        ksPrefs.push(PrefKeys.RECENT_BALANCE, updatedBalance.value.toString())
+    }
 
     override suspend fun clearAccount() {
         ksPrefs.clear()

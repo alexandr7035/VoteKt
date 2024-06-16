@@ -19,4 +19,5 @@ sealed class WalletScreenIntent {
     ) : WalletScreenIntent()
 
     object LogOut : WalletScreenIntent()
+    object RefreshBalance : WalletScreenIntent()
 }

@@ -2,12 +2,12 @@ package by.alexandr7035.votekt.ui.feature.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import by.alexandr7035.ethereum.model.Wei
 import by.alexandr7035.votekt.domain.core.ErrorType
 import by.alexandr7035.votekt.domain.core.OperationResult
 import by.alexandr7035.votekt.domain.usecase.account.GetSelfAccountUseCase
 import by.alexandr7035.votekt.domain.usecase.account.LogoutUseCase
 import by.alexandr7035.votekt.domain.usecase.account.ObserveBalanceUseCase
+import by.alexandr7035.votekt.domain.usecase.account.RefreshBalanceUseCase
 import by.alexandr7035.votekt.domain.usecase.contract.GetContractStateUseCase
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenIntent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 
 class WalletViewModel(
     private val getSelfAccountUseCase: GetSelfAccountUseCase,
+    private val refreshBalanceUseCase: RefreshBalanceUseCase,
     private val observeBalanceUseCase: ObserveBalanceUseCase,
     private val contractStateUseCase: GetContractStateUseCase,
     private val logoutUseCase: LogoutUseCase,
@@ -35,21 +36,22 @@ class WalletViewModel(
 
     fun onWalletIntent(intent: WalletScreenIntent) {
         when (intent) {
-            is WalletScreenIntent.LoadData -> reduceLoadData()
-            is WalletScreenIntent.WalletAction -> reduceWalletAction(intent)
-            is WalletScreenIntent.LogOut -> reduceLogOut()
-            is WalletScreenIntent.ChangeHeaderVisibility -> reduceHeaderVisibility(intent.isVisible)
-            is WalletScreenIntent.ExplorerUrlClick -> reduceExplorerClick(intent)
+            is WalletScreenIntent.LoadData -> onLoadData()
+            is WalletScreenIntent.WalletAction -> onWalletAction(intent)
+            is WalletScreenIntent.LogOut -> onLogOutClick()
+            is WalletScreenIntent.ChangeHeaderVisibility -> onChangeHeaderVisibillity(intent.isVisible)
+            is WalletScreenIntent.ExplorerUrlClick -> onOpenExplorerClick(intent)
+            is WalletScreenIntent.RefreshBalance -> refreshBalance()
         }
     }
 
-    private fun reduceHeaderVisibility(isVisible: Boolean) {
+    private fun onChangeHeaderVisibillity(isVisible: Boolean) {
         _state.update {
             it.copy(isHeaderVisible = isVisible)
         }
     }
 
-    private fun reduceLogOut() {
+    private fun onLogOutClick() {
         viewModelScope.launch {
             val logoutRes = OperationResult.runWrapped {
                 logoutUseCase.invoke()
@@ -70,22 +72,25 @@ class WalletViewModel(
         }
     }
 
-    // Consider using offline-first approach
-    // Without full-screen errors
-    private fun reduceLoadData() {
-        viewModelScope.launch {
-            val address = getSelfAccountUseCase.invoke()
-            _state.update {
-                it.copy(address = address)
-            }
-        }
+    private fun onLoadData() {
+        loadSelfAccount()
+        refreshBalance()
 
         observeBalanceUseCase.invoke()
             .catch { error ->
                 reduceError(ErrorType.fromThrowable(error))
             }
-            .onEach {
-                reduceBalance(it)
+            .onEach { balance ->
+                _state.update {
+                    it.copy(
+                        balanceState = it.balanceState.copy(
+                            balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
+                                balance.toEther(),
+                                "ETH"
+                            ),
+                        ),
+                    )
+                }
             }
             .launchIn(viewModelScope)
 
@@ -101,7 +106,66 @@ class WalletViewModel(
             .launchIn(viewModelScope)
     }
 
-    private fun reduceWalletAction(action: WalletScreenIntent.WalletAction) {
+    private fun refreshBalance() {
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    balanceState = it.balanceState.copy(
+                        isBalanceLoading = true
+                    )
+                )
+            }
+
+            val res = OperationResult.runWrapped {
+                refreshBalanceUseCase.invoke()
+            }
+
+            when (res) {
+                is OperationResult.Failure -> {
+                    _state.update {
+                        it.copy(
+                            balanceState = it.balanceState.copy(
+                                isBalanceLoading = false,
+                                isBalanceError = true,
+                            )
+                        )
+                    }
+                }
+                is OperationResult.Success -> {
+                    _state.update {
+                        it.copy(
+                            balanceState = it.balanceState.copy(
+                                isBalanceLoading = false
+                            )
+                        )
+                    }
+                }
+            }
+
+            println("refreshed balance ${_state.value.balanceState}")
+        }
+    }
+
+    private fun loadSelfAccount() {
+        viewModelScope.launch {
+            val res = OperationResult.runWrapped {
+                getSelfAccountUseCase.invoke()
+            }
+
+            when (res) {
+                is OperationResult.Failure -> {
+                    reduceError(res.error.errorType)
+                }
+                is OperationResult.Success -> {
+                    _state.update {
+                        it.copy(address = res.data)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun onWalletAction(action: WalletScreenIntent.WalletAction) {
         val navigationEvent = when (action) {
             WalletScreenIntent.WalletAction.Receive -> WalletScreenNavigationEvent.ToReceive
             WalletScreenIntent.WalletAction.Send -> WalletScreenNavigationEvent.ToSend
@@ -110,20 +174,7 @@ class WalletViewModel(
         _state.update { it.copy(navigationEvent = triggered(navigationEvent)) }
     }
 
-    private fun reduceBalance(balance: Wei) {
-        _state.update {
-            it.copy(
-                error = null,
-                isBalanceLoading = false,
-                balanceFormatted = BalanceFormatter.formatAmountWithSymbol(
-                    balance.toEther(),
-                    "ETH"
-                )
-            )
-        }
-    }
-
-    private fun reduceExplorerClick(intent: WalletScreenIntent.ExplorerUrlClick) {
+    private fun onOpenExplorerClick(intent: WalletScreenIntent.ExplorerUrlClick) {
         _state.update {
             it.copy(
                 navigationEvent = triggered(
