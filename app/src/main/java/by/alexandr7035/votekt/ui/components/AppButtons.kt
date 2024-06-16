@@ -71,7 +71,7 @@ fun SecondaryButton(
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = textColor ?: MaterialTheme.colorScheme.primary,
-            containerColor = buttonColor ?: MaterialTheme.colorScheme.background,
+            containerColor = buttonColor ?: Color.White,
         ),
         shape = RoundedCornerShape(Dimensions.buttonCorners),
         contentPadding = PaddingValues(
