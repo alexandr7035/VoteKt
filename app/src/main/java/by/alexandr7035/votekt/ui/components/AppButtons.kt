@@ -3,8 +3,10 @@ package by.alexandr7035.votekt.ui.components
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -89,6 +91,7 @@ fun SecondaryButton(
         enabled = enabled,
     ) {
         leadingIcon()
+        Spacer(Modifier.width(4.dp))
         Text(text = text)
     }
 }

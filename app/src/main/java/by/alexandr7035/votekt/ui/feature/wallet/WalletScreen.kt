@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import by.alexandr7035.votekt.R
+import by.alexandr7035.votekt.domain.model.explorer.ExploreType
 import by.alexandr7035.votekt.ui.components.ErrorFullScreen
 import by.alexandr7035.votekt.ui.components.preview.ScreenPreview
 import by.alexandr7035.votekt.ui.core.effects.OnResumeEffect
@@ -64,6 +65,7 @@ import by.alexandr7035.votekt.ui.feature.wallet.model.SelfBalanceState
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenIntent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenNavigationEvent
 import by.alexandr7035.votekt.ui.feature.wallet.model.WalletScreenState
+import by.alexandr7035.votekt.ui.feature.wallet.share.SelfWalletQrDialogScreen
 import by.alexandr7035.votekt.ui.theme.Dimensions
 import by.alexandr7035.votekt.ui.theme.WhiteAlpha25
 import by.alexandr7035.votekt.ui.utils.copyToClipboard
@@ -94,6 +96,21 @@ fun WalletScreen(
             viewModel.onWalletIntent(it)
         }
     )
+
+    if (state.isSelfWalletDialogShown) {
+        SelfWalletQrDialogScreen(
+            onDismiss = {
+                viewModel.onWalletIntent(WalletScreenIntent.HideMyQrDialog)
+            },
+            onAddressClick = {
+                state.address.let {
+                    viewModel.onWalletIntent(
+                        WalletScreenIntent.ExplorerUrlClick(it.hex, ExploreType.ADDRESS)
+                    )
+                }
+            }
+        )
+    }
 
     NavigationEventEffect(
         event = state.navigationEvent,
@@ -344,16 +361,8 @@ private fun Actions(
         modifier = Modifier.wrapContentSize(),
         horizontalArrangement = Arrangement.spacedBy(20.dp)
     ) {
-        ActionBtn(icon = R.drawable.ic_send) {
-            onWalletAction(WalletScreenIntent.WalletAction.Send)
-        }
-
         ActionBtn(icon = R.drawable.ic_receive) {
             onWalletAction(WalletScreenIntent.WalletAction.Receive)
-        }
-
-        ActionBtn(icon = R.drawable.ic_vote_outlined) {
-            onWalletAction(WalletScreenIntent.WalletAction.Vote)
         }
     }
 }

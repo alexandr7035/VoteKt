@@ -112,4 +112,8 @@
     <string name="confirm_phrase">Confirm phrase</string>
     <string name="empty_balance_placeholder">...</string>
     <string name="cd_refresh_balance">Refresh balance</string>
+    <string name="copy">Copy</string>
+    <string name="share">Share</string>
+    <string name="my_evm_address_template">This is my EVM address: %s</string>
+    <string name="share_address_via">Share address via</string>
 </resources>

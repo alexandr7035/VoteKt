@@ -19,6 +19,8 @@ sealed class WalletScreenIntent {
         val exploreType: ExploreType,
     ) : WalletScreenIntent()
 
+    object HideMyQrDialog : WalletScreenIntent()
+
     object LogOut : WalletScreenIntent()
     object RefreshBalance : WalletScreenIntent()
 }

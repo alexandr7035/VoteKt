@@ -1,9 +1,10 @@
 package by.alexandr7035.votekt.ui.utils
 
 @Suppress("MagicNumber")
-fun String.prettifyAddress(): String {
-    val prefixLength = 5
-    val suffixLength = 4
+fun String.prettifyAddress(
+    prefixLength: Int = 5,
+    suffixLength: Int = 4,
+): String {
     val ellipsis = "..."
     val length = this.length
 

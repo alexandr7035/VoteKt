@@ -45,6 +45,7 @@ import by.alexandr7035.votekt.ui.feature.proposals.details.VotingDetailsViewMode
 import by.alexandr7035.votekt.ui.feature.proposals.feed.ProposalsViewModel
 import by.alexandr7035.votekt.ui.feature.transactions.history.TransactionsViewModel
 import by.alexandr7035.votekt.ui.feature.wallet.WalletViewModel
+import by.alexandr7035.votekt.ui.feature.wallet.share.SelfWalletQrDialogViewModel
 import com.cioccarellia.ksprefs.KsPrefs
 import com.cioccarellia.ksprefs.config.EncryptionType
 import com.cioccarellia.ksprefs.config.model.AutoSavePolicy
@@ -118,6 +119,10 @@ val appModule = module {
             syncWithContractUseCase = get(),
             logoutUseCase = get(),
         )
+    }
+
+    viewModel {
+        SelfWalletQrDialogViewModel(getSelfAccountUseCase = get())
     }
 
     viewModel {

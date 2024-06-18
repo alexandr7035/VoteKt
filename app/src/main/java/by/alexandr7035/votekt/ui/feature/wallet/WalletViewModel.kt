@@ -45,6 +45,7 @@ class WalletViewModel(
             is WalletScreenIntent.ChangeHeaderVisibility -> onChangeHeaderVisibility(intent.isVisible)
             is WalletScreenIntent.ExplorerUrlClick -> onOpenExplorerClick(intent)
             is WalletScreenIntent.RefreshBalance -> refreshBalance()
+            is WalletScreenIntent.HideMyQrDialog -> onHideWalletDialog()
         }
     }
 
@@ -188,12 +189,15 @@ class WalletViewModel(
     }
 
     private fun onWalletAction(action: WalletScreenIntent.WalletAction) {
-        val navigationEvent = when (action) {
-            WalletScreenIntent.WalletAction.Receive -> WalletScreenNavigationEvent.ToReceive
-            WalletScreenIntent.WalletAction.Send -> WalletScreenNavigationEvent.ToSend
-            WalletScreenIntent.WalletAction.Vote -> WalletScreenNavigationEvent.ToVote
+        when (action) {
+            WalletScreenIntent.WalletAction.Receive -> {
+                _state.update {
+                    it.copy(isSelfWalletDialogShown = true)
+                }
+            }
+
+            else -> {}
         }
-        _state.update { it.copy(navigationEvent = triggered(navigationEvent)) }
     }
 
     private fun onOpenExplorerClick(intent: WalletScreenIntent.ExplorerUrlClick) {
@@ -215,6 +219,12 @@ class WalletViewModel(
             _state.update {
                 it.copy(error = errorType.uiError)
             }
+        }
+    }
+
+    private fun onHideWalletDialog() {
+        _state.update {
+            it.copy(isSelfWalletDialogShown = false)
         }
     }
 

@@ -13,6 +13,7 @@ data class WalletScreenState(
     val contractState: ContractState? = null,
     val navigationEvent: StateEventWithContent<WalletScreenNavigationEvent> = consumed(),
     val error: UiErrorMessage? = null,
+    val isSelfWalletDialogShown: Boolean = false,
 )
 
 data class SelfBalanceState(

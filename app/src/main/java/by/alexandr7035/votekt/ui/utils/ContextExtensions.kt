@@ -34,6 +34,13 @@ fun Context.copyToClipboard(
     )
 }
 
+fun Context.copyToClipboard(
+    @StringRes label: Int,
+    text: String,
+) {
+    copyToClipboard(this.getString(label), text)
+}
+
 fun Context.findActivity(): FragmentActivity? = when (this) {
     is FragmentActivity -> this
     is ContextWrapper -> baseContext.findActivity()
