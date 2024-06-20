@@ -57,6 +57,9 @@ android {
             buildConfigField("String", "TEST_MNEMONIC", LOCAL_TEST_MNEMONIC)
             buildConfigField("int", "CHAIN_ID", LOCAL_CHAIN_ID)
             buildConfigField("Boolean", "ENABLE_DEMO_NODE", ENABLE_DEMO_NODE)
+
+            applicationIdSuffix ".local"
+            resValue "string", "app_name", "VoteKt Local"
         }
     }
 
