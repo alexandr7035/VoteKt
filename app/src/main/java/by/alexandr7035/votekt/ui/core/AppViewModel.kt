@@ -14,6 +14,7 @@ import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockUseCase
 import by.alexandr7035.votekt.domain.usecase.applock.CheckAppLockedWithBiometricsUseCase
 import by.alexandr7035.votekt.domain.usecase.explorer.GetBlockchainExplorerUrlUseCase
 import by.alexandr7035.votekt.domain.usecase.node.ConnectToNodeUseCase
+import by.alexandr7035.votekt.domain.usecase.transactions.CancelOutgoingTransactionUseCase
 import by.alexandr7035.votekt.domain.usecase.transactions.ConfirmOutgoingTransactionUseCase
 import by.alexandr7035.votekt.domain.usecase.transactions.ObserveOutgoingTransactionUseCase
 import by.alexandr7035.votekt.ui.core.resources.UiText
@@ -38,7 +39,7 @@ class AppViewModel(
     private val checkAppLockedWithBiometricsUseCase: CheckAppLockedWithBiometricsUseCase,
     private val getBlockchainExplorerUrlUseCase: GetBlockchainExplorerUrlUseCase,
     private val observeOutgoingTransactionUseCase: ObserveOutgoingTransactionUseCase,
-    private val cancelCurrentTransactionUseCase: ObserveOutgoingTransactionUseCase,
+    private val cancelCurrentTransactionUseCase: CancelOutgoingTransactionUseCase,
     private val confirmOutgoingTransactionUseCase: ConfirmOutgoingTransactionUseCase,
 ) : ViewModel() {
     private val _appState: MutableStateFlow<AppState> = MutableStateFlow(
