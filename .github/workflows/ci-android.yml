@@ -9,8 +9,8 @@ on:
 
 env:
   PLUGIN_VERSION: 1.23.6
-  PLUGIN_NAME: detekt-formatting-${PLUGIN_VERSION}.jar
-  PLUGIN_URL: https://github.com/detekt/detekt/releases/download/v${PLUGIN_VERSION}/${PLUGIN_NAME}
+  PLUGIN_NAME: detekt-formatting-$PLUGIN_VERSION.jar
+  PLUGIN_URL: https://github.com/detekt/detekt/releases/download/v$PLUGIN_VERSION/$PLUGIN_NAME
 
 jobs:
   detekt:
@@ -21,9 +21,9 @@ jobs:
 
       - name: "Download detekt-formatting plugin"
         run: |
-          curl -sSL -o config/detekt/${PLUGIN_NAME} ${PLUGIN_URL}
+          curl -sSL -o config/detekt/$PLUGIN_NAME $PLUGIN_URL
 
       - name: "Run detekt"
         uses: natiginfo/action-detekt-all@1.23.6
         with:
-          args: --config config/detekt/detekt.yml -plugins config/detekt/${PLUGIN_NAME}
+          args: --config config/detekt/detekt.yml -plugins config/detekt/$PLUGIN_NAME
