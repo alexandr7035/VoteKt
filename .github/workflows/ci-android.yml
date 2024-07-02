@@ -21,4 +21,4 @@ jobs:
       - name: "Run detekt"
         uses: natiginfo/action-detekt-all@1.23.6
         with:
-          args: --config config/detekt/detekt.yml -plugins config/detekt/detekt-formatting-1.23.6.jar
+          args: --build-upon-default-config --config config/detekt/detekt.yml -plugins config/detekt/detekt-formatting-1.23.6.jar
