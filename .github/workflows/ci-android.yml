@@ -7,13 +7,22 @@ on:
    branches:
    - develop
 
+env:
+  PLUGIN_VERSION: 1.23.6
+  PLUGIN_NAME: detekt-formatting-${{ env.PLUGIN_VERSION }}.jar
+
 jobs:
- detekt:
-   runs-on: ubuntu-latest
-   steps:
-      - name: "checkout"
+  detekt:
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
         uses: actions/checkout@v2
-      - name: "detekt"
+
+      - name: "Download detekt-formatting plugin"
+        run: |
+          curl -sSL -o config/detekt/${{ env.PLUGIN_NAME }} https://github.com/detekt/detekt/releases/download/v${{ env.PLUGIN_VERSION }}/${{ env.PLUGIN_NAME }}
+
+      - name: "Run detekt"
         uses: natiginfo/action-detekt-all@1.23.6
         with:
-          args: --config config/detekt/detekt.yml
+          args: --config config/detekt/detekt.yml -plugins config/detekt/${{ env.PLUGIN_NAME }}
